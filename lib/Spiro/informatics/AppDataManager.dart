@@ -1,8 +1,6 @@
 
 import 'dart:typed_data';
 
-import 'package:helpline/Spiro/about/external/data/BatteryMapping.dart';
-import 'package:helpline/Spiro/about/external/data/VehicleMapping.dart';
 
 import '../about/internal/additionaldetails/FIleSaver.dart';
 import '../about/internal/file/ConnectFileStorage.dart';
@@ -35,15 +33,7 @@ class AppDataManager implements DataManager {
     return await connectFileStorage.fileExists(file);
   }
 
-  @override
-  sendBatteryItem(BatteryMapping batteryItem) async {
-    return await connectComms.sendBatteryItem(batteryItem);
-  }
 
-  @override
-  sendVehicleItem(VehicleMapping vehicleItem) async{
-    return await connectComms.sendVehicleItem(vehicleItem);
-  }
 
 
 }

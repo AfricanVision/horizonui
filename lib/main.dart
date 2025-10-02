@@ -74,7 +74,7 @@ class Spiro extends StatelessWidget {
           bottomSheetTheme: BottomSheetThemeData(
               dragHandleColor: colorPrimaryDark
           ),
-          dialogTheme: DialogTheme(
+          dialogTheme: DialogThemeData(
             backgroundColor: colorMilkWhite,
             elevation: 5,
             contentTextStyle: TextStyle(

@@ -1571,7 +1571,7 @@ dateTimePicker(String label,  String helpers, FormFieldValidator<DateTime> valid
                               (states) => states.contains(MaterialState.selected) ? colorPrimaryDark : colorPrimaryDark ),
                       entryModeIconColor: colorTinted,
                     ),
-                    dialogTheme: DialogTheme(
+                    dialogTheme: DialogThemeData(
                       backgroundColor: colorPrimaryDark,
                       elevation: 5,
                       contentTextStyle: TextStyle(

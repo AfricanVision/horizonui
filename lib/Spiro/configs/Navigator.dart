@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:page_transition/page_transition.dart';
 
 import '../about/internal/application/NavigatorType.dart';
-class spiroNavigation {
+class SpiroNavigation {
 
   void navigateToPage(NavigatorType type, dynamic path, BuildContext context) {
     _runSec(context, type, path);

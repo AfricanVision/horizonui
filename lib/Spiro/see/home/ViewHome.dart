@@ -1,7 +1,4 @@
 
-
-import 'package:helpline/Spiro/about/external/data/BatteryMapping.dart';
-
 import '../parent/ParentViewModel.dart';
 import 'ConnectHome.dart';
 

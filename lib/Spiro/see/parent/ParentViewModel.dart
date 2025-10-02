@@ -12,7 +12,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:permission_handler/permission_handler.dart';
-import '../../about/internal/application/spiroError.dart';
+import '../../about/internal/application/SpiroError.dart';
 import '../../about/internal/application/NavigatorType.dart';
 import '../../about/internal/application/NotificationType.dart';
 import '../../about/internal/application/Severity.dart';
@@ -410,29 +410,29 @@ class ParentViewModel extends ChangeNotifier{
       DioException dioError = error;
 
       if (error.type == DioExceptionType.connectionTimeout) {
-        showError(actions, closeAction, spiroError(code: 5000.01, message: "An error occurred while processing you request.",
+        showError(actions, closeAction, SpiroError(code: 5000.01, message: "An error occurred while processing you request.",
             helper: "Kindly ensure that you have a stable internet connection.",
             title: "Spiro Error",
             severity: Severity.message.name), buttonName);
       }else if (error.type == DioExceptionType.receiveTimeout) {
-        showError(actions, closeAction, spiroError(code: 5000.02, message: "An error occurred while processing you request.",
+        showError(actions, closeAction, SpiroError(code: 5000.02, message: "An error occurred while processing you request.",
             helper: "Kindly ensure that you have a stable internet connection.",
             title: "Spiro Error",
             severity: Severity.message.name), buttonName);
       }else if (dioError.response?.statusCode == 401) {
 
       }else if (dioError.response?.statusCode == 403) {
-        showError(actions, closeAction, spiroError(code: 5100.00, message: "An connection error occurred while processing your request. Usually a result of your network (Wifi) security blocking outgoing / incoming request",
+        showError(actions, closeAction, SpiroError(code: 5100.00, message: "An connection error occurred while processing your request. Usually a result of your network (Wifi) security blocking outgoing / incoming request",
             helper: "Try using your mobile data or switching to a different network outside your current organisational limit.",
             title: "Spiro Error",
             severity: Severity.message.name), buttonName);
       }else if(dioError.response?.statusCode == 413){
 
-        showError(actions, closeAction, getspiroError(dioError.response?.data), buttonName);
+        showError(actions, closeAction, getSpiroError(dioError.response?.data), buttonName);
 
       } else if(dioError.response?.statusCode == 500){
 
-        spiroError error = getspiroError(dioError.response?.data);
+        SpiroError error = getSpiroError(dioError.response?.data);
 
         if(error.code == 56098.001){
 
@@ -444,24 +444,24 @@ class ParentViewModel extends ChangeNotifier{
           showError(actions, closeAction, error, buttonName);
         }
       }else {
-       showError(actions, closeAction, spiroError(code: 5500.02, message: "An error occurred while processing you request.",
+       showError(actions, closeAction, SpiroError(code: 5500.02, message: "An error occurred while processing you request.",
         helper: "Kindly relaunch the application and try again and if problem persist kindly contact us.",
             title: "Spiro Error",
             severity: Severity.message.name), buttonName);
       }
 
     }else if(error is Exception){
-      showError(actions, closeAction, spiroError(code: 6000.01, message: "An error occurred while processing you request.",
+      showError(actions, closeAction, SpiroError(code: 6000.01, message: "An error occurred while processing you request.",
           helper: "Kindly relaunch the application and try again and if problem persist kindly contact us.",
           title: "Spiro Error",
           severity: Severity.message.name), buttonName);
     }else if(error is int){
-      showError(actions, closeAction, spiroError(code: 6000.02, message: "An error occurred while processing you request.",
+      showError(actions, closeAction, SpiroError(code: 6000.02, message: "An error occurred while processing you request.",
           helper: "Kindly relaunch the application/reinstall the application or retry below and if problem persist kindly contact us.",
           title: "Spiro Error",
           severity: Severity.message.name), buttonName);
     } else {
-      showError(actions, closeAction, spiroError(code: 8700.02, message: "An error occurred while processing you request.",
+      showError(actions, closeAction, SpiroError(code: 8700.02, message: "An error occurred while processing you request.",
           helper: "Kindly relaunch the application and try again and if problem persist kindly contact us.",
           title: "Spiro Error",
           severity: Severity.message.name), buttonName);
@@ -506,7 +506,7 @@ class ParentViewModel extends ChangeNotifier{
 
 
 
-  void showError(Function() actions, Function() closeActions, spiroError error, String buttonText) async {
+  void showError(Function() actions, Function() closeActions, SpiroError error, String buttonText) async {
 
     if (errorEntry == null) {
       _hideKeyboard();
@@ -682,14 +682,14 @@ class ParentViewModel extends ChangeNotifier{
     super.dispose();
   }
 
-  spiroError getspiroError(data) {
+  SpiroError getSpiroError(data) {
 
-    spiroError error;
+    SpiroError error;
     try{
-      error = spiroError.fromJson(data);
+      error = SpiroError.fromJson(data);
     }catch (e) {
 
-      error = spiroError(code: 900, message: "An error occurred while processing you request.",
+      error = SpiroError(code: 900, message: "An error occurred while processing you request.",
           helper: "Kindly ensure that your internet connection is working well.",
           title: "Spiro Error",
           severity: Severity.message.name);

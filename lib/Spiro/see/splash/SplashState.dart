@@ -76,7 +76,7 @@ class SplashState extends State<Splash> implements ConnectSplash {
   _initialize() {
     Timer(const
     Duration(seconds: 2),
-            () => spiroNavigation().navigateToPage(NavigatorType.openFully, const Home(), context));
+            () => SpiroNavigation().navigateToPage(NavigatorType.openFully, const Home(), context));
 
   }
 
