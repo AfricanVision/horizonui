@@ -2,10 +2,10 @@
 import 'dart:typed_data';
 
 
-import '../about/internal/additionaldetails/FIleSaver.dart';
-import '../about/internal/file/ConnectFileStorage.dart';
-import '../about/internal/memory/ConnectInternalMemory.dart';
-import '../comms/ConnectComms.dart';
+import '../data/internal/additionaldetails/FIleSaver.dart';
+import '../data/internal/file/ConnectFileStorage.dart';
+import '../data/internal/memory/ConnectInternalMemory.dart';
+import '../endpoints/ConnectComms.dart';
 import 'DataManager.dart';
 
 class AppDataManager implements DataManager {

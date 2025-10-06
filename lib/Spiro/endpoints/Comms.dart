@@ -2,7 +2,7 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import '../about/internal/memory/ConnectInternalMemory.dart';
+import '../data/internal/memory/ConnectInternalMemory.dart';
 import 'ConnectComms.dart';
 
 class Comms implements ConnectComms {

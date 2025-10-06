@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:stacked/stacked.dart';
-import '../../about/internal/application/NavigatorType.dart';
-import '../../about/internal/application/NotificationType.dart';
-import '../../about/internal/application/TextType.dart';
+import '../../data/internal/application/NavigatorType.dart';
+import '../../data/internal/application/NotificationType.dart';
+import '../../data/internal/application/TextType.dart';
 import '../../configs/Navigator.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
