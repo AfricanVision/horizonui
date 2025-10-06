@@ -1,5 +1,5 @@
 import 'package:flutter/cupertino.dart';
-import '../about/internal/application/TextType.dart';
+import '../data/internal/application/TextType.dart';
 import 'Component.dart';
 
 class Responsive extends StatelessWidget {

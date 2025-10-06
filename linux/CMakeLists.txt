@@ -36,7 +36,7 @@ endif()
 
 # Compilation settings that should be applied to most targets.
 #
-# Be cautious about adding new options here, as plugins use this function by
+# Be cautious data adding new options here, as plugins use this function by
 # default. In most cases, you should add new options to specific targets instead
 # of modifying this function.
 function(APPLY_STANDARD_SETTINGS TARGET)
@@ -54,7 +54,7 @@ add_subdirectory(${FLUTTER_MANAGED_DIR})
 find_package(PkgConfig REQUIRED)
 pkg_check_modules(GTK REQUIRED IMPORTED_TARGET gtk+-3.0)
 
-# Application build; see runner/CMakeLists.txt.
+# Application build; ui runner/CMakeLists.txt.
 add_subdirectory("runner")
 
 # Run the Flutter tool portions of the build. This must not be removed.

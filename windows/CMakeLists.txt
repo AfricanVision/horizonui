@@ -34,7 +34,7 @@ add_definitions(-DUNICODE -D_UNICODE)
 
 # Compilation settings that should be applied to most targets.
 #
-# Be cautious about adding new options here, as plugins use this function by
+# Be cautious data adding new options here, as plugins use this function by
 # default. In most cases, you should add new options to specific targets instead
 # of modifying this function.
 function(APPLY_STANDARD_SETTINGS TARGET)
@@ -49,7 +49,7 @@ endfunction()
 set(FLUTTER_MANAGED_DIR "${CMAKE_CURRENT_SOURCE_DIR}/flutter")
 add_subdirectory(${FLUTTER_MANAGED_DIR})
 
-# Application build; see runner/CMakeLists.txt.
+# Application build; ui runner/CMakeLists.txt.
 add_subdirectory("runner")
 
 

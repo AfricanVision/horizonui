@@ -1,7 +1,7 @@
 
-import '../about/internal/file/ConnectFileStorage.dart';
-import '../about/internal/memory/ConnectInternalMemory.dart';
-import '../comms/ConnectComms.dart';
+import '../data/internal/file/ConnectFileStorage.dart';
+import '../data/internal/memory/ConnectInternalMemory.dart';
+import '../endpoints/ConnectComms.dart';
 
 abstract class DataManager implements ConnectInternalMemory, ConnectComms, ConnectFileStorage {
 

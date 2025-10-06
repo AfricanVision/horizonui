@@ -11,7 +11,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:phone_input/phone_input_package.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
-import '../about/internal/application/TextType.dart';
+import '../data/internal/application/TextType.dart';
 import '../utils/Colors.dart';
 import '../utils/CommonUtils.dart';
 import '../utils/Images.dart';
