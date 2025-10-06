@@ -10,6 +10,8 @@ import '../../data/internal/application/NavigatorType.dart';
 import '../../data/internal/application/TextType.dart';
 import '../../configs/Navigator.dart';
 import '../../designs/Component.dart';
+import '../../designs/Responsive.dart';
+import '../../utils/Colors.dart';
 import 'ConnectHome.dart';
 import 'Home.dart';
 import 'ViewHome.dart';
@@ -27,39 +29,29 @@ class HomeState extends State<Home> implements ConnectHome{
           _model = viewModel,
           _initialiseView()
         },
-        builder: (context, viewModel, child) => WillPopScope(child: _mainBody(), onWillPop: () async {
-          if (_model?.loadingEntry == null && _model?.errorEntry == null) {
-            _closeApp();
-          }
-          return false;
-        }));
+        builder: (context, viewModel, child) => PopScope(canPop: false, // Prevents auto pop
+            onPopInvokedWithResult: (didPop, result) {
+              if (!didPop) {
+                if (_model?.loadingEntry == null && _model?.errorEntry == null) {
+                  _closeApp();
+                }
+              }
+            },child: Scaffold(
+            body: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints viewportConstraints) {
+                  return Responsive(mobile: _mobileView(viewportConstraints),desktop: _desktopView(viewportConstraints),tablet: _desktopView(viewportConstraints),);})),));
   }
 
   _initialiseView() async {
     //_model?.setUserDetails();
   }
 
+  _mobileView(BoxConstraints viewportConstraints){
+    return Column();
+  }
 
-
-  _mainBody(){
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: text("SPIRO SUPPORT", 24, TextType.Bold),
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (String value) {
-            },
-            itemBuilder: (BuildContext context) => [
-
-            ],
-          )
-        ],
-      ),
-
-      body: Column(),
-
-    );
+  _desktopView(BoxConstraints viewportConstraints){
+    return Column();
   }
 
   void _closeApp() {
