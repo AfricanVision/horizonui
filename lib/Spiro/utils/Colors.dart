@@ -50,6 +50,7 @@ const colorGrey2 = const Color( 0xFF707070);
 const colorTinted = const Color( 0xFFffaf80);
 const colorWarmYellow = const Color( 0xFFedd612);
 const colorReddish = const Color( 0xFFc83743);
+const shawnblue = const Color(0xFF2962FF);
 
 
  Color getColorFromHex(String hexColor) {
