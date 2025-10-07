@@ -66,7 +66,7 @@ class HomeState extends State<Home> implements ConnectHome{
   }
 
   _initialiseView() async {
-    // Initialization logic here
+
   }
 
   Widget _mainBody(){
@@ -128,7 +128,7 @@ class HomeState extends State<Home> implements ConnectHome{
         color: Colors.white,
         child: Column(
           children: [
-            // Header
+
             Container(
               height: 120,
               width: double.infinity,
@@ -145,7 +145,7 @@ class HomeState extends State<Home> implements ConnectHome{
               ),
             ),
 
-            // Menu Items
+
             Expanded(
               child: ListView(
                 padding: EdgeInsets.zero,
@@ -169,7 +169,7 @@ class HomeState extends State<Home> implements ConnectHome{
               ),
             ),
 
-            // Footer
+
             Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -751,7 +751,7 @@ class HomeState extends State<Home> implements ConnectHome{
             child: text('On-Shift Agents', 16, TextType.Bold),
           ),
 
-          // Table Header
+
           Container(
             padding: EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -769,7 +769,7 @@ class HomeState extends State<Home> implements ConnectHome{
             ),
           ),
 
-          // Agent Rows
+
           _buildAgentRow('AGQ01', 'John Doe', 'Accra Central', 'online', 'Morning'),
           _buildAgentRow('AGQ02', 'Sarah Wilson', 'Lagos Island', 'busy', 'Morning'),
           _buildAgentRow('AGQ03', 'Michael Chen', 'Nairobi CBD', 'online', 'Morning'),
@@ -779,7 +779,7 @@ class HomeState extends State<Home> implements ConnectHome{
           _buildAgentRow('AGQ07', 'James Miller', 'Tamale Station', 'offline', 'Morning'),
           _buildAgentRow('AGQ08', 'Anna Davis', 'Cape Coast', 'online', 'Evening'),
 
-          // Footer
+
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey[300]!))),
