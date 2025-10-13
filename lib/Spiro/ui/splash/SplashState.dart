@@ -6,6 +6,7 @@ import '../../data/internal/application/NotificationType.dart';
 import '../../data/internal/application/TextType.dart';
 import '../../configs/Navigator.dart';
 import '../../designs/Component.dart';
+import '../../designs/Responsive.dart';
 import '../../utils/Colors.dart';
 import '../../utils/Images.dart';
 import '../home/Home.dart';
@@ -18,7 +19,7 @@ class SplashState extends State<Splash> implements ConnectSplash {
 
   ViewSplash? _model;
 
-  @override
+  /*@override
   Widget build(BuildContext context) {
 
     return ViewModelBuilder<ViewSplash>.reactive(
@@ -68,10 +69,42 @@ class SplashState extends State<Splash> implements ConnectSplash {
           ),
         ));
 
+  }*/
+
+
+  @override
+  Widget build(BuildContext context) {
+    return ViewModelBuilder<ViewSplash>.reactive(
+        viewModelBuilder: () => ViewSplash(context, this),
+        onViewModelReady: (viewModel) => {
+          _model = viewModel,
+          _initialize()
+        },
+        builder: (context, viewModel, child) => PopScope(canPop: false, // Prevents auto pop
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              if (_model?.loadingEntry == null && _model?.errorEntry == null) {
+
+              }
+            }
+          },child: Scaffold(
+              body: LayoutBuilder(
+    builder: (BuildContext context, BoxConstraints viewportConstraints) {
+    return Responsive(mobile: _mobileView(viewportConstraints),desktop: _desktopView(viewportConstraints),tablet: _desktopView(viewportConstraints),);})
+
+    )));
+
+
   }
 
 
+  _mobileView(BoxConstraints viewportConstraints){
+    return Column();
+  }
 
+  _desktopView(BoxConstraints viewportConstraints){
+    return Column();
+  }
 
   _initialize() {
     Timer(const
@@ -79,11 +112,6 @@ class SplashState extends State<Splash> implements ConnectSplash {
             () => SpiroNavigation().navigateToPage(NavigatorType.openFully, const Home(), context));
 
   }
-
-
-
-
-
 
 
 }
