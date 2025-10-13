@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
-import '../data/internal/application/UserRegistration.dart';
+import '../data/internal/application/Agents.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import 'CommsDirections.dart';
 import 'ConnectComms.dart';
@@ -17,7 +17,7 @@ class Comms implements ConnectComms {
   Comms(this.helper);
 
   @override
-  Future<bool> sendUserRegistration(UserRegistration userData) async {
+  Future<bool> sendAgent(Agent userData) async {
     try {
 
       final response = await dio.post(

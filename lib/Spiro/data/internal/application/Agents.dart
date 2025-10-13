@@ -1,16 +1,20 @@
-class UserRegistration {
-  String firstname;
-  String middlename;
-  String lastname;
-  String dob;
-  String nationality;
-  String identification;
-  String phonenumber;
-  String email;
-  String statusId;
-  String createdBy;
+class Agent {
+  final String? id;
+  final String firstname;
+  final String middlename;
+  final String lastname;
+  final String dob;
+  final String nationality;
+  final String identification;
+  final String phonenumber;
+  final String email;
+  final String statusId;
+  final String createdBy;
+  final DateTime? createdAt;
+  final DateTime? updatedAt;
 
-  UserRegistration({
+  Agent({
+    this.id,
     required this.firstname,
     required this.middlename,
     required this.lastname,
@@ -21,10 +25,13 @@ class UserRegistration {
     required this.email,
     required this.statusId,
     required this.createdBy,
+    this.createdAt,
+    this.updatedAt,
   });
 
   Map<String, dynamic> toJson() {
     return {
+      if (id != null) 'id': id,
       'firstname': firstname,
       'middlename': middlename,
       'lastname': lastname,
@@ -38,8 +45,9 @@ class UserRegistration {
     };
   }
 
-  factory UserRegistration.fromJson(Map<String, dynamic> json) {
-    return UserRegistration(
+  factory Agent.fromJson(Map<String, dynamic> json) {
+    return Agent(
+      id: json['id'],
       firstname: json['firstname'] ?? '',
       middlename: json['middlename'] ?? '',
       lastname: json['lastname'] ?? '',
@@ -48,8 +56,10 @@ class UserRegistration {
       identification: json['identification'] ?? '',
       phonenumber: json['phonenumber'] ?? '',
       email: json['email'] ?? '',
-      statusId: json['statusId'] ?? '',
-      createdBy: json['createdBy'] ?? '',
+      statusId: json['statusId'] ?? 'b8641bcd-07d5-4919-b459-5a081dee449b',
+      createdBy: json['createdBy'] ?? 'admin',
+      createdAt: json['createdAt'] != null ? DateTime.parse(json['createdAt']) : null,
+      updatedAt: json['updatedAt'] != null ? DateTime.parse(json['updatedAt']) : null,
     );
   }
 }

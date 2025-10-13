@@ -1,8 +1,8 @@
 
-import '../../data/internal/application/BatteryHistoryRequest.dart';
-import '../../data/internal/application/BatteryRequest.dart';
-import '../../data/internal/application/UserRegistration.dart';
-import '../parent/ParentViewModel.dart';
+import '../data/internal/application/BatteryHistoryRequest.dart';
+import '../data/internal/application/BatteryRequest.dart';
+import '../data/internal/application/Agents.dart';
+import 'parent/ParentViewModel.dart';
 import 'ConnectHome.dart';
 import 'package:dio/dio.dart';
 
@@ -12,9 +12,9 @@ class ViewHome extends ParentViewModel {
 
   ViewHome(super.context, this.connection);
 
-  Future<bool> sendUserRegistration(UserRegistration userData) async {
+  Future<bool> sendAgent(Agent userData) async {
     try {
-      return await getDataManager().sendUserRegistration(userData);
+      return await getDataManager().sendAgent(userData);
     } catch (e) {
       rethrow;
     }

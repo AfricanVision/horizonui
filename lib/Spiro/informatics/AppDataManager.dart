@@ -6,7 +6,7 @@ import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/file/ConnectFileStorage.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import '../endpoints/ConnectComms.dart';
-import '../data/internal/application/UserRegistration.dart';
+import '../data/internal/application/Agents.dart';
 import 'DataManager.dart';
 
 class AppDataManager implements DataManager {
@@ -19,8 +19,8 @@ class AppDataManager implements DataManager {
 
 
   @override
-  Future<bool> sendUserRegistration(UserRegistration userData) async {
-    return await connectComms.sendUserRegistration(userData);
+  Future<bool> sendUserRegistration(Agent userData) async {
+    return await connectComms.sendAgent(userData);
   }
 
   @override
@@ -76,5 +76,11 @@ class AppDataManager implements DataManager {
   @override
   Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
     return await connectComms.updateBatteryHistory(batteryHistoryRequest);
+  }
+
+  @override
+  Future<bool> sendAgent(Agent userData) {
+    // TODO: implement sendAgent
+    throw UnimplementedError();
   }
 }
