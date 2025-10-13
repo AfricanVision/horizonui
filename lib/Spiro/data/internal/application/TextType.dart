@@ -1,9 +1,1 @@
-enum TextType{
-
-  Bold,
-  Light,
-  Regular,
-  SemiBold
-
-
-}
+enum TextType { Bold, Light, Regular, SemiBold, Medium }

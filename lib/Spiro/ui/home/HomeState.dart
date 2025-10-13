@@ -1,27 +1,21 @@
-import 'dart:convert';
-import 'package:flutter/cupertino.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 import 'package:stacked/stacked.dart';
-import '../../data/internal/application/NavigatorType.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+
+import '../../data/internal/application/BatteryRequest.dart';
 import '../../data/internal/application/NotificationType.dart';
 import '../../data/internal/application/TextType.dart';
 import '../../data/internal/application/UserRegistration.dart';
-import '../../data/internal/application/BatteryRequest.dart';
-import '../../configs/Navigator.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
-import '../../utils/InputValidator.dart';
 import '../../utils/Validators.dart';
 import 'ConnectHome.dart';
 import 'Home.dart';
 import 'ViewHome.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:fl_chart/fl_chart.dart';
 
-class HomeState extends State<Home> implements ConnectHome{
-
+class HomeState extends State<Home> implements ConnectHome {
   ViewHome? _model;
 
   final TextEditingController _firstnameController = TextEditingController();
@@ -29,7 +23,8 @@ class HomeState extends State<Home> implements ConnectHome{
   final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
   final TextEditingController _nationalityController = TextEditingController();
-  final TextEditingController _identificationController = TextEditingController();
+  final TextEditingController _identificationController =
+      TextEditingController();
   final TextEditingController _phonenumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
 
@@ -43,17 +38,24 @@ class HomeState extends State<Home> implements ConnectHome{
 
   final TextEditingController _oemController = TextEditingController();
   final TextEditingController _serialNumberController = TextEditingController();
-  final TextEditingController _batteryTypeIdController = TextEditingController();
+  final TextEditingController _batteryTypeIdController =
+      TextEditingController();
 
   String _selectedAgentForm = '';
-  final TextEditingController _incidentTitleController = TextEditingController();
-  final TextEditingController _incidentDescriptionController = TextEditingController();
-  final TextEditingController _incidentLocationController = TextEditingController();
-  final TextEditingController _batterySerialController = TextEditingController();
-  final TextEditingController _batteryStatusController = TextEditingController();
+  final TextEditingController _incidentTitleController =
+      TextEditingController();
+  final TextEditingController _incidentDescriptionController =
+      TextEditingController();
+  final TextEditingController _incidentLocationController =
+      TextEditingController();
+  final TextEditingController _batterySerialController =
+      TextEditingController();
+  final TextEditingController _batteryStatusController =
+      TextEditingController();
   final TextEditingController _powerEventController = TextEditingController();
   final TextEditingController _shiftNotesController = TextEditingController();
-  final TextEditingController _customerSearchController = TextEditingController();
+  final TextEditingController _customerSearchController =
+      TextEditingController();
 
   bool _isLoading = false;
   bool _showAddForm = true;
@@ -73,6 +75,12 @@ class HomeState extends State<Home> implements ConnectHome{
 
   String _selectedAdminForm = '';
 
+  // Global Admin Country Selector
+  String?
+  _selectedCountry; // null = "All Countries", or "Kenya", "Rwanda", "Uganda"
+  String _currentUserRole = 'global'; // 'global', 'local', 'agent'
+  String _currentUserCountry = 'Kenya'; // Default country for local admin/agent
+
   @override
   void initState() {
     super.initState();
@@ -81,67 +89,66 @@ class HomeState extends State<Home> implements ConnectHome{
   @override
   Widget build(BuildContext context) {
     return ViewModelBuilder<ViewHome>.reactive(
-        viewModelBuilder: () => ViewHome(context, this),
-        onViewModelReady: (viewModel) => {
-          _model = viewModel,
-          _initialiseView()
+      viewModelBuilder: () => ViewHome(context, this),
+      onViewModelReady: (viewModel) => {_model = viewModel, _initialiseView()},
+      builder: (context, viewModel, child) => WillPopScope(
+        child: _mainBody(),
+        onWillPop: () async {
+          if (_model?.loadingEntry == null && _model?.errorEntry == null) {
+            _closeApp();
+          }
+          return false;
         },
-        builder: (context, viewModel, child) => WillPopScope(
-            child: _mainBody(),
-            onWillPop: () async {
-              if (_model?.loadingEntry == null && _model?.errorEntry == null) {
-                _closeApp();
-              }
-              return false;
-            }
-        ));
+      ),
+    );
   }
 
-  _initialiseView() async {
-  }
+  _initialiseView() async {}
 
-  Widget _mainBody(){
+  Widget _mainBody() {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      appBar: _showDashboard ? AppBar(
-        backgroundColor: colorPrimaryDark,
-        title: text("Spiro App", 18, TextType.Bold),
-        actions: [
-          PopupMenuButton<String>(
-            icon: Icon(Icons.add, color: colorMilkWhite),
-            onSelected: (value) {
-              setState(() {
-                _showAgentForm = value == 'agent';
-                _showBatteryForm = value == 'battery';
-                _showDashboard = false;
-                _showDataEntryView = false;
-              });
-            },
-            itemBuilder: (BuildContext context) => [
-              PopupMenuItem<String>(
-                value: 'agent',
-                child: Row(
-                  children: [
-                    Icon(Icons.person_add, color: colorPrimary),
-                    SizedBox(width: 8),
-                    Text('Add Agent'),
+      appBar: _showDashboard
+          ? AppBar(
+              backgroundColor: colorPrimaryDark,
+              title: text("Spiro App", 18, TextType.Bold),
+              actions: [
+                PopupMenuButton<String>(
+                  icon: Icon(Icons.add, color: colorMilkWhite),
+                  onSelected: (value) {
+                    setState(() {
+                      _showAgentForm = value == 'agent';
+                      _showBatteryForm = value == 'battery';
+                      _showDashboard = false;
+                      _showDataEntryView = false;
+                    });
+                  },
+                  itemBuilder: (BuildContext context) => [
+                    PopupMenuItem<String>(
+                      value: 'agent',
+                      child: Row(
+                        children: [
+                          Icon(Icons.person_add, color: colorPrimary),
+                          SizedBox(width: 8),
+                          Text('Add Agent'),
+                        ],
+                      ),
+                    ),
+                    PopupMenuItem<String>(
+                      value: 'battery',
+                      child: Row(
+                        children: [
+                          Icon(Icons.battery_std, color: colorPrimary),
+                          SizedBox(width: 8),
+                          Text('Add Battery'),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
-              ),
-              PopupMenuItem<String>(
-                value: 'battery',
-                child: Row(
-                  children: [
-                    Icon(Icons.battery_std, color: colorPrimary),
-                    SizedBox(width: 8),
-                    Text('Add Battery'),
-                  ],
-                ),
-              ),
-            ],
-          )
-        ],
-      ) : null,
+              ],
+            )
+          : null,
       drawer: _showDashboard ? _buildSidebar() : null,
       body: _getCurrentView(),
     );
@@ -207,7 +214,12 @@ class HomeState extends State<Home> implements ConnectHome{
               children: [
                 textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
                 SizedBox(height: 4),
-                textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
+                textWithColor(
+                  'Control Tower',
+                  14,
+                  TextType.Regular,
+                  colorMilkWhite,
+                ),
               ],
             ),
           ),
@@ -247,7 +259,12 @@ class HomeState extends State<Home> implements ConnectHome{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       text('Shawn Matunda', 14, TextType.Bold),
-                      textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                      textWithColor(
+                        'Global Admin',
+                        12,
+                        TextType.Regular,
+                        Colors.grey[600]!,
+                      ),
                     ],
                   ),
                 ),
@@ -288,7 +305,11 @@ class HomeState extends State<Home> implements ConnectHome{
                 children: [
                   text('Station Operations', 28, TextType.Bold),
                   SizedBox(height: 8),
-                  text('Active station issues and management', 16, TextType.Regular),
+                  text(
+                    'Active station issues and management',
+                    16,
+                    TextType.Regular,
+                  ),
                 ],
               ),
             ),
@@ -308,7 +329,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
       ),
       child: Column(
         children: [
@@ -325,7 +348,10 @@ class HomeState extends State<Home> implements ConnectHome{
                 Expanded(flex: 2, child: text('Issue Type', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Status', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Priority', 12, TextType.Bold)),
-                Expanded(flex: 2, child: text('Assigned Owner', 12, TextType.Bold)),
+                Expanded(
+                  flex: 2,
+                  child: text('Assigned Owner', 12, TextType.Bold),
+                ),
                 Expanded(flex: 2, child: text('Time', 12, TextType.Bold)),
               ],
             ),
@@ -435,19 +461,27 @@ class HomeState extends State<Home> implements ConnectHome{
 
   String _getStationStatusIcon(String status) {
     switch (status) {
-      case 'open': return '✔';
-      case 'check': return '○';
-      case 'retained': return '✔';
-      default: return '✔';
+      case 'open':
+        return '✔';
+      case 'check':
+        return '○';
+      case 'retained':
+        return '✔';
+      default:
+        return '✔';
     }
   }
 
   Color _getStationStatusColor(String status) {
     switch (status) {
-      case 'open': return Colors.blue;
-      case 'check': return Colors.orange;
-      case 'retained': return Colors.green;
-      default: return Colors.grey;
+      case 'open':
+        return Colors.blue;
+      case 'check':
+        return Colors.orange;
+      case 'retained':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -458,7 +492,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -468,7 +504,12 @@ class HomeState extends State<Home> implements ConnectHome{
             children: [
               TextButton(
                 onPressed: () {},
-                child: textWithColor('Previous', 12, TextType.Regular, Colors.blue),
+                child: textWithColor(
+                  'Previous',
+                  12,
+                  TextType.Regular,
+                  Colors.blue,
+                ),
               ),
               SizedBox(width: 16),
               TextButton(
@@ -529,7 +570,12 @@ class HomeState extends State<Home> implements ConnectHome{
               children: [
                 textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
                 SizedBox(height: 4),
-                textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
+                textWithColor(
+                  'Control Tower',
+                  14,
+                  TextType.Regular,
+                  colorMilkWhite,
+                ),
               ],
             ),
           ),
@@ -569,7 +615,12 @@ class HomeState extends State<Home> implements ConnectHome{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       text('Shawn Matunda', 14, TextType.Bold),
-                      textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                      textWithColor(
+                        'Global Admin',
+                        12,
+                        TextType.Regular,
+                        Colors.grey[600]!,
+                      ),
                     ],
                   ),
                 ),
@@ -610,7 +661,11 @@ class HomeState extends State<Home> implements ConnectHome{
                 children: [
                   text('Battery Analytics', 28, TextType.Bold),
                   SizedBox(height: 8),
-                  text('Battery performance and health metrics', 16, TextType.Regular),
+                  text(
+                    'Battery performance and health metrics',
+                    16,
+                    TextType.Regular,
+                  ),
                 ],
               ),
             ),
@@ -629,20 +684,52 @@ class HomeState extends State<Home> implements ConnectHome{
       mainAxisSpacing: 16,
       childAspectRatio: 1.2,
       children: [
-        _buildBatteryStatCard('Text Extends', '15,420', 'In circulation', '+2.1%', true),
-        _buildBatteryStatCard('Avg Cycle Count', '1,247', 'Per battery', '+3.5%', true),
-        _buildBatteryStatCard('Battery Health', '89%', 'Overall condition', '+1.2%', true),
-        _buildBatteryStatCard('Replacement Rate', '2.1%', 'Monthly', '-0.9%', false),
+        _buildBatteryStatCard(
+          'Text Extends',
+          '15,420',
+          'In circulation',
+          '+2.1%',
+          true,
+        ),
+        _buildBatteryStatCard(
+          'Avg Cycle Count',
+          '1,247',
+          'Per battery',
+          '+3.5%',
+          true,
+        ),
+        _buildBatteryStatCard(
+          'Battery Health',
+          '89%',
+          'Overall condition',
+          '+1.2%',
+          true,
+        ),
+        _buildBatteryStatCard(
+          'Replacement Rate',
+          '2.1%',
+          'Monthly',
+          '-0.9%',
+          false,
+        ),
       ],
     );
   }
 
-  Widget _buildBatteryStatCard(String title, String mainValue, String subtitle, String trend, bool trendPositive) {
+  Widget _buildBatteryStatCard(
+    String title,
+    String mainValue,
+    String subtitle,
+    String trend,
+    bool trendPositive,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       padding: EdgeInsets.all(16),
       child: Column(
@@ -650,13 +737,18 @@ class HomeState extends State<Home> implements ConnectHome{
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           textWithColor(title, 14, TextType.SemiBold, Colors.grey[700]!),
-          text(mainValue, 20, TextType.Bold),
+          text(mainValue, 24, TextType.Bold),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               textWithColor(subtitle, 12, TextType.Regular, Colors.grey[600]!),
               SizedBox(height: 4),
-              textWithColor(trend, 12, TextType.SemiBold, trendPositive ? Colors.green : Colors.red),
+              textWithColor(
+                trend,
+                12,
+                TextType.SemiBold,
+                trendPositive ? Colors.green : Colors.red,
+              ),
             ],
           ),
         ],
@@ -681,12 +773,8 @@ class HomeState extends State<Home> implements ConnectHome{
       Container(
         height: 250,
         child: SfCartesianChart(
-          primaryXAxis: CategoryAxis(
-            title: AxisTitle(text: 'Days'),
-          ),
-          primaryYAxis: NumericAxis(
-            title: AxisTitle(text: 'Swaps'),
-          ),
+          primaryXAxis: CategoryAxis(title: AxisTitle(text: 'Days')),
+          primaryYAxis: NumericAxis(title: AxisTitle(text: 'Swaps')),
           series: <CartesianSeries>[
             ColumnSeries<ChartData, String>(
               dataSource: [
@@ -702,15 +790,12 @@ class HomeState extends State<Home> implements ConnectHome{
               yValueMapper: (ChartData data, _) => data.y,
               pointColorMapper: (ChartData data, _) => data.color,
               dataLabelSettings: DataLabelSettings(isVisible: true),
-            )
+            ),
           ],
         ),
       ),
     );
   }
-
-
-
 
   Widget _buildAnalyticsView() {
     return Scaffold(
@@ -757,7 +842,12 @@ class HomeState extends State<Home> implements ConnectHome{
               children: [
                 textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
                 SizedBox(height: 4),
-                textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
+                textWithColor(
+                  'Control Tower',
+                  14,
+                  TextType.Regular,
+                  colorMilkWhite,
+                ),
               ],
             ),
           ),
@@ -797,7 +887,12 @@ class HomeState extends State<Home> implements ConnectHome{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       text('Shawn Matunda', 14, TextType.Bold),
-                      textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                      textWithColor(
+                        'Global Admin',
+                        12,
+                        TextType.Regular,
+                        Colors.grey[600]!,
+                      ),
                     ],
                   ),
                 ),
@@ -838,7 +933,11 @@ class HomeState extends State<Home> implements ConnectHome{
                 children: [
                   text('Analytics', 28, TextType.Bold),
                   SizedBox(height: 8),
-                  text('Performance insights and metrics', 16, TextType.Regular),
+                  text(
+                    'Performance insights and metrics',
+                    16,
+                    TextType.Regular,
+                  ),
                 ],
               ),
             ),
@@ -904,7 +1003,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
       ),
       child: Column(
         children: [
@@ -921,8 +1022,14 @@ class HomeState extends State<Home> implements ConnectHome{
                 Expanded(flex: 2, child: text('Station', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Status', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Shift', 12, TextType.Bold)),
-                Expanded(flex: 2, child: text('Swaps Progress', 12, TextType.Bold)),
-                Expanded(flex: 2, child: text('Last Activity', 12, TextType.Bold)),
+                Expanded(
+                  flex: 2,
+                  child: text('Swaps Progress', 12, TextType.Bold),
+                ),
+                Expanded(
+                  flex: 2,
+                  child: text('Last Activity', 12, TextType.Bold),
+                ),
               ],
             ),
           ),
@@ -1045,11 +1152,16 @@ class HomeState extends State<Home> implements ConnectHome{
 
   String _getAgentStatusIcon(String status) {
     switch (status) {
-      case 'online': return '●';
-      case 'busy': return '●';
-      case 'break': return '○';
-      case 'offline': return '○';
-      default: return '○';
+      case 'online':
+        return '●';
+      case 'busy':
+        return '●';
+      case 'break':
+        return '○';
+      case 'offline':
+        return '○';
+      default:
+        return '○';
     }
   }
 
@@ -1060,7 +1172,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1070,7 +1184,12 @@ class HomeState extends State<Home> implements ConnectHome{
             children: [
               TextButton(
                 onPressed: () {},
-                child: textWithColor('Previous', 12, TextType.Regular, Colors.blue),
+                child: textWithColor(
+                  'Previous',
+                  12,
+                  TextType.Regular,
+                  Colors.blue,
+                ),
               ),
               SizedBox(width: 16),
               TextButton(
@@ -1101,7 +1220,12 @@ class HomeState extends State<Home> implements ConnectHome{
                 children: [
                   textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
                   SizedBox(height: 4),
-                  textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
+                  textWithColor(
+                    'Control Tower',
+                    14,
+                    TextType.Regular,
+                    colorMilkWhite,
+                  ),
                 ],
               ),
             ),
@@ -1144,7 +1268,12 @@ class HomeState extends State<Home> implements ConnectHome{
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         text('Shawn Matunda', 14, TextType.Bold),
-                        textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                        textWithColor(
+                          'Global Admin',
+                          12,
+                          TextType.Regular,
+                          Colors.grey[600]!,
+                        ),
                       ],
                     ),
                   ),
@@ -1166,10 +1295,10 @@ class HomeState extends State<Home> implements ConnectHome{
         size: 20,
       ),
       title: textWithColor(
-          title,
-          14,
-          isSelected ? TextType.Bold : TextType.Regular,
-          isSelected ? colorPrimary : Colors.grey[700]!
+        title,
+        14,
+        isSelected ? TextType.Bold : TextType.Regular,
+        isSelected ? colorPrimary : Colors.grey[700]!,
       ),
       selected: isSelected,
       onTap: () {
@@ -1279,7 +1408,12 @@ class HomeState extends State<Home> implements ConnectHome{
               children: [
                 textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
                 SizedBox(height: 4),
-                textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
+                textWithColor(
+                  'Control Tower',
+                  14,
+                  TextType.Regular,
+                  colorMilkWhite,
+                ),
               ],
             ),
           ),
@@ -1288,8 +1422,14 @@ class HomeState extends State<Home> implements ConnectHome{
               padding: EdgeInsets.zero,
               children: [
                 _buildMenuSection('REPORTS', [
-                  _buildReportsMenuItem('Operational Reports', Icons.assessment),
-                  _buildReportsMenuItem('Performance Analytics', Icons.analytics),
+                  _buildReportsMenuItem(
+                    'Operational Reports',
+                    Icons.assessment,
+                  ),
+                  _buildReportsMenuItem(
+                    'Performance Analytics',
+                    Icons.analytics,
+                  ),
                   _buildReportsMenuItem('Incident Reports', Icons.warning),
                   _buildReportsMenuItem('Agent Performance', Icons.people),
                   _buildReportsMenuItem('Battery Reports', Icons.battery_std),
@@ -1321,7 +1461,12 @@ class HomeState extends State<Home> implements ConnectHome{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       text('Shawn Matunda', 14, TextType.Bold),
-                      textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                      textWithColor(
+                        'Global Admin',
+                        12,
+                        TextType.Regular,
+                        Colors.grey[600]!,
+                      ),
                     ],
                   ),
                 ),
@@ -1452,7 +1597,11 @@ class HomeState extends State<Home> implements ConnectHome{
               children: [
                 text('Active Alerts', 16, TextType.Bold),
                 SizedBox(height: 4),
-                text('3 critical alerts require immediate attention', 14, TextType.Regular),
+                text(
+                  '3 critical alerts require immediate attention',
+                  14,
+                  TextType.Regular,
+                ),
               ],
             ),
           ),
@@ -1506,11 +1655,7 @@ class HomeState extends State<Home> implements ConnectHome{
         borderRadius: BorderRadius.circular(8),
         border: Border.all(color: color.withOpacity(0.3)),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 4,
-            offset: Offset(0, 2),
-          ),
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -1535,7 +1680,12 @@ class HomeState extends State<Home> implements ConnectHome{
                 SizedBox(height: 8),
                 text(description, 14, TextType.Regular),
                 SizedBox(height: 8),
-                textWithColor(location, 14, TextType.Regular, Colors.grey[600]!),
+                textWithColor(
+                  location,
+                  14,
+                  TextType.Regular,
+                  Colors.grey[600]!,
+                ),
               ],
             ),
           ),
@@ -1589,7 +1739,12 @@ class HomeState extends State<Home> implements ConnectHome{
                   backgroundColor: colorPrimary,
                   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 ),
-                child: textWithColor('View All Alerts', 12, TextType.SemiBold, Colors.white),
+                child: textWithColor(
+                  'View All Alerts',
+                  12,
+                  TextType.SemiBold,
+                  Colors.white,
+                ),
               ),
             ],
           ),
@@ -1638,7 +1793,12 @@ class HomeState extends State<Home> implements ConnectHome{
               children: [
                 textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
                 SizedBox(height: 4),
-                textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
+                textWithColor(
+                  'Control Tower',
+                  14,
+                  TextType.Regular,
+                  colorMilkWhite,
+                ),
               ],
             ),
           ),
@@ -1647,16 +1807,44 @@ class HomeState extends State<Home> implements ConnectHome{
               padding: EdgeInsets.zero,
               children: [
                 _buildMenuSection('INCIDENTS', [
-                  _buildIncidentsMenuItem('Active Alerts', Icons.warning, Colors.orange),
-                  _buildIncidentsMenuItem('Battery Issues', Icons.battery_alert, Colors.red),
-                  _buildIncidentsMenuItem('Network Issues', Icons.wifi_off, Colors.blue),
-                  _buildIncidentsMenuItem('Power Events', Icons.power_off, Colors.amber),
-                  _buildIncidentsMenuItem('Agent Status', Icons.person_off, Colors.purple),
+                  _buildIncidentsMenuItem(
+                    'Active Alerts',
+                    Icons.warning,
+                    Colors.orange,
+                  ),
+                  _buildIncidentsMenuItem(
+                    'Battery Issues',
+                    Icons.battery_alert,
+                    Colors.red,
+                  ),
+                  _buildIncidentsMenuItem(
+                    'Network Issues',
+                    Icons.wifi_off,
+                    Colors.blue,
+                  ),
+                  _buildIncidentsMenuItem(
+                    'Power Events',
+                    Icons.power_off,
+                    Colors.amber,
+                  ),
+                  _buildIncidentsMenuItem(
+                    'Agent Status',
+                    Icons.person_off,
+                    Colors.purple,
+                  ),
                 ]),
                 Divider(height: 32),
                 _buildMenuSection('ACTIONS', [
-                  _buildIncidentsMenuItem('Create Incident', Icons.add_alert, Colors.green),
-                  _buildIncidentsMenuItem('Incident History', Icons.history, Colors.grey),
+                  _buildIncidentsMenuItem(
+                    'Create Incident',
+                    Icons.add_alert,
+                    Colors.green,
+                  ),
+                  _buildIncidentsMenuItem(
+                    'Incident History',
+                    Icons.history,
+                    Colors.grey,
+                  ),
                 ]),
               ],
             ),
@@ -1679,7 +1867,12 @@ class HomeState extends State<Home> implements ConnectHome{
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       text('Shawn Matunda', 14, TextType.Bold),
-                      textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                      textWithColor(
+                        'Global Admin',
+                        12,
+                        TextType.Regular,
+                        Colors.grey[600]!,
+                      ),
                     ],
                   ),
                 ),
@@ -1701,128 +1894,229 @@ class HomeState extends State<Home> implements ConnectHome{
     );
   }
 
-  Widget _buildHomeContent() {
-    return Container(
-      color: colorPrimaryLight,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          text("Welcome to Spiro", 24, TextType.Bold),
-          SizedBox(height: 20),
-          text("Your all-in-one business solution", 16, TextType.Regular),
-          SizedBox(height: 40),
-          roundedCornerButton(
-              "Go to Dashboard",
-                  () => setState(() => _showDashboard = true)
-          ),
+  Widget _buildIncidentReportForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text('Report an Incident', 18, TextType.Bold),
+        SizedBox(height: 20),
+        _buildFormField(
+          label: 'Incident Title *',
+          hintText: 'e.g., Battery Overheating',
+          controller: _incidentTitleController,
+        ),
+        SizedBox(height: 16),
+        _buildFormField(
+          label: 'Description *',
+          hintText: 'Describe the incident in detail...',
+          controller: _incidentDescriptionController,
+          maxLines: 3,
+        ),
+        SizedBox(height: 16),
+        _buildFormField(
+          label: 'Location *',
+          hintText: 'e.g., Station A, Lagos',
+          controller: _incidentLocationController,
+        ),
+        SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: roundedCornerButton("Submit Incident Report", () {
+            _submitIncidentReport();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildBatteryHistoryForm() {
+    return Column(
         ],
+      ),
+        text('Battery History Tracking', 18, TextType.Bold),
+        SizedBox(height: 20),
+        _buildFormField(
+          label: 'Battery Serial Number *',
+          hintText: 'e.g., BAT-123456',
+          controller: _batterySerialController,
+        ),
+        SizedBox(height: 16),
+        _buildFormField(
+          label: 'Current Status *',
+          hintText: 'e.g., In Service, Maintenance, Retired',
+          controller: _batteryStatusController,
+        ),
+        SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: roundedCornerButton("Update Battery History", () {
+            _updateBatteryHistory();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPowerEventsForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text('Power Event Log', 18, TextType.Bold),
+        SizedBox(height: 20),
+        _buildFormField(
+          label: 'Event Description *',
+          hintText: 'e.g., Power Outage, Voltage Spike',
+          controller: _powerEventController,
+          maxLines: 2,
+        ),
+        SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: roundedCornerButton("Log Power Event", () {
+            _logPowerEvent();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildShiftRecordsForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text('Shift Record Entry', 18, TextType.Bold),
+        SizedBox(height: 20),
+        _buildFormField(
+          label: 'Shift Notes *',
+          hintText: 'Enter shift summary and notes...',
+          controller: _shiftNotesController,
+          maxLines: 4,
+        ),
+        SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: roundedCornerButton("Save Shift Record", () {
+            _saveShiftRecord();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildCustomerDetailsForm() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text('Customer Information', 18, TextType.Bold),
+        SizedBox(height: 20),
+        _buildFormField(
+          label: 'Search Customer *',
+          hintText: 'Enter customer name or ID',
+          controller: _customerSearchController,
+        ),
+        SizedBox(height: 30),
+        SizedBox(
+          width: double.infinity,
+          child: roundedCornerButton("Search Customer", () {
+            _searchCustomer();
+          }),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAgentFormBox(String title, String description) {
+    bool isSelected = _selectedAgentForm == title;
+    return Container(
+      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedAgentForm = title;
+          });
+        },
+        child: Container(
+          width: 280,
+          height: 90,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isSelected ? colorPrimaryLight : Colors.white,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: isSelected ? colorPrimary : Colors.grey[300]!,
+              width: isSelected ? 2 : 1,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 2,
+                offset: Offset(0, 1),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              text(title, 16, TextType.SemiBold),
+              SizedBox(height: 4),
+              textWithColor(
+                description,
+                14,
+                TextType.Regular,
+                Colors.grey[600]!,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
 
-  Widget _buildAgentManagementForm() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              backButtonWithAction(context, () {
-                setState(() {
-                  _showAgentForm = false;
-                  _showDashboard = true;
-                  _clearAgentForm();
-                  _showAddForm = false;
-                });
-              }),
-              SizedBox(width: 16),
-              text("Agent Management", 20, TextType.Bold),
-            ],
-          ),
-          SizedBox(height: 16),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search Agents...',
-                hintStyle: TextStyle(color: Colors.grey[600]),
-                prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
-          ),
-          SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton(
-              onPressed: () {
-                setState(() {
-                  _showAddForm = true;
-                  _showEditForm = false;
-                  _currentEditingAgent = '';
-                  _clearAgentForm();
-                });
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.grey[600],
-                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(6),
-                ),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.add, color: Colors.white, size: 20),
-                  SizedBox(width: 8),
-                  textWithColor('Add Agent', 14, TextType.SemiBold, Colors.white),
-                ],
-              ),
-            ),
-          ),
-          SizedBox(height: 16),
-          if (_showAddForm) _buildAddAgentForm(),
-          if (_showEditForm) _buildEditAgentForm(),
-          text("Agents (4)", 20, TextType.Bold),
-          SizedBox(height: 16),
-          Column(
-            children: [
-              _buildAgentCard(
-                name: 'John Doe',
-                agentId: 'AGT-001',
-                status: 'Active',
-                phone: '+234-801-234-5678',
-                email: 'john.doe@spiro.com',
-                station: 'Lagos Central Hub',
-                address: '15 Ikoyi Street, Lagos Island, Lagos State',
-                joined: '2024-01-15',
-                updated: '2024-09-15 10:00:00',
-              ),
-              SizedBox(height: 16),
-              _buildAgentCard(
-                name: 'Sarah Kim',
-                agentId: 'AGT-002',
-                status: 'Active',
-                phone: '+234-802-345-6789',
-                email: 'sarah.kim@spiro.com',
-                station: 'Ikeja Business District',
-                address: '23 Allen Avenue, Ikeja, Lagos State',
-                joined: '2024-02-01',
-                updated: '2024-09-20 14:30:00',
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
+  void _submitIncidentReport() {
+    print('Submitting incident report:');
+    print('Title: ${_incidentTitleController.text}');
+    print('Description: ${_incidentDescriptionController.text}');
+    print('Location: ${_incidentLocationController.text}');
+    _showSuccessNotification("Incident report submitted successfully!");
+    _clearAgentFormFields();
+  }
+
+  void _updateBatteryHistory() {
+    print('Updating battery history:');
+    print('Serial: ${_batterySerialController.text}');
+    print('Status: ${_batteryStatusController.text}');
+    _showSuccessNotification("Battery history updated!");
+    _clearAgentFormFields();
+  }
+
+  void _logPowerEvent() {
+    print('Logging power event: ${_powerEventController.text}');
+    _showSuccessNotification("Power event logged!");
+    _clearAgentFormFields();
+  }
+
+  void _saveShiftRecord() {
+    print('Saving shift record: ${_shiftNotesController.text}');
+    _showSuccessNotification("Shift record saved!");
+    _clearAgentFormFields();
+  }
+
+  void _searchCustomer() {
+    print('Searching customer: ${_customerSearchController.text}');
+    _showSuccessNotification("Customer search completed!");
+    _clearAgentFormFields();
+  }
+
+  void _clearAgentFormFields() {
+    _incidentTitleController.clear();
+    _incidentDescriptionController.clear();
+    _incidentLocationController.clear();
+    _batterySerialController.clear();
+    _batteryStatusController.clear();
+    _powerEventController.clear();
+    _shiftNotesController.clear();
+    _customerSearchController.clear();
   }
 
   Widget _buildAddAgentForm() {
@@ -1940,7 +2234,12 @@ class HomeState extends State<Home> implements ConnectHome{
                     _clearAgentForm();
                   });
                 },
-                child: textWithColor('Cancel', 14, TextType.Regular, Colors.grey[600]!),
+                child: textWithColor(
+                  'Cancel',
+                  14,
+                  TextType.Regular,
+                  Colors.grey[600]!,
+                ),
               ),
               SizedBox(width: 12),
               ElevatedButton(
@@ -1981,8 +2280,22 @@ class HomeState extends State<Home> implements ConnectHome{
         RichText(
           text: TextSpan(
             text: label,
-            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.black87),
-            children: isRequired ? [TextSpan(text: ' *', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold))] : [],
+            style: TextStyle(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+            children: isRequired
+                ? [
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: Colors.red,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ]
+                : [],
           ),
         ),
         SizedBox(height: 6),
@@ -1998,7 +2311,10 @@ class HomeState extends State<Home> implements ConnectHome{
             decoration: InputDecoration(
               hintText: hintText,
               hintStyle: TextStyle(color: Colors.grey[600]),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 12,
+              ),
               border: InputBorder.none,
               isDense: true,
             ),
@@ -2006,6 +2322,137 @@ class HomeState extends State<Home> implements ConnectHome{
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildHomeContent() {
+    return Container(
+      color: colorPrimaryLight,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          roundedCornerButton(
+            "Go to Dashboard",
+            () => setState(() => _showDashboard = true),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAgentManagementForm() {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(16.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              backButtonWithAction(context, () {
+                setState(() {
+                  _showAgentForm = false;
+                  _showDashboard = true;
+                  _clearAgentForm();
+                  _showAddForm = false;
+                });
+              }),
+              SizedBox(width: 16),
+              text("Agent Management", 20, TextType.Bold),
+            ],
+          ),
+          SizedBox(height: 16),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.grey[300]!),
+            ),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search agents...',
+                hintStyle: TextStyle(color: Colors.grey[600]),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: Colors.grey[600],
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  _showAddForm = true;
+                  _showEditForm = false;
+                  _currentEditingAgent = '';
+                  _clearAgentForm();
+                });
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+                padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(6),
+                ),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, color: Colors.white, size: 20),
+                  SizedBox(width: 8),
+                  textWithColor(
+                    'Add Agent',
+                    14,
+                    TextType.SemiBold,
+                    Colors.white,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          SizedBox(height: 16),
+          if (_showAddForm) _buildAddAgentForm(),
+          if (_showEditForm) _buildEditAgentForm(),
+          text("Agents (4)", 20, TextType.Bold),
+          SizedBox(height: 16),
+          Column(
+            children: [
+              _buildAgentCard(
+                name: 'John Doe',
+                agentId: 'AGT-001',
+                status: 'Active',
+                phone: '+234-801-234-5678',
+                email: 'john.doe@spiro.com',
+                station: 'Lagos Central Hub',
+                address: '15 Ikoyi Street, Lagos Island, Lagos State',
+                joined: '2024-01-15',
+                updated: '2024-09-15 10:00:00',
+              ),
+              SizedBox(height: 16),
+              _buildAgentCard(
+                name: 'Sarah Kim',
+                agentId: 'AGT-002',
+                status: 'Active',
+                phone: '+234-802-345-6789',
+                email: 'sarah.kim@spiro.com',
+                station: 'Ikeja Business District',
+                address: '23 Allen Avenue, Ikeja, Lagos State',
+                joined: '2024-02-01',
+                updated: '2024-09-20 14:30:00',
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 
@@ -2036,1492 +2483,19 @@ class HomeState extends State<Home> implements ConnectHome{
   }
 
   Widget _buildDataEntrySidebar() {
-    return Container(
-      width: 280,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(right: BorderSide(color: Colors.grey[300]!)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            height: 120,
-            width: double.infinity,
-            color: colorPrimaryDark,
-            padding: EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
-                SizedBox(height: 4),
-                textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
-              ],
-            ),
-          ),
-          Expanded(
-            child: ListView(
-              padding: EdgeInsets.zero,
-              children: [
-                _buildMenuSection('AGENTS', [
-                  _buildMenuItem('Stations', Icons.ev_station),
-                  _buildMenuItem('Batteries', Icons.battery_std),
-                  _buildMenuItem('Analytics', Icons.analytics),
-                  _buildMenuItem('Incidents', Icons.warning),
-                  _buildMenuItem('Reports', Icons.assessment),
-                  _buildMenuItem('Data Entry', Icons.data_usage),
-                ]),
-                Divider(height: 32),
-                _buildMenuSection('SETTINGS', [
-                  _buildMenuItem('Settings', Icons.settings),
-                ]),
-              ],
-            ),
-          ),
-          Container(
-            padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.grey[300]!)),
-            ),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  backgroundColor: colorPrimary,
-                  child: Icon(Icons.person, color: Colors.white, size: 20),
-                  radius: 20,
-                ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      text('Shawn Matunda', 14, TextType.Bold),
-                      textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
+    return Container();
   }
 
   Widget _buildDataEntryHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            backButtonWithAction(context, () {
-              setState(() {
-                _showDataEntryView = false;
-                _showDashboard = true;
-              });
-            }),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  text('Data Entry', 28, TextType.Bold),
-                  SizedBox(height: 8),
-                  text('Input operational data', 16, TextType.Regular),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+    return Container();
   }
 
   Widget _buildDataEntryPortalCard() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-      ),
-      padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          text('Data Entry Portal', 20, TextType.Bold),
-          SizedBox(height: 8),
-          text('Input and manage operational data', 14, TextType.Regular),
-        ],
-      ),
-    );
+    return Container();
   }
 
   Widget _buildAgentFormsSection() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showAgentFormsSection = true;
-                        _showAdminForm = false;
-                        _selectedAdminForm = '';
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: _showAgentFormsSection ? colorPrimaryDark : Colors.grey[200],
-                        borderRadius: BorderRadius.only(
-                          topLeft: Radius.circular(8),
-                          bottomLeft: Radius.circular(8),
-                        ),
-                      ),
-                      child: Center(
-                        child: textWithColor(
-                          'Agent Forms',
-                          14,
-                          TextType.SemiBold,
-                          _showAgentFormsSection ? colorMilkWhite : Colors.grey[700]!,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _showAgentFormsSection = false;
-                        _showAdminForm = true;
-                        _selectedAdminForm = '';
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: _showAdminForm ? colorPrimaryDark : Colors.grey[200],
-                        borderRadius: BorderRadius.only(
-                          topRight: Radius.circular(8),
-                          bottomRight: Radius.circular(8),
-                        ),
-                      ),
-                      child: Center(
-                        child: textWithColor(
-                          'Admin Forms',
-                          14,
-                          TextType.SemiBold,
-                          _showAdminForm ? colorMilkWhite : Colors.grey[700]!,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Divider(height: 1),
-          if (_showAgentFormsSection) _buildAgentFormContent(),
-          if (_showAdminForm) _buildAdminFormContent(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAgentFormContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(24),
-          child: text('Agent Forms', 18, TextType.Bold),
-        ),
-        Divider(height: 1),
-        Container(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildFormCategory(
-                  'AGENT OPERATIONS',
-                  [
-                    _buildAgentFormBox('Incident Reports', 'Log operational incidents'),
-                    _buildAgentFormBox('Battery History', 'Track battery lifecycle'),
-                    _buildAgentFormBox('Power Events', 'Monitor power status'),
-                    _buildAgentFormBox('Shift Records', 'Daily shift tracker'),
-                    _buildAgentFormBox('Customer Details', 'View customer information'),
-                  ],
-                ),
-              ),
-              Container(
-                width: 1,
-                margin: EdgeInsets.symmetric(vertical: 16),
-                color: Colors.grey[300],
-              ),
-              Expanded(
-                flex: 3,
-                child: _selectedAgentForm.isNotEmpty
-                    ? _buildAgentFormCreationArea()
-                    : Container(
-                  padding: EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(Icons.description, size: 48, color: Colors.grey[400]),
-                      SizedBox(height: 16),
-                      text('Select an agent form to get started', 16, TextType.Regular),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAgentFormCreationArea() {
-    return Container(
-      padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              text(_selectedAgentForm, 20, TextType.Bold),
-              IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  setState(() {
-                    _selectedAgentForm = '';
-                    _clearAgentFormFields();
-                  });
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          if (_selectedAgentForm == 'Incident Reports') _buildIncidentReportForm(),
-          if (_selectedAgentForm == 'Battery History') _buildBatteryHistoryForm(),
-          if (_selectedAgentForm == 'Power Events') _buildPowerEventsForm(),
-          if (_selectedAgentForm == 'Shift Records') _buildShiftRecordsForm(),
-          if (_selectedAgentForm == 'Customer Details') _buildCustomerDetailsForm(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildIncidentReportForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Report an Incident', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Incident Title *',
-          hintText: 'e.g., Battery Overheating',
-          controller: _incidentTitleController,
-        ),
-        SizedBox(height: 16),
-        _buildFormField(
-          label: 'Description *',
-          hintText: 'Describe the incident in detail...',
-          controller: _incidentDescriptionController,
-          maxLines: 3,
-        ),
-        SizedBox(height: 16),
-        _buildFormField(
-          label: 'Location *',
-          hintText: 'e.g., Station A, Lagos',
-          controller: _incidentLocationController,
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Submit Incident Report",
-                () {
-              _submitIncidentReport();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBatteryHistoryForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Battery History Tracking', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Battery Serial Number *',
-          hintText: 'e.g., BAT-123456',
-          controller: _batterySerialController,
-        ),
-        SizedBox(height: 16),
-        _buildFormField(
-          label: 'Current Status *',
-          hintText: 'e.g., In Service, Maintenance, Retired',
-          controller: _batteryStatusController,
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Update Battery History",
-                () {
-              _updateBatteryHistory();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPowerEventsForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Power Event Log', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Event Description *',
-          hintText: 'e.g., Power Outage, Voltage Spike',
-          controller: _powerEventController,
-          maxLines: 2,
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Log Power Event",
-                () {
-              _logPowerEvent();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShiftRecordsForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Shift Record Entry', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Shift Notes *',
-          hintText: 'Enter shift summary and notes...',
-          controller: _shiftNotesController,
-          maxLines: 4,
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Save Shift Record",
-                () {
-              _saveShiftRecord();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCustomerDetailsForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Customer Information', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Search Customer *',
-          hintText: 'Enter customer name or ID',
-          controller: _customerSearchController,
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Search Customer",
-                () {
-              _searchCustomer();
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAgentFormBox(String title, String description) {
-    bool isSelected = _selectedAgentForm == title;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedAgentForm = title;
-          });
-        },
-        child: Container(
-          width: 280,
-          height: 90,
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSelected ? colorPrimaryLight : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isSelected ? colorPrimary : Colors.grey[300]!,
-              width: isSelected ? 2 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              text(title, 16, TextType.SemiBold),
-              SizedBox(height: 4),
-              textWithColor(description, 14, TextType.Regular, Colors.grey[600]!),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  void _submitIncidentReport() {
-    print('Submitting incident report:');
-    print('Title: ${_incidentTitleController.text}');
-    print('Description: ${_incidentDescriptionController.text}');
-    print('Location: ${_incidentLocationController.text}');
-    _showSuccessNotification("Incident report submitted successfully!");
-    _clearAgentFormFields();
-  }
-
-  void _updateBatteryHistory() {
-    print('Updating battery history:');
-    print('Serial: ${_batterySerialController.text}');
-    print('Status: ${_batteryStatusController.text}');
-    _showSuccessNotification("Battery history updated!");
-    _clearAgentFormFields();
-  }
-
-  void _logPowerEvent() {
-    print('Logging power event: ${_powerEventController.text}');
-    _showSuccessNotification("Power event logged!");
-    _clearAgentFormFields();
-  }
-
-  void _saveShiftRecord() {
-    print('Saving shift record: ${_shiftNotesController.text}');
-    _showSuccessNotification("Shift record saved!");
-    _clearAgentFormFields();
-  }
-
-  void _searchCustomer() {
-    print('Searching customer: ${_customerSearchController.text}');
-    _showSuccessNotification("Customer search completed!");
-    _clearAgentFormFields();
-  }
-
-  void _clearAgentFormFields() {
-    _incidentTitleController.clear();
-    _incidentDescriptionController.clear();
-    _incidentLocationController.clear();
-    _batterySerialController.clear();
-    _batteryStatusController.clear();
-    _powerEventController.clear();
-    _shiftNotesController.clear();
-    _customerSearchController.clear();
-  }
-
-  Widget _buildAdminFormContent() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.all(24),
-          child: text('Admin Forms', 18, TextType.Bold),
-        ),
-        Divider(height: 1),
-        Container(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                flex: 2,
-                child: _buildFormCategory(
-                  'ADMIN CONFIGURATION',
-                  [
-                    _buildAdminFormBox('Country Management', 'Manage country data'),
-                    _buildAdminFormBox('Station Management', 'Configure stations'),
-                    _buildAdminFormBox('Agent Management', 'Manage agent profiles'),
-                    _buildAdminFormBox('Shift Management', 'Configure shift schedules'),
-                    _buildAdminFormBox('Customer Management', 'Manage customer information'),
-                  ],
-                ),
-              ),
-              Container(
-                width: 1,
-                margin: EdgeInsets.symmetric(vertical: 16),
-                color: Colors.grey[300],
-              ),
-              Expanded(
-                flex: 3,
-                child: _selectedAdminForm.isNotEmpty
-                    ? _buildAdminFormCreationArea()
-                    : Container(
-                  padding: EdgeInsets.all(24),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAdminFormBox(String title, String description) {
-    bool isSelected = _selectedAdminForm == title;
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: GestureDetector(
-        onTap: () {
-          setState(() {
-            _selectedAdminForm = title;
-          });
-        },
-        child: Container(
-          width: 280,
-          height: 90,
-          padding: EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: isSelected ? colorPrimaryLight : Colors.white,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: isSelected ? colorPrimary : Colors.grey[300]!,
-              width: isSelected ? 2 : 1,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black12,
-                blurRadius: 2,
-                offset: Offset(0, 1),
-              ),
-            ],
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              text(title, 16, TextType.SemiBold),
-              SizedBox(height: 4),
-              textWithColor(description, 14, TextType.Regular, Colors.grey[600]!),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAdminFormCreationArea() {
-    return Container(
-      padding: EdgeInsets.all(24),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              text(_selectedAdminForm, 20, TextType.Bold),
-              IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  setState(() {
-                    _selectedAdminForm = '';
-                  });
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: 20),
-          if (_selectedAdminForm == 'Country Management') _buildCountryManagementForm(),
-          if (_selectedAdminForm == 'Station Management') _buildStationManagementForm(),
-          if (_selectedAdminForm == 'Agent Management') _buildAgentManagementFormContent(),
-          if (_selectedAdminForm == 'Shift Management') _buildShiftManagementForm(),
-          if (_selectedAdminForm == 'Customer Management') _buildCustomerManagementForm(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAgentManagementFormContent() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              backButtonWithAction(context, () {
-                setState(() {
-                  _showAgentForm = false;
-                  _showDashboard = true;
-                  _clearAgentForm();
-                  _showAddForm = false;
-                });
-              }),
-              SizedBox(width: 16),
-              text("Agent Management", 20, TextType.Bold),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.grey[50],
-                        borderRadius: BorderRadius.circular(8),
-                        border: Border.all(color: Colors.grey[300]!),
-                      ),
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: 'Search agents...',
-                          hintStyle: TextStyle(color: Colors.grey[600]),
-                          prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                        ),
-                      ),
-                    ),
-                  ),
-                  SizedBox(width: 16),
-                  ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _showAddForm = true;
-                        _showEditForm = false;
-                        _currentEditingAgent = '';
-                        _clearAgentForm();
-                      });
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.add, color: Colors.white, size: 20),
-                        SizedBox(width: 8),
-                        textWithColor('Add Agent', 14, TextType.SemiBold, Colors.white),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 24),
-              text("Agents (4)", 20, TextType.Bold),
-              SizedBox(height: 16),
-              if (_showAddForm) _buildAddAgentForm(),
-              if (_showEditForm) _buildEditAgentForm(),
-              Column(
-                children: [
-                  _buildAgentCard(
-                    name: 'John Doe',
-                    agentId: 'AGT-001',
-                    status: 'Active',
-                    phone: '+234-801-234-5678',
-                    email: 'john.doe@spiro.com',
-                    station: 'Lagos Central Hub',
-                    address: '15 Ikoyi Street, Lagos Island, Lagos State',
-                    joined: '2024-01-15',
-                    updated: '2024-09-15 10:00:00',
-                  ),
-                  SizedBox(height: 16),
-                  _buildAgentCard(
-                    name: 'Sarah Kim',
-                    agentId: 'AGT-002',
-                    status: 'Active',
-                    phone: '+234-802-345-6789',
-                    email: 'sarah.kim@spiro.com',
-                    station: 'Ikeja Business District',
-                    address: '23 Allen Avenue, Ikeja, Lagos State',
-                    joined: '2024-02-01',
-                    updated: '2024-09-20 14:30:00',
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildAgentCard({
-    required String name,
-    required String agentId,
-    required String status,
-    required String phone,
-    required String email,
-    required String station,
-    required String address,
-    required String joined,
-    required String updated,
-  }) {
-    Color statusColor = status == 'Active' ? Colors.green : Colors.orange;
-
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey[300]!),
-      ),
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.grey[200],
-                ),
-                child: Icon(Icons.person, color: Colors.grey[600]),
-              ),
-              SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        text(name, 16, TextType.Bold),
-                        Row(
-                          children: [
-                            _buildCardIconButton(Icons.edit, 'Edit', Colors.blue, () {
-                              setState(() {
-                                _showAddForm = false;
-                              });
-                              _editAgent(
-                                name: name,
-                                agentId: agentId,
-                                phone: phone,
-                                email: email,
-                                station: station,
-                                address: address,
-                              );
-                            }),
-                            SizedBox(width: 8),
-                            _buildCardIconButton(Icons.delete, 'Delete', Colors.red, () {
-                              _showDeleteConfirmation(name, agentId);
-                            }),
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 4),
-                    Row(
-                      children: [
-                        text(phone, 14, TextType.Regular),
-                        SizedBox(width: 8),
-                        Container(
-                          width: 4,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        text(agentId, 14, TextType.Regular),
-                        SizedBox(width: 8),
-                        Container(
-                          width: 4,
-                          height: 4,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[500],
-                          ),
-                        ),
-                        SizedBox(width: 8),
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: statusColor.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(4),
-                            border: Border.all(color: statusColor),
-                          ),
-                          child: textWithColor(status, 12, TextType.SemiBold, statusColor),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12),
-          Padding(
-            padding: EdgeInsets.only(left: 52),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Icon(Icons.email, size: 16, color: Colors.grey[600]),
-                    SizedBox(width: 8),
-                    textWithColor(email, 14, TextType.Regular, Colors.blue),
-                  ],
-                ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Icon(Icons.location_on, size: 16, color: Colors.grey[600]),
-                    SizedBox(width: 8),
-                    text(station, 14, TextType.Regular),
-                  ],
-                ),
-                SizedBox(height: 8),
-                text('Address: $address', 14, TextType.Regular),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    text('Joined: $joined', 12, TextType.Regular),
-                    SizedBox(width: 16),
-                    text('Updated: $updated', 12, TextType.Regular),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCardIconButton(IconData icon, String tooltip, Color color, VoidCallback onPressed) {
-    return Container(
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: IconButton(
-        icon: Icon(icon, size: 16, color: color),
-        tooltip: tooltip,
-        onPressed: onPressed,
-        padding: EdgeInsets.all(4),
-        constraints: BoxConstraints(minWidth: 32, minHeight: 32),
-      ),
-    );
-  }
-
-  void _editAgent({
-    required String name,
-    required String agentId,
-    required String phone,
-    required String email,
-    required String station,
-    required String address,
-  }) {
-    setState(() {
-      _showAddForm = false;
-      _showEditForm = true;
-      _currentEditingAgent = name;
-      _populateEditFormWithAgentData(
-        name: name,
-        agentId: agentId,
-        phone: phone,
-        email: email,
-        station: station,
-        address: address,
-      );
-    });
-  }
-
-  Widget _buildEditAgentForm() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: Colors.blue[50],
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.blue[200]!),
-      ),
-      padding: EdgeInsets.all(16),
-      margin: EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  text("Edit Agent Details", 16, TextType.Bold),
-                  if (_currentEditingAgent.isNotEmpty)
-                    text("Editing: $_currentEditingAgent", 12, TextType.Regular),
-                ],
-              ),
-              IconButton(
-                icon: Icon(Icons.close, size: 18),
-                onPressed: () {
-                  setState(() {
-                    _showEditForm = false;
-                    _currentEditingAgent = '';
-                    _clearEditForm();
-                  });
-                },
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildEditFormField(
-                      label: 'Full Name',
-                      hintText: 'Enter full name',
-                      controller: _editNameController,
-                    ),
-                    SizedBox(height: 12),
-                    _buildEditFormField(
-                      label: 'Phone Number',
-                      hintText: 'Enter phone number',
-                      controller: _editPhoneController,
-                    ),
-                    SizedBox(height: 12),
-                    _buildEditFormField(
-                      label: 'Address',
-                      hintText: 'Enter address',
-                      controller: _editAddressController,
-                      maxLines: 2,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildEditFormField(
-                      label: 'Agent ID',
-                      hintText: 'Enter agent ID',
-                      controller: _editAgentIdController,
-                    ),
-                    SizedBox(height: 12),
-                    _buildEditFormField(
-                      label: 'Email',
-                      hintText: 'Enter email address',
-                      controller: _editEmailController,
-                    ),
-                    SizedBox(height: 12),
-                    _buildEditFormField(
-                      label: 'Station',
-                      hintText: 'Enter station',
-                      controller: _editStationController,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 16),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _showEditForm = false;
-                    _currentEditingAgent = '';
-                    _clearEditForm();
-                  });
-                },
-                child: textWithColor('Cancel', 14, TextType.Regular, Colors.grey[600]!),
-              ),
-              SizedBox(width: 12),
-              ElevatedButton(
-                onPressed: _saveAgentEdits,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                ),
-                child: textWithColor('Save Changes', 14, TextType.SemiBold, Colors.white),
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEditFormField({
-    required String label,
-    required String hintText,
-    required TextEditingController controller,
-    int maxLines = 1,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text(label, 14, TextType.SemiBold),
-        SizedBox(height: 6),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(6),
-            border: Border.all(color: Colors.grey[400]!),
-          ),
-          child: TextField(
-            controller: controller,
-            maxLines: maxLines,
-            decoration: InputDecoration(
-              hintText: hintText,
-              hintStyle: TextStyle(color: Colors.grey[600]),
-              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              border: InputBorder.none,
-              isDense: true,
-            ),
-            style: TextStyle(fontSize: 14),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _populateEditFormWithAgentData({
-    required String name,
-    required String agentId,
-    required String phone,
-    required String email,
-    required String station,
-    required String address,
-  }) {
-    _editNameController.text = name;
-    _editAgentIdController.text = agentId;
-    _editPhoneController.text = phone;
-    _editEmailController.text = email;
-    _editStationController.text = station;
-    _editAddressController.text = address;
-  }
-
-  void _clearEditForm() {
-    _editNameController.clear();
-    _editAgentIdController.clear();
-    _editPhoneController.clear();
-    _editEmailController.clear();
-    _editStationController.clear();
-    _editAddressController.clear();
-  }
-
-  void _saveAgentEdits() {
-    print('Saving agent edits:');
-    print('Name: ${_editNameController.text}');
-    print('Agent ID: ${_editAgentIdController.text}');
-    print('Phone: ${_editPhoneController.text}');
-    print('Email: ${_editEmailController.text}');
-    print('Station: ${_editStationController.text}');
-    print('Address: ${_editAddressController.text}');
-
-    _showSuccessNotification("Agent details updated successfully!");
-
-    setState(() {
-      _showEditForm = false;
-      _currentEditingAgent = '';
-      _clearEditForm();
-    });
-  }
-
-  void _showDeleteConfirmation(String name, String agentId) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: text("Delete Agent", 16, TextType.Bold),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              text("Are you sure you want to delete this agent?", 14, TextType.Regular),
-              SizedBox(height: 8),
-              text("Name: $name", 14, TextType.SemiBold),
-              text("Agent ID: $agentId", 14, TextType.Regular),
-              SizedBox(height: 8),
-              text("This action cannot be undone.", 14, TextType.Regular),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(context),
-              child: textWithColor('Cancel', 14, TextType.Regular, Colors.grey[600]!),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _deleteAgent(name, agentId);
-              },
-              child: textWithColor('Delete', 14, TextType.SemiBold, Colors.red),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteAgent(String name, String agentId) {
-    print('Deleting agent: $name ($agentId)');
-    _showSuccessNotification("Agent $name deleted successfully!");
-  }
-
-  void _showAddAgentForm() {
-    setState(() {
-      _showAddForm = true;
-      _showEditForm = false;
-      _currentEditingAgent = '';
-      _clearAgentForm();
-    });
-  }
-
-  Widget _buildCountryManagementForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Add New Country', 18, TextType.Bold),
-        SizedBox(height: 20),
-        Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildFormField(
-                    label: 'Country Name *',
-                    hintText: 'e.g., Nigeria',
-                    controller: TextEditingController(),
-                  ),
-                  SizedBox(height: 16),
-                  _buildFormField(
-                    label: 'Country Code *',
-                    hintText: 'e.g., NG',
-                    controller: TextEditingController(),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildFormField(
-                    label: 'Currency *',
-                    hintText: 'e.g., NGN',
-                    controller: TextEditingController(),
-                  ),
-                  SizedBox(height: 16),
-                  _buildFormField(
-                    label: 'Timezone *',
-                    hintText: 'e.g., WAT',
-                    controller: TextEditingController(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Add Country",
-                () {},
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildStationManagementForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Add New Station', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Station Name *',
-          hintText: 'e.g., Lagos Main Station',
-          controller: TextEditingController(),
-        ),
-        SizedBox(height: 16),
-        _buildFormField(
-          label: 'Location *',
-          hintText: 'Full address...',
-          controller: TextEditingController(),
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Add Station",
-                () {},
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildShiftManagementForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Configure Shift', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Shift Name *',
-          hintText: 'e.g., Morning Shift',
-          controller: TextEditingController(),
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Save Shift",
-                () {},
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildCustomerManagementForm() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        text('Add Customer', 18, TextType.Bold),
-        SizedBox(height: 20),
-        _buildFormField(
-          label: 'Customer Name *',
-          hintText: 'e.g., ABC Corporation',
-          controller: TextEditingController(),
-        ),
-        SizedBox(height: 30),
-        SizedBox(
-          width: double.infinity,
-          child: roundedCornerButton(
-            "Add Customer",
-                () {},
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildFormCategory(String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(24, 24, 24, 16),
-          child: text(title, 14, TextType.Bold),
-        ),
-        ...items,
-      ],
-    );
-  }
-
-  Widget _buildFormItem(String title, String description) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: BoxDecoration(
-        border: Border(bottom: BorderSide(color: Colors.grey[200]!)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          text(title, 16, TextType.SemiBold),
-          SizedBox(height: 4),
-          textWithColor(description, 14, TextType.Regular, Colors.grey[600]!),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBatteryManagementForm() {
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(16.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              backButtonWithAction(context, () {
-                setState(() {
-                  _showBatteryForm = false;
-                  _showDashboard = true;
-                  _clearBatteryForm();
-                });
-              }),
-              SizedBox(width: 16),
-              text("Battery Management", 20, TextType.Bold),
-            ],
-          ),
-          SizedBox(height: 16),
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.grey[50],
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(color: Colors.grey[300]!),
-            ),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search batteries...',
-                hintStyle: TextStyle(color: Colors.grey[600]),
-                prefixIcon: Icon(Icons.search, color: Colors.grey[600]),
-                border: InputBorder.none,
-                contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              ),
-            ),
-          ),
-          SizedBox(height: 24),
-          _buildBatteryFormSection(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildBatteryFormSection() {
-    return Container(
-      width: double.infinity,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          text("Add New Battery", 20, TextType.Bold),
-          SizedBox(height: 20),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _buildBatteryLeftColumn(),
-              ),
-              SizedBox(width: 20),
-              Expanded(
-                child: _buildBatteryRightColumn(),
-              ),
-            ],
-          ),
-          SizedBox(height: 30),
-          SizedBox(
-            width: double.infinity,
-            child: roundedCornerButton(
-              _isLoading ? "Adding..." : "Add Battery",
-              _isLoading ? null : _submitBatteryForm,
-            ),
-          ),
-          if (_isLoading) ...[
-            SizedBox(height: 16),
-            Center(child: CircularProgressIndicator(color: colorPrimary)),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMenuSection(String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-          child: textWithColor(title, 12, TextType.Bold, Colors.grey[600]!),
-        ),
-        ...items,
-      ],
-    );
-  }
-
-  Widget _buildBatteryLeftColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildFormField(
-          label: 'OEM *',
-          hintText: 'A7246AX1Axxxxxxxx',
-          controller: _oemController,
-        ),
-        SizedBox(height: 16),
-        _buildFormField(
-          label: 'Serial Number *',
-          hintText: 'EKON/RW/UNI/07100',
-          controller: _serialNumberController,
-          keyboardType: TextInputType.text,
-        ),
-      ],
-    );
-  }
-
-  Widget _buildBatteryRightColumn() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildFormField(
-          label: 'Battery Type ID *',
-          hintText: '',
-          controller: _batteryTypeIdController,
-        ),
-      ],
-    );
+    return Container();
   }
 
   Widget _buildDashboard() {
@@ -3533,7 +2507,10 @@ class HomeState extends State<Home> implements ConnectHome{
           Row(
             children: [
               Expanded(
-                child: titleAndDescription('Dashboard', 'Control tower overview'),
+                child: titleAndDescription(
+                  'Dashboard',
+                  'Control tower overview',
+                ),
               ),
               IconButton(
                 icon: Icon(Icons.home, color: colorPrimary),
@@ -3592,44 +2569,46 @@ class HomeState extends State<Home> implements ConnectHome{
     return GridView.count(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
-      crossAxisCount: 5,
+      crossAxisCount: 4,
       crossAxisSpacing: 16,
       mainAxisSpacing: 16,
-      childAspectRatio: 1.4,
+      childAspectRatio: 1.8,
       children: [
-        _buildStatCard('Active Agents', '1229', '19 total • +12% vs last week', '+12%', true),
-        _buildStatCard('Swaps Today', '999', '99,999 total • Target: 100,000', '+69%', true),
-        _buildStatCard('Active Issues', '20', 'Across all stations critical', null, false),
-        _buildStatCard('Downtime %', '2.1%', '97.9% uptime good', null, true),
-        _buildStatCard('Power Usage', '12.4 MW', '14-day avg: 11.8 MW', '+3.2%', true),
+        _buildStatCard('Active Agents', '356', Icons.people, Colors.blue),
+        _buildStatCard('Total Swaps', '7,379', Icons.swap_horiz, Colors.green),
+        _buildStatCard('Power Stations', '19', Icons.ev_station, Colors.orange),
+        _buildStatCard('Batteries', '1,234', Icons.battery_std, Colors.purple),
       ],
     );
   }
 
-  Widget _buildStatCard(String title, String mainValue, String subtitle, String? trend, bool? trendPositive) {
+  Widget _buildStatCard(
+    String title,
+    String mainValue,
+    IconData icon,
+    Color color,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          textWithColor(title, 14, TextType.SemiBold, Colors.grey[700]!),
-          text(mainValue, 24, TextType.Bold),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              textWithColor(subtitle, 12, TextType.Regular, Colors.grey[600]!),
-              if (trend != null) ...[
-                SizedBox(height: 4),
-                textWithColor(trend, 12, TextType.SemiBold, trendPositive == true ? Colors.green : Colors.red),
-              ],
+              textWithColor(title, 14, TextType.SemiBold, Colors.grey[700]!),
+              Icon(icon, color: color, size: 28),
             ],
           ),
+          text(mainValue, 24, TextType.Bold),
         ],
       ),
     );
@@ -3641,7 +2620,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       padding: EdgeInsets.all(16),
       child: Column(
@@ -3663,7 +2644,6 @@ class HomeState extends State<Home> implements ConnectHome{
             ),
             child: Stack(
               children: [
-
                 Container(
                   width: double.infinity,
                   height: double.infinity,
@@ -3674,18 +2654,31 @@ class HomeState extends State<Home> implements ConnectHome{
                     'assets/images/africa_map.png',
                     fit: BoxFit.contain,
                     errorBuilder: (context, error, stackTrace) {
-
                       return Container(
                         color: Colors.blue[50],
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(Icons.map, size: 48, color: Colors.blue[300]),
+                              Icon(
+                                Icons.map,
+                                size: 48,
+                                color: Colors.blue[300],
+                              ),
                               SizedBox(height: 8),
-                              textWithColor('Africa Operations Map', 16, TextType.Bold, Colors.blue[600]!),
+                              textWithColor(
+                                'Africa Operations Map',
+                                16,
+                                TextType.Bold,
+                                Colors.blue[600]!,
+                              ),
                               SizedBox(height: 8),
-                              textWithColor('Add africa_map.png to assets', 12, TextType.Regular, Colors.grey[600]!),
+                              textWithColor(
+                                'Add africa_map.png to assets',
+                                12,
+                                TextType.Regular,
+                                Colors.grey[600]!,
+                              ),
                             ],
                           ),
                         ),
@@ -3694,43 +2687,62 @@ class HomeState extends State<Home> implements ConnectHome{
                   ),
                 ),
 
-
                 Positioned(
                   top: 80,
                   left: 150,
-                  child: _buildCountryMarker('Nigeria', Colors.green, '4972 agents'),
+                  child: _buildCountryMarker(
+                    'Nigeria',
+                    Colors.green,
+                    '4972 agents',
+                  ),
                 ),
                 Positioned(
                   top: 120,
                   left: 120,
-                  child: _buildCountryMarker('Ghana', Colors.blue, '2891 agents'),
+                  child: _buildCountryMarker(
+                    'Ghana',
+                    Colors.blue,
+                    '2891 agents',
+                  ),
                 ),
                 Positioned(
                   top: 180,
                   left: 200,
-                  child: _buildCountryMarker('Kenya', Colors.orange, '1567 agents'),
+                  child: _buildCountryMarker(
+                    'Kenya',
+                    Colors.orange,
+                    '1567 agents',
+                  ),
                 ),
                 Positioned(
                   top: 220,
                   left: 210,
-                  child: _buildCountryMarker('Tanzania', Colors.purple, '892 agents'),
+                  child: _buildCountryMarker(
+                    'Tanzania',
+                    Colors.purple,
+                    '892 agents',
+                  ),
                 ),
                 Positioned(
                   top: 150,
                   left: 190,
-                  child: _buildCountryMarker('Uganda', Colors.red, '745 agents'),
+                  child: _buildCountryMarker(
+                    'Uganda',
+                    Colors.red,
+                    '745 agents',
+                  ),
                 ),
                 Positioned(
                   top: 200,
                   left: 195,
-                  child: _buildCountryMarker('Rwanda', Colors.amber, '423 agents'),
+                  child: _buildCountryMarker(
+                    'Rwanda',
+                    Colors.amber,
+                    '423 agents',
+                  ),
                 ),
 
-                Positioned(
-                  top: 16,
-                  left: 16,
-                  child: _buildMapInfoPanel(),
-                ),
+                Positioned(top: 16, left: 16, child: _buildMapInfoPanel()),
               ],
             ),
           ),
@@ -3742,7 +2754,6 @@ class HomeState extends State<Home> implements ConnectHome{
   Widget _buildCountryMarker(String country, Color color, String info) {
     return GestureDetector(
       onTap: () {
-
         _showCountryDetails(country, info);
       },
       child: Container(
@@ -3784,7 +2795,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -3804,7 +2817,7 @@ class HomeState extends State<Home> implements ConnectHome{
               SizedBox(width: 12),
               _buildStatusIndicator(Colors.blue, 'Maintenance'),
             ],
-          )
+          ),
         ],
       ),
     );
@@ -3813,7 +2826,7 @@ class HomeState extends State<Home> implements ConnectHome{
   Widget _buildStatusIndicator(Color color, String label) {
     return Row(
       children: [
-        Container(width: 8, height: 8, decoration: BoxDecoration(color: color, shape: BoxShape.circle)),
+        Container(width: 8, height: 8, color: color),
         SizedBox(width: 4),
         text(label, 10, TextType.Regular),
       ],
@@ -3821,7 +2834,6 @@ class HomeState extends State<Home> implements ConnectHome{
   }
 
   void _showCountryDetails(String country, String info) {
-
     print('Selected: $country - $info');
 
     // Example: Show a snackbar with country info
@@ -3832,7 +2844,6 @@ class HomeState extends State<Home> implements ConnectHome{
       ),
     );
   }
-
 
   Widget _buildChartsRow() {
     return Row(
@@ -3852,9 +2863,7 @@ class HomeState extends State<Home> implements ConnectHome{
         height: 250,
         child: SfCartesianChart(
           primaryXAxis: CategoryAxis(),
-          primaryYAxis: NumericAxis(
-            title: AxisTitle(text: 'Percentage'),
-          ),
+          primaryYAxis: NumericAxis(title: AxisTitle(text: 'Percentage')),
           series: <CartesianSeries>[
             ColumnSeries<ChartData, String>(
               dataSource: [
@@ -3868,7 +2877,7 @@ class HomeState extends State<Home> implements ConnectHome{
               yValueMapper: (ChartData data, _) => data.y,
               pointColorMapper: (ChartData data, _) => data.color,
               dataLabelSettings: DataLabelSettings(isVisible: true),
-            )
+            ),
           ],
         ),
       ),
@@ -3881,12 +2890,8 @@ class HomeState extends State<Home> implements ConnectHome{
       Container(
         height: 250,
         child: SfCartesianChart(
-          primaryXAxis: CategoryAxis(
-            title: AxisTitle(text: 'Date'),
-          ),
-          primaryYAxis: NumericAxis(
-            title: AxisTitle(text: 'Power (kWh)'),
-          ),
+          primaryXAxis: CategoryAxis(title: AxisTitle(text: 'Date')),
+          primaryYAxis: NumericAxis(title: AxisTitle(text: 'Power (kWh)')),
           series: <CartesianSeries>[
             LineSeries<ChartData, String>(
               dataSource: [
@@ -3902,7 +2907,7 @@ class HomeState extends State<Home> implements ConnectHome{
               yValueMapper: (ChartData data, _) => data.y,
               dataLabelSettings: DataLabelSettings(isVisible: true),
               markerSettings: MarkerSettings(isVisible: true),
-            )
+            ),
           ],
         ),
       ),
@@ -3914,16 +2919,14 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       padding: EdgeInsets.all(16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          text(title, 16, TextType.Bold),
-          SizedBox(height: 16),
-          chart,
-        ],
+        children: [text(title, 16, TextType.Bold), SizedBox(height: 16), chart],
       ),
     );
   }
@@ -3947,7 +2950,11 @@ class HomeState extends State<Home> implements ConnectHome{
   Widget _buildLineChartPoint(double height) {
     return Column(
       children: [
-        Container(width: 6, height: 6, decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle)),
+        Container(
+          width: 6,
+          height: 6,
+          decoration: BoxDecoration(color: Colors.blue, shape: BoxShape.circle),
+        ),
         Container(width: 2, height: height / 4, color: Colors.blue),
       ],
     );
@@ -3956,11 +2963,7 @@ class HomeState extends State<Home> implements ConnectHome{
   Widget _buildLegendItem(Color color, String text) {
     return Row(
       children: [
-        Container(
-          width: 12,
-          height: 12,
-          color: color,
-        ),
+        Container(width: 12, height: 12, color: color),
         SizedBox(width: 4),
         textWithColor(text, 12, TextType.Regular, colorPrimaryDark),
       ],
@@ -3972,7 +2975,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       padding: EdgeInsets.all(16),
       child: Column(
@@ -4069,7 +3074,14 @@ class HomeState extends State<Home> implements ConnectHome{
                 sideTitles: SideTitles(
                   showTitles: true,
                   getTitlesWidget: (value, meta) {
-                    final titles = ['Nigeria', 'Ghana', 'Kenya', 'Tanzania', 'Uganda', 'Rwanda'];
+                    final titles = [
+                      'Nigeria',
+                      'Ghana',
+                      'Kenya',
+                      'Tanzania',
+                      'Uganda',
+                      'Rwanda',
+                    ];
                     return Padding(
                       padding: EdgeInsets.only(top: 8.0),
                       child: Text(
@@ -4092,7 +3104,9 @@ class HomeState extends State<Home> implements ConnectHome{
                   reservedSize: 40,
                 ),
               ),
-              rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+              rightTitles: AxisTitles(
+                sideTitles: SideTitles(showTitles: false),
+              ),
               topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
             ),
             gridData: FlGridData(show: true, drawVerticalLine: false),
@@ -4110,7 +3124,8 @@ class HomeState extends State<Home> implements ConnectHome{
       children: [
         Container(
           width: 30,
-          height: height / 8, // Adjust division factor based on your max data value
+          height:
+              height / 8, // Adjust division factor based on your max data value
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
@@ -4118,7 +3133,11 @@ class HomeState extends State<Home> implements ConnectHome{
           child: Center(
             child: Text(
               height.toInt().toString(),
-              style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ),
@@ -4155,7 +3174,9 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -4180,23 +3201,73 @@ class HomeState extends State<Home> implements ConnectHome{
               ],
             ),
           ),
-          _buildAgentRow('AGQ01', 'John Doe', 'Accra Central', 'online', 'Morning'),
-          _buildAgentRow('AGQ02', 'Sarah Wilson', 'Lagos Island', 'busy', 'Morning'),
-          _buildAgentRow('AGQ03', 'Michael Chen', 'Nairobi CBD', 'online', 'Morning'),
-          _buildAgentRow('AGQ04', 'Emma Johnson', 'Kumasi Hub', 'break', 'Morning'),
-          _buildAgentRow('AGQ05', 'David Brown', 'Abuja Central', 'busy', 'Afternoon'),
-          _buildAgentRow('AGQ06', 'Lisa Zhang', 'Mombasa Port', 'online', 'Afternoon'),
-          _buildAgentRow('AGQ07', 'James Miller', 'Tamale Station', 'offline', 'Morning'),
-          _buildAgentRow('AGQ08', 'Anna Davis', 'Cape Coast', 'online', 'Evening'),
+          _buildAgentRow(
+            'AGQ01',
+            'John Doe',
+            'Accra Central',
+            'online',
+            'Morning',
+          ),
+          _buildAgentRow(
+            'AGQ02',
+            'Sarah Wilson',
+            'Lagos Island',
+            'busy',
+            'Morning',
+          ),
+          _buildAgentRow(
+            'AGQ03',
+            'Michael Chen',
+            'Nairobi CBD',
+            'online',
+            'Morning',
+          ),
+          _buildAgentRow(
+            'AGQ04',
+            'Emma Johnson',
+            'Kumasi Hub',
+            'break',
+            'Morning',
+          ),
+          _buildAgentRow(
+            'AGQ05',
+            'David Brown',
+            'Abuja Central',
+            'busy',
+            'Afternoon',
+          ),
+          _buildAgentRow(
+            'AGQ06',
+            'Lisa Zhang',
+            'Mombasa Port',
+            'online',
+            'Afternoon',
+          ),
+          _buildAgentRow(
+            'AGQ07',
+            'James Miller',
+            'Tamale Station',
+            'offline',
+            'Morning',
+          ),
+          _buildAgentRow(
+            'AGQ08',
+            'Anna Davis',
+            'Cape Coast',
+            'online',
+            'Evening',
+          ),
           Container(
             padding: EdgeInsets.all(16),
-            decoration: BoxDecoration(border: Border(top: BorderSide(color: Colors.grey[300]!))),
+            decoration: BoxDecoration(
+              border: Border(top: BorderSide(color: Colors.grey[300]!)),
+            ),
             child: textWithAlignAndColor(
-                'Do not sell or share my personal info',
-                10,
-                TextType.Regular,
-                TextAlign.center,
-                Colors.grey[600]!
+              'Do not sell or share my personal info',
+              10,
+              TextType.Regular,
+              TextAlign.center,
+              Colors.grey[600]!,
             ),
           ),
         ],
@@ -4204,12 +3275,20 @@ class HomeState extends State<Home> implements ConnectHome{
     );
   }
 
-  Widget _buildAgentRow(String id, String name, String station, String status, String shift) {
+  Widget _buildAgentRow(
+    String id,
+    String name,
+    String station,
+    String status,
+    String shift,
+  ) {
     Color statusColor = _getStatusColor(status);
 
     return Container(
       padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[100]!))),
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey[100]!)),
+      ),
       child: Row(
         children: [
           Expanded(flex: 2, child: text(id, 12, TextType.Regular)),
@@ -4219,7 +3298,14 @@ class HomeState extends State<Home> implements ConnectHome{
             flex: 2,
             child: Row(
               children: [
-                Container(width: 6, height: 6, decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle)),
+                Container(
+                  width: 6,
+                  height: 6,
+                  decoration: BoxDecoration(
+                    color: statusColor,
+                    shape: BoxShape.circle,
+                  ),
+                ),
                 SizedBox(width: 4),
                 text(status, 12, TextType.Regular),
               ],
@@ -4237,33 +3323,62 @@ class HomeState extends State<Home> implements ConnectHome{
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(padding: EdgeInsets.all(16), child: text('Active Alerts', 16, TextType.Bold)),
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: text('Active Alerts', 16, TextType.Bold),
+          ),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: textWithColor(
-                '3 critical alerts require immediate attention',
-                12,
-                TextType.SemiBold,
-                Colors.red
+              '3 critical alerts require immediate attention',
+              12,
+              TextType.SemiBold,
+              Colors.red,
             ),
           ),
           SizedBox(height: 16),
-          _buildAlertItem('Power Consumption High', 'Station power usage exceeds normal parameters', 'Power - Kumasi Hub • Ghana', '45 minutes ago', Colors.red),
+          _buildAlertItem(
+            'Power Consumption High',
+            'Station power usage exceeds normal parameters',
+            'Power - Kumasi Hub • Ghana',
+            '45 minutes ago',
+            Colors.red,
+          ),
           SizedBox(height: 12),
-          _buildAlertItem('Connectivity Issues', 'Intermittent WiFi connectivity reported', 'Connectivity - Tamale Station • Ghana', '1 hour ago', Colors.orange),
+          _buildAlertItem(
+            'Connectivity Issues',
+            'Intermittent WiFi connectivity reported',
+            'Connectivity - Tamale Station • Ghana',
+            '1 hour ago',
+            Colors.orange,
+          ),
           SizedBox(height: 12),
-          _buildAlertItem('System Maintenance Required', 'Scheduled maintenance overdue by 3 days', 'System - Abuja Central • Nigeria', '2 hours ago', Colors.blue),
+          _buildAlertItem(
+            'System Maintenance Required',
+            'Scheduled maintenance overdue by 3 days',
+            'System - Abuja Central • Nigeria',
+            '2 hours ago',
+            Colors.blue,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildAlertItem(String title, String description, String location, String time, Color color) {
+  Widget _buildAlertItem(
+    String title,
+    String description,
+    String location,
+    String time,
+    Color color,
+  ) {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16),
       padding: EdgeInsets.all(12),
@@ -4293,7 +3408,11 @@ class HomeState extends State<Home> implements ConnectHome{
   }
 
   Future<void> _submitAgentForm() async {
-    if (_firstnameController.text.isEmpty || _lastnameController.text.isEmpty || _identificationController.text.isEmpty || _phonenumberController.text.isEmpty || _emailController.text.isEmpty) {
+    if (_firstnameController.text.isEmpty ||
+        _lastnameController.text.isEmpty ||
+        _identificationController.text.isEmpty ||
+        _phonenumberController.text.isEmpty ||
+        _emailController.text.isEmpty) {
       _showErrorNotification("Please fill in all required fields");
       return;
     }
@@ -4337,7 +3456,9 @@ class HomeState extends State<Home> implements ConnectHome{
   }
 
   Future<void> _submitBatteryForm() async {
-    if (_oemController.text.isEmpty || _serialNumberController.text.isEmpty || _batteryTypeIdController.text.isEmpty) {
+    if (_oemController.text.isEmpty ||
+        _serialNumberController.text.isEmpty ||
+        _batteryTypeIdController.text.isEmpty) {
       _showErrorNotification("Please fill in all required fields");
       return;
     }
@@ -4391,7 +3512,7 @@ class HomeState extends State<Home> implements ConnectHome{
       true,
       true,
       null,
-          () {
+      () {
         setState(() {
           _showAgentForm = false;
           _showBatteryForm = false;
@@ -4411,7 +3532,7 @@ class HomeState extends State<Home> implements ConnectHome{
       true,
       true,
       null,
-          () {},
+      () {},
     );
   }
 
@@ -4421,21 +3542,31 @@ class HomeState extends State<Home> implements ConnectHome{
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'online': return Colors.green;
-      case 'busy': return Colors.orange;
-      case 'break': return Colors.blue;
-      case 'offline': return Colors.grey;
-      default: return Colors.grey;
+      case 'online':
+        return Colors.green;
+      case 'busy':
+        return Colors.orange;
+      case 'break':
+        return Colors.blue;
+      case 'offline':
+        return Colors.grey;
+      default:
+        return Colors.grey;
     }
   }
 
   Color _getPriorityColor(String priority) {
     switch (priority.toLowerCase()) {
-      case 'critical': return Colors.red;
-      case 'high': return Colors.orange;
-      case 'medium': return Colors.blue;
-      case 'low': return Colors.green;
-      default: return Colors.grey;
+      case 'critical':
+        return Colors.red;
+      case 'high':
+        return Colors.orange;
+      case 'medium':
+        return Colors.blue;
+      case 'low':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 
@@ -4468,10 +3599,8 @@ class HomeState extends State<Home> implements ConnectHome{
     _customerSearchController.dispose();
     super.dispose();
   }
-
-
-
 }
+
 class ChartData {
   final String x;
   final double y;
