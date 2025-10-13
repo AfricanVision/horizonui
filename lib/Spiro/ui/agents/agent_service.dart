@@ -5,11 +5,13 @@ import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 
 class AgentService {
   final String baseUrl = 'http://localhost:8080/api/agents';
+  final String apikey = 'admin-api-key-67890';
+
 
   Future<List<Agent>> getAgents() async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8080/api/agents'),
+        Uri.parse('$baseUrl/agents'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
