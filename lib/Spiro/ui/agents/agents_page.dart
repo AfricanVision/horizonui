@@ -869,7 +869,9 @@ class _AgentsPageState extends State<AgentsPage> {
     );
   }
 
-   void _clearAgentForm() {
+
+
+  void _clearAgentForm() {
     _firstnameController.clear();
     _middlenameController.clear();
     _lastnameController.clear();
