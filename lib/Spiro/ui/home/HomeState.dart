@@ -9,7 +9,9 @@ import '../incidents/incidents_page.dart';
 import '../reports/reports_page.dart';
 import '../data_entry/data_entry_page.dart';
 import '../../designs/Component.dart';
+import '../../designs/Responsive.dart';
 import '../../utils/Colors.dart';
+import 'ConnectHome.dart';
 import 'Home.dart';
 
 class HomeState extends State<Home> {
@@ -18,62 +20,35 @@ class HomeState extends State<Home> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      drawer: _selectedMenuItem == 'Dashboard' ? _buildSidebar() : null,
-      body: _currentPage,
-    );
+    return ViewModelBuilder<ViewHome>.reactive(
+        viewModelBuilder: () => ViewHome(context, this),
+        onViewModelReady: (viewModel) => {
+          _model = viewModel,
+          _initialiseView()
+        },
+        builder: (context, viewModel, child) => PopScope(canPop: false, // Prevents auto pop
+            onPopInvokedWithResult: (didPop, result) {
+              if (!didPop) {
+                if (_model?.loadingEntry == null && _model?.errorEntry == null) {
+                  _closeApp();
+                }
+              }
+            },child: Scaffold(
+            body: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints viewportConstraints) {
+                  return Responsive(mobile: _mobileView(viewportConstraints),desktop: _desktopView(viewportConstraints),tablet: _desktopView(viewportConstraints),);})),));
   }
 
+  _initialiseView() async {
+    //_model?.setUserDetails();
+  }
 
+  _mobileView(BoxConstraints viewportConstraints){
+    return Column();
+  }
 
-  Widget _buildSidebar() {
-    return Drawer(
-      child: Container(
-        color: Colors.white,
-        child: Column(
-          children: [
-            Container(
-              height: 120,
-              width: double.infinity,
-              color: colorPrimaryDark,
-              padding: EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  textWithColor('Spiro App', 20, TextType.Bold, colorMilkWhite),
-                  SizedBox(height: 4),
-                  textWithColor('Control Tower', 14, TextType.Regular, colorMilkWhite),
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: EdgeInsets.zero,
-                children: [
-                  _buildMenuSection('MAIN MENU', [
-                    _buildMenuItem('Dashboard', Icons.dashboard),
-                    _buildMenuItem('Agents', Icons.people),
-                    _buildMenuItem('Stations', Icons.ev_station),
-                    _buildMenuItem('Batteries', Icons.battery_std),
-                    _buildMenuItem('Analytics', Icons.analytics),
-                    _buildMenuItem('Incidents', Icons.warning),
-                    _buildMenuItem('Reports', Icons.assessment),
-                    _buildMenuItem('Data Entry', Icons.data_usage),
-                  ]),
-                  Divider(height: 32),
-                  _buildMenuSection('SYSTEM', [
-                    _buildMenuItem('Settings', Icons.settings),
-                  ]),
-                ],
-              ),
-            ),
-            _buildUserSection(),
-          ],
-        ),
-      ),
-    );
+  _desktopView(BoxConstraints viewportConstraints){
+    return Column();
   }
 
   Widget _buildMenuItem(String title, IconData icon) {
