@@ -1,11 +1,9 @@
-import 'package:flutter/cupertino.dart';
-
+import 'package:flutter/material.dart';
 import 'HomeState.dart';
 
-class Home extends StatefulWidget{
+class Home extends StatefulWidget {
   const Home({super.key});
 
   @override
-  State<Home> createState() => HomeState();
-
+  HomeState createState() => HomeState();
 }

@@ -1,0 +1,143 @@
+import 'dart:convert';
+import 'package:http/http.dart' as http;
+import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
+
+
+class AgentService {
+  final String baseUrl = 'http://localhost:8080/api';
+  final String apikey = 'admin-api-key-67890';
+
+
+  Future<List<Agent>> getAgents() async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/agents'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-API-KEY': apikey
+        },
+      );
+
+      print('GET Agents Response Status: ${response.statusCode}');
+      print('GET Agents Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final List<dynamic> data = json.decode(response.body);
+        return data.map((item) => Agent.fromJson(item)).toList();
+      } else {
+        throw Exception('Failed to load agents: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Error loading agents: $e');
+      throw Exception('Failed to load agents: $e');
+    }
+  }
+
+  Future<Agent> addAgent(Agent agent) async {
+    try {
+      final Map<String, dynamic> requestBody = {
+        'firstname': agent.firstname,
+        'middlename': agent.middlename,
+        'lastname': agent.lastname,
+        'dob': agent.dob,
+        'nationality': agent.nationality,
+        'identification': agent.identification,
+        'phonenumber': agent.phonenumber,
+        'email': agent.email,
+        'statusId': agent.statusId,
+        'createdBy': agent.createdBy,
+      };
+
+      print('Sending agent data: ${json.encode(requestBody)}');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/agents'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('POST Agent Response Status: ${response.statusCode}');
+      print('POST Agent Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        return Agent.fromJson(responseData);
+      } else {
+        throw Exception('Failed to add agent: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Error adding agent: $e');
+      throw Exception('Failed to add agent: $e');
+    }
+  }
+
+  Future<Agent> updateAgent(String agentId, Agent agent) async {
+    try {
+      final Map<String, dynamic> requestBody = {
+        'id': agentId,
+        'firstname': agent.firstname,
+        'middlename': agent.middlename,
+        'lastname': agent.lastname,
+        'dob': agent.dob,
+        'nationality': agent.nationality,
+        'identification': agent.identification,
+        'phonenumber': agent.phonenumber,
+        'email': agent.email,
+        'statusId': agent.statusId,
+        'createdBy': agent.createdBy,
+      };
+
+      print('Updating agent data: ${json.encode(requestBody)}');
+
+      final response = await http.post(
+        Uri.parse('$baseUrl/agents/update'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+        body: json.encode(requestBody),
+      );
+
+      print('UPDATE Agent Response Status: ${response.statusCode}');
+      print('UPDATE Agent Response Body: ${response.body}');
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> responseData = json.decode(response.body);
+        return Agent.fromJson(responseData);
+      } else {
+        throw Exception('Failed to update agent: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Error updating agent: $e');
+      throw Exception('Failed to update agent: $e');
+    }
+  }
+
+  Future<void> deleteAgent(String agentId) async {
+    try {
+      // Note: Your controller doesn't have a delete endpoint
+      // You'll need to add this to your Spring Boot controller
+      final response = await http.delete(
+        Uri.parse('$baseUrl/agents/$agentId'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+        },
+      );
+
+      print('DELETE Agent Response Status: ${response.statusCode}');
+      print('DELETE Agent Response Body: ${response.body}');
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to delete agent: ${response.statusCode} - ${response.body}');
+      }
+    } catch (e) {
+      print('Error deleting agent: $e');
+      throw Exception('Failed to delete agent: $e');
+    }
+  }
+}

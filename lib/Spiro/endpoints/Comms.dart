@@ -2,56 +2,190 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import '../data/internal/application/BatteryHistoryRequest.dart';
+import '../data/internal/application/BatteryRequest.dart';
+import '../data/internal/application/Agents.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
+import 'CommsDirections.dart';
 import 'ConnectComms.dart';
 
 class Comms implements ConnectComms {
 
   Dio dio = Dio();
-
   ConnectInternalMemory helper;
 
   Comms(this.helper);
 
+  @override
+  Future<bool> sendAgent(Agent userData) async {
+    try {
 
+      final response = await dio.post(
+        "http://localhost:8080/spiro/horizon/agents",
+        data: jsonEncode(userData.toJson()),
+        options: Options(
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
 
-  /*@override
-  Future<Response> sendVehicleItem(VehicleMapping batteryItem) async{
+      print('Response Code: ${response.statusCode}');
+      print('Response Body: ${response.data}');
 
-    *//*  FormData formData = FormData.fromMap({
-      "arguments": batteryItem.toJson(),
-    });
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error sending user registration: $e');
+      rethrow;
+    }
+  }
 
-    final response = await dio.post(
+  @override
+  Future<bool> createBattery(BatteryRequest batteryRequest) async {
+    try {
+      final response = await dio.post(
+        "http://localhost:8080/spiro/horizon/battery/add",
+        data: jsonEncode(batteryRequest.toJson()),
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-      data: formData,
-      options: Options(
-        contentType: 'multipart/form-data',
-      ),
-    );*//*
+  @override
+  Future<BatteryRequest> getBatteryById(String id) async {
+    try {
+      final response = await dio.get(
+        "$partnersRoute$getBatteryById$id",
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return BatteryRequest.fromJson(response.data);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-    FormData formData = FormData.fromMap({
-      "arguments": jsonEncode(batteryItem.toJson()),
-    });
+  @override
+  Future<List<BatteryRequest>> getAllBatteries() async {
+    try {
+      final response = await dio.get(
+        "$partnersRoute$getAllBatteries",
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return (response.data as List).map((item) => BatteryRequest.fromJson(item)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-    final response = await dio.post(
-      "https://sandbox.zohoapis.in/crm/v7/functions/vehicle_battery_update/actions/execute?auth_type=apikey&zapikey=1003.8ec3943cc3c38111b5131692914a876a.7f5623dd74cabb0f67edd488aeba9adb",
-      data: formData,
-      options: Options(
-        contentType: 'multipart/form-data',
-        sendTimeout: Duration(seconds: 10),
-        receiveTimeout: Duration(seconds: 10),
-        validateStatus: (status) => true, // Accept non-200 statuses
-      ),
-    );
+  @override
+  Future<bool> updateBattery(BatteryRequest batteryRequest) async {
+    try {
+      final response = await dio.post(
+        "$partnersRoute$updateBattery",
+        data: jsonEncode(batteryRequest.toJson()),
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-    print('Response Code: ${response.statusCode}');
-    print('Response Body: ${response.data}');
+  @override
+  Future<bool> createBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+    try {
+      final response = await dio.post(
+        "$partnersRoute$createBatteryHistory",
+        data: jsonEncode(batteryHistoryRequest.toJson()),
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-    return response;
+  @override
+  Future<BatteryHistoryRequest> getBatteryHistoryById(String id) async {
+    try {
+      final response = await dio.get(
+        "$partnersRoute$getBatteryHistoryById$id",
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return BatteryHistoryRequest.fromJson(response.data);
+    } catch (e) {
+      rethrow;
+    }
+  }
 
-  }*/
+  @override
+  Future<List<BatteryHistoryRequest>> getAllBatteryHistory() async {
+    try {
+      final response = await dio.get(
+        "$partnersRoute$getAllBatteryHistory",
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return (response.data as List).map((item) => BatteryHistoryRequest.fromJson(item)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
 
+  @override
+  Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+    try {
+      final response = await dio.post(
+        "$partnersRoute$updateBatteryHistory",
+        data: jsonEncode(batteryHistoryRequest.toJson()),
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      rethrow;
+    }
+  }
 
 
 }
