@@ -4,15 +4,17 @@ import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 
 
 class AgentService {
-  final String baseUrl = 'http://localhost:8080/api/agents';
+  final String baseUrl = 'http://localhost:8080/api';
+  final String apiKey = 'admin-api-key-67890';
 
   Future<List<Agent>> getAgents() async {
     try {
       final response = await http.get(
-        Uri.parse('http://localhost:8080/api/agents'),
+        Uri.parse('$baseUrl/agents'),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-API-KEY': apiKey,
         },
       );
 
@@ -114,27 +116,5 @@ class AgentService {
     }
   }
 
-  Future<void> deleteAgent(String agentId) async {
-    try {
-      // Note: Your controller doesn't have a delete endpoint
-      // You'll need to add this to your Spring Boot controller
-      final response = await http.delete(
-        Uri.parse('$baseUrl/agents/$agentId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
 
-      print('DELETE Agent Response Status: ${response.statusCode}');
-      print('DELETE Agent Response Body: ${response.body}');
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete agent: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      print('Error deleting agent: $e');
-      throw Exception('Failed to delete agent: $e');
-    }
-  }
 }
