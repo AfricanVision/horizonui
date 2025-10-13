@@ -4,7 +4,7 @@ import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 
 
 class AgentService {
-  final String baseUrl = 'http://localhost:8080/api/agents';
+  final String baseUrl = 'http://localhost:8080/api';
   final String apikey = 'admin-api-key-67890';
 
 
@@ -15,6 +15,7 @@ class AgentService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-API-KEY': apikey
         },
       );
 
