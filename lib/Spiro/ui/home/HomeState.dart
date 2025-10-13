@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:horizonui/Spiro/ui/home/ConnectHome.dart';
+import 'package:stacked/stacked.dart';
 import '../../data/internal/application/TextType.dart';
+import '../../designs/Responsive.dart';
 import '../dashboard/dashboard_page.dart';
 import '../agents/agents_page.dart';
 import '../stations/stations_page.dart';
@@ -10,18 +14,54 @@ import '../reports/reports_page.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
 import 'Home.dart';
+import 'ViewHome.dart';
 
-class HomeState extends State<Home> {
+class HomeState extends State<Home> implements ConnectHome{
   String _selectedMenuItem = 'Dashboard';
   Widget _currentPage = DashboardPage();
 
-  @override
+  ViewHome? _model;
+
+ /* @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
       drawer: _selectedMenuItem == 'Dashboard' ? _buildSidebar() : null,
       body: _currentPage,
     );
+  }
+*/
+  @override
+  Widget build(BuildContext context) {
+    return ViewModelBuilder<ViewHome>.reactive(
+        viewModelBuilder: () => ViewHome(context, this),
+        onViewModelReady: (viewModel) => {
+          _model = viewModel,
+          _initialiseView()
+        },
+        builder: (context, viewModel, child) => PopScope(canPop: false, // Prevents auto pop
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              if (_model?.loadingEntry == null && _model?.errorEntry == null) {
+                _closeApp();
+              }
+            }
+          },child: Scaffold(
+              body: LayoutBuilder(
+                  builder: (BuildContext context, BoxConstraints viewportConstraints) {
+                    return Responsive(mobile: _mobileView(viewportConstraints),desktop: _desktopView(viewportConstraints),tablet: _desktopView(viewportConstraints),);})),));
+  }
+
+  _initialiseView() async {
+    //_model?.setUserDetails();
+  }
+
+  _mobileView(BoxConstraints viewportConstraints){
+    return Column();
+  }
+
+  _desktopView(BoxConstraints viewportConstraints){
+    return _currentPage;
   }
 
 
@@ -133,5 +173,10 @@ class HomeState extends State<Home> {
       ),
     );
   }
+
+  void _closeApp() {
+    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+  }
+
 
 }

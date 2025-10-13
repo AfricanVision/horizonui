@@ -11,13 +11,21 @@ class ViewHome extends ParentViewModel {
 
   ViewHome(super.context, this.connection);
 
-  Future<bool> sendAgent(Agent userData) async {
-    try {
-      return await getDataManager().sendAgent(userData);
-    } catch (e) {
-      rethrow;
-    }
+  void sendAgent(Agent userData) {
+
+    hasNetwork(() => { closeNetwork(), sendAgent(userData)}).then((value) => {
+      if(value){
+        showLoading("Glading Rights :)....."),
+        getDataManager().sendAgent(userData).then((response) => {
+          closeLoading(),
+         // connection.setUserRights(UserRights.fromJson(response.data))
+        }).onError((error, stackTrace) => {
+          handleError(error, () => {dismissError(), sendAgent(userData)}, () => {dismissError(), sendAgent(userData)}, "Retry")
+        })
+      }
+    });
   }
+
   Future<bool> createBattery(BatteryRequest batteryRequest) async {
     try {
       return await getDataManager().createBattery(batteryRequest);
