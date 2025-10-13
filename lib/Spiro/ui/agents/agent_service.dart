@@ -56,6 +56,7 @@ class AgentService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-API-KEY': apikey
         },
         body: json.encode(requestBody),
       );
@@ -78,17 +79,17 @@ class AgentService {
   Future<Agent> updateAgent(String agentId, Agent agent) async {
     try {
       final Map<String, dynamic> requestBody = {
-        'id': agentId,
-        'firstname': agent.firstname,
-        'middlename': agent.middlename,
-        'lastname': agent.lastname,
-        'dob': agent.dob,
-        'nationality': agent.nationality,
-        'identification': agent.identification,
-        'phonenumber': agent.phonenumber,
-        'email': agent.email,
-        'statusId': agent.statusId,
-        'createdBy': agent.createdBy,
+        "firstname": "John",
+        "middlename": "Michael",
+        "lastname": "Doe",
+        "dob": "1990-05-15",
+        "nationality": "Kenyan",
+        "identification": "A123456789",
+        "phonenumber": "255712345678",
+        "email": "john.doe@example.com",
+        "statusId": "active-status-id",
+        "createdBy": "admin",
+        "updatedBy": "admin"
       };
 
       print('Updating agent data: ${json.encode(requestBody)}');
@@ -117,27 +118,7 @@ class AgentService {
     }
   }
 
-  Future<void> deleteAgent(String agentId) async {
-    try {
-      // Note: Your controller doesn't have a delete endpoint
-      // You'll need to add this to your Spring Boot controller
-      final response = await http.delete(
-        Uri.parse('$baseUrl/agents/$agentId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
 
-      print('DELETE Agent Response Status: ${response.statusCode}');
-      print('DELETE Agent Response Body: ${response.body}');
 
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete agent: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      print('Error deleting agent: $e');
-      throw Exception('Failed to delete agent: $e');
-    }
-  }
+
 }

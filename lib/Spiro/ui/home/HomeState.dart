@@ -7,7 +7,6 @@ import '../batteries/batteries_page.dart';
 import '../analytics/analytics_page.dart';
 import '../incidents/incidents_page.dart';
 import '../reports/reports_page.dart';
-import '../data_entry/data_entry_page.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
 import 'Home.dart';

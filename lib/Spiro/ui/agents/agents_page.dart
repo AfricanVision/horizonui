@@ -859,7 +859,7 @@ class _AgentsPageState extends State<AgentsPage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                _deleteAgent(agentId);
+
               },
               child: textWithColor('Delete', 14, TextType.SemiBold, Colors.red),
             ),
@@ -869,20 +869,7 @@ class _AgentsPageState extends State<AgentsPage> {
     );
   }
 
-  Future<void> _deleteAgent(String agentId) async {
-    setState(() => _isLoading = true);
-    try {
-      await _agentService.deleteAgent(agentId);
-      _showSuccessNotification("Agent deleted successfully!");
-      await _loadAgents(); // Refresh the list
-    } catch (e) {
-      _showErrorNotification("Failed to delete agent: $e");
-    } finally {
-      setState(() => _isLoading = false);
-    }
-  }
-
-  void _clearAgentForm() {
+   void _clearAgentForm() {
     _firstnameController.clear();
     _middlenameController.clear();
     _lastnameController.clear();

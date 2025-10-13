@@ -1,10 +1,9 @@
 
-import '../data/internal/application/BatteryHistoryRequest.dart';
-import '../data/internal/application/BatteryRequest.dart';
-import '../data/internal/application/Agents.dart';
-import 'parent/ParentViewModel.dart';
+import '../../data/internal/application/Agents.dart';
+import '../../data/internal/application/BatteryHistoryRequest.dart';
+import '../../data/internal/application/BatteryRequest.dart';
+import '../parent/ParentViewModel.dart';
 import 'ConnectHome.dart';
-import 'package:dio/dio.dart';
 
 class ViewHome extends ParentViewModel {
 

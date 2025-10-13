@@ -11,7 +11,6 @@ import '../batteries/batteries_page.dart';
 import '../analytics/analytics_page.dart';
 import '../incidents/incidents_page.dart';
 import '../reports/reports_page.dart';
-import '../data_entry/data_entry_page.dart';
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -51,9 +50,6 @@ class _DashboardPageState extends State<DashboardPage> {
           break;
         case 'Reports':
           _currentPage = ReportsPage();
-          break;
-        case 'Data Entry':
-          _currentPage = DataEntryPage();
           break;
         default:
           _currentPage = DashboardPageContent();
@@ -115,7 +111,6 @@ class _DashboardPageState extends State<DashboardPage> {
                         _buildMenuItem('Analytics', Icons.analytics),
                         _buildMenuItem('Incidents', Icons.warning),
                         _buildMenuItem('Reports', Icons.assessment),
-                        _buildMenuItem('Data Entry', Icons.data_usage),
                       ]),
                       Divider(height: 32),
                       _buildMenuSection('SYSTEM', [
