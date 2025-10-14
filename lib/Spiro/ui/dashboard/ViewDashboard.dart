@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/dashboard/ConnectDashBoard.dart';
 import '../../data/internal/application/Agents.dart';
 import '../home/ConnectHome.dart';
 import '../parent/ParentViewModel.dart';
 import '../dashboard/Dashboard.dart';
 
-class ViewHome extends ParentViewModel {
-  ConnectHome connection;
+class ViewDashboard extends ParentViewModel {
+  ConnectDashBoard connection;
 
-  ViewHome(super.context, this.connection);
+  ViewDashboard(super.context, this.connection);
 
    sendAgent(Agent data) async {
     hasNetwork(() => { closeNetwork(), sendAgent(data)}).then((value) => {
@@ -23,6 +24,31 @@ class ViewHome extends ParentViewModel {
     });
   }
 
+
+  void getAgents() {
+    hasNetwork(() => { closeNetwork(), getAgents()}).then((value) => {
+      if(value){
+        showLoading("Loading :)....."),
+        getDataManager().getAgents().then((response) => {
+          closeLoading(),
+          connection.setAgents(getAgentList(response.data))
+        }).onError((error, stackTrace) => {
+          handleError(error, () => {dismissError(), getAgents()}, () => {dismissError()}, "Retry")
+        })
+      }
+    });
+  }
+
+  List<Agent> getAgentList(List<dynamic> value) {
+
+    List<Agent> types = [];
+
+    for (var element in value) {
+      types.add(Agent.fromJson(element));
+    }
+
+    return types;
+  }
 
   Future<void> refreshDashboardData() async {
     try {

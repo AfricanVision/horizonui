@@ -14,4 +14,6 @@ abstract class ConnectComms{
   Future<BatteryHistoryRequest> getBatteryHistoryById(String id);
   Future<List<BatteryHistoryRequest>> getAllBatteryHistory();
   Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest);
+
+  Future<Response> getAgents();
 }

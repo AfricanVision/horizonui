@@ -83,4 +83,9 @@ class AppDataManager implements DataManager {
     // TODO: implement sendAgent
     throw UnimplementedError();
   }
+
+  @override
+  Future<Response> getAgents() async  {
+    return await connectComms.getAgents();
+  }
 }

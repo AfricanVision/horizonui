@@ -2,9 +2,11 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import '../configs/Env.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/application/Agents.dart';
+import '../data/internal/application/Pair.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import 'CommsDirections.dart';
 import 'ConnectComms.dart';
@@ -71,7 +73,7 @@ class Comms implements ConnectComms {
   Future<BatteryRequest> getBatteryById(String id) async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getBatteryById$id",
+        "$baseUrl$getBatteryById$id",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -88,7 +90,7 @@ class Comms implements ConnectComms {
   Future<List<BatteryRequest>> getAllBatteries() async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getAllBatteries",
+        "$baseUrl$getAllBatteries",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -105,7 +107,7 @@ class Comms implements ConnectComms {
   Future<bool> updateBattery(BatteryRequest batteryRequest) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$updateBattery",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -124,7 +126,7 @@ class Comms implements ConnectComms {
   Future<bool> createBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$createBatteryHistory",
+        "$baseUrl$createBatteryHistory",
         data: jsonEncode(batteryHistoryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -143,7 +145,7 @@ class Comms implements ConnectComms {
   Future<BatteryHistoryRequest> getBatteryHistoryById(String id) async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getBatteryHistoryById$id",
+        "$baseUrl$getBatteryHistoryById$id",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -160,7 +162,7 @@ class Comms implements ConnectComms {
   Future<List<BatteryHistoryRequest>> getAllBatteryHistory() async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getAllBatteryHistory",
+        "$baseUrl$getAllBatteryHistory",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -177,7 +179,7 @@ class Comms implements ConnectComms {
   Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$updateBatteryHistory",
+        "$baseUrl$updateBatteryHistory",
         data: jsonEncode(batteryHistoryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -190,6 +192,42 @@ class Comms implements ConnectComms {
     } catch (e) {
       rethrow;
     }
+  }
+
+  @override
+  Future<Response> getAgents() async {
+
+      Pair navigation = await getRequestHeaders(getAgentsUrl, "");
+      dio.options.headers = navigation.value;
+
+      return await dio.get(navigation.key, options: Options(
+          headers: dio.options.headers
+      ));
+
+  }
+
+  Future<Pair> getRequestHeaders(String url, String urlData) async{
+
+    dio.options.headers = <String, dynamic>{};
+
+  /*  MeDescription data = await helper.getMyDescription();
+
+    if(data.token.isNotEmpty && url != deviceToken){
+      dio.options.headers["Authorization"] = "Bearer ${data.token}";
+    }*/
+
+    dio.options.contentType = Headers.jsonContentType;
+
+    dio.options.responseType = ResponseType.json;
+
+    dio.options.headers["X-API-KEY"] = apikey;
+
+    dio.options.headers["version"] = localisedAppVersion;
+
+    url = baseUrl + url;
+
+    return Future.value(Pair(url, dio.options.headers));
+
   }
 
 
