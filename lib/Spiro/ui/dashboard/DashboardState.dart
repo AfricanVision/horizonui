@@ -3,29 +3,24 @@ import '../../data/internal/application/TextType.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:fl_chart/fl_chart.dart';
+import '../../data/internal/application/Agents.dart';
 
+import '../agents/agent_service.dart';
 import '../agents/agents_page.dart';
 import '../stations/stations_page.dart';
 import '../batteries/batteries_page.dart';
 import '../analytics/analytics_page.dart';
 import '../incidents/incidents_page.dart';
 import '../reports/reports_page.dart';
+import 'Dashboard.dart';
 
-class DashboardPage extends StatefulWidget {
-  const DashboardPage({super.key});
-
-  @override
-  State<DashboardPage> createState() => _DashboardPageState();
-}
-
-class _DashboardPageState extends State<DashboardPage> {
+class DashboardState extends State<Dashboard> {
   String _selectedMenuItem = 'Dashboard';
   Widget _currentPage = DashboardPageContent();
   bool _isSidebarOpen = true;
 
   void _navigateToPage(String pageName) {
-    print('Navigating to: $pageName'); // Debug print
+    print('Navigating to: $pageName');
 
     setState(() {
       _selectedMenuItem = pageName;
@@ -69,7 +64,6 @@ class _DashboardPageState extends State<DashboardPage> {
       backgroundColor: Colors.grey[50],
       body: Row(
         children: [
-          // Animated Sidebar
           AnimatedContainer(
             duration: Duration(milliseconds: 300),
             width: _isSidebarOpen ? 280 : 0,
@@ -81,7 +75,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 ? Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+
                 Container(
                   height: 120,
                   width: double.infinity,
@@ -98,7 +92,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
 
-                // Navigation Menu
                 Expanded(
                   child: ListView(
                     padding: EdgeInsets.zero,
@@ -120,7 +113,6 @@ class _DashboardPageState extends State<DashboardPage> {
                   ),
                 ),
 
-                // User Profile Section
                 Container(
                   padding: EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -155,13 +147,11 @@ class _DashboardPageState extends State<DashboardPage> {
                 : SizedBox.shrink(),
           ),
 
-          // Main Content Area with Toggle Button
           Expanded(
             child: Stack(
               children: [
                 _currentPage,
 
-                // Sidebar Toggle Button
                 Positioned(
                   left: 16,
                   top: 16,
@@ -240,11 +230,9 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _handleLogout() {
     print('Logging out...');
-    // Implement logout logic here
   }
 }
 
-// Dashboard Page Content
 class DashboardPageContent extends StatefulWidget {
   const DashboardPageContent({super.key});
 
@@ -256,6 +244,11 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
   late AnimationController _animationController;
   late Animation<double> _barAnimation;
   bool _animationPlayed = false;
+
+  final AgentService _agentService = AgentService();
+  List<Agent> _agents = [];
+  bool _isLoading = true;
+  String _errorMessage = '';
 
   @override
   void initState() {
@@ -270,13 +263,35 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       curve: Curves.easeOutCubic,
     );
 
-    // Start animation after build
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_animationPlayed) {
-        _animationController.forward();
-        _animationPlayed = true;
-      }
+    _loadDashboardData().then((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!_animationPlayed) {
+          _animationController.forward();
+          _animationPlayed = true;
+        }
+      });
     });
+  }
+
+  Future<void> _loadDashboardData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = '';
+      });
+
+      _agents = await _agentService.getAgents();
+
+      setState(() {
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading dashboard data: $e');
+      setState(() {
+        _isLoading = false;
+        _errorMessage = 'Failed to load data: $e';
+      });
+    }
   }
 
   @override
@@ -292,7 +307,7 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Page Header
+
           Container(
             padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
@@ -312,31 +327,82 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
                   ),
                 ),
                 IconButton(
-                  icon: Icon(Icons.refresh, color: Colors.white),
-                  onPressed: () => _refreshData(),
+                  icon: _isLoading
+                      ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                  )
+                      : Icon(Icons.refresh, color: Colors.white),
+                  onPressed: _isLoading ? null : () => _refreshData(),
                 ),
               ],
             ),
           ),
           SizedBox(height: 24),
 
-          // Stats Grid
-          _buildStatsGrid(),
-          SizedBox(height: 24),
 
-          // Africa Map Section
-          _buildAfricaMapSection(),
-          SizedBox(height: 24),
+          if (_errorMessage.isNotEmpty)
+            Container(
+              padding: EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red[50],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.red),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.error, color: Colors.red),
+                  SizedBox(width: 8),
+                  Expanded(
+                    child: textWithColor(_errorMessage, 14, TextType.Regular, Colors.red),
+                  ),
+                  IconButton(
+                    icon: Icon(Icons.refresh, color: Colors.red),
+                    onPressed: _loadDashboardData,
+                  ),
+                ],
+              ),
+            ),
 
-          // Main Content Columns
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(flex: 2, child: _buildMainContentColumn()),
-              SizedBox(width: 16),
-              Expanded(flex: 1, child: _buildSideContentColumn()),
-            ],
-          ),
+          if (_errorMessage.isNotEmpty) SizedBox(height: 16),
+
+          if (_isLoading)
+            Center(
+              child: Padding(
+                padding: EdgeInsets.all(32),
+                child: Column(
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    text('Loading dashboard data...', 16, TextType.Regular),
+                  ],
+                ),
+              ),
+            )
+          else
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+
+                _buildStatsGrid(),
+                SizedBox(height: 24),
+
+
+                _buildAfricaMapSection(),
+                SizedBox(height: 24),
+
+
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(flex: 2, child: _buildMainContentColumn()),
+                    SizedBox(width: 16),
+                    Expanded(flex: 1, child: _buildSideContentColumn()),
+                  ],
+                ),
+              ],
+            ),
         ],
       ),
     );
@@ -344,12 +410,19 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
 
   void _refreshData() {
     print('Refreshing data...');
-    // Reset and replay animation when refreshing
+
     _animationController.reset();
     _animationController.forward();
+    _loadDashboardData();
   }
 
   Widget _buildStatsGrid() {
+
+    int totalAgents = _agents.length;
+    int activeAgents = _agents.where((agent) => agent.statusId?.toLowerCase().contains('active') == true).length;
+    int agentsWithEmail = _agents.where((agent) => agent.email != null && agent.email!.isNotEmpty).length;
+    double activePercentage = totalAgents > 0 ? (activeAgents / totalAgents * 100) : 0;
+
     return GridView.count(
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
@@ -358,11 +431,10 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       mainAxisSpacing: 5,
       childAspectRatio: 1.5,
       children: [
-        _buildStatCard('Active Agents', '1229', '19 total • +12% vs last week', '+12%', true),
-        _buildStatCard('Swaps Today', '999', '99,999 total • Target: 100,000', '+69%', true),
-        _buildStatCard('Active Issues', '20', 'Across all stations critical', null, false),
-        _buildStatCard('Downtime %', '2.1%', '97.9% uptime good', null, true),
-        _buildStatCard('Power Usage', '12.4 MW', '14-day avg: 11.8 MW', '+3.2%', true),
+        _buildStatCard('Total Agents', '$totalAgents', '$activeAgents active • ${activePercentage.toStringAsFixed(1)}% active', '+${(activePercentage - 50).abs().toStringAsFixed(1)}%', activePercentage > 50),
+        _buildStatCard('Active Agents', '$activeAgents', '${totalAgents - activeAgents} inactive • ${activePercentage.toStringAsFixed(1)}% rate', '+${activePercentage.toStringAsFixed(1)}%', true),
+        _buildStatCard('Agents with Email', '$agentsWithEmail', '${totalAgents - agentsWithEmail} missing email', '${((agentsWithEmail / totalAgents) * 100).toStringAsFixed(1)}%', agentsWithEmail == totalAgents),
+        _buildStatCard('Data Quality', '${((agentsWithEmail / totalAgents) * 100).toStringAsFixed(1)}%', 'Complete profiles ratio', null, agentsWithEmail == totalAgents),
       ],
     );
   }
@@ -423,7 +495,16 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
               border: Border.all(color: Colors.grey[300]!),
             ),
             child: Center(
-              child: text('Africa Map Visualization', 16, TextType.Regular),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  text('Total Agents: ${_agents.length}', 16, TextType.Bold),
+                  SizedBox(height: 8),
+                  text('Active Agents: ${_agents.where((agent) => agent.statusId?.toLowerCase().contains('active') == true).length}', 14, TextType.Regular),
+                  SizedBox(height: 16),
+                  text('Africa Map Visualization', 14, TextType.Regular),
+                ],
+              ),
             ),
           ),
         ],
@@ -436,7 +517,7 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       children: [
         _buildChartsRow(),
         SizedBox(height: 24),
-        _buildSwapsTrendSection(),
+        // _buildSwapsTrendSection(),
       ],
     );
   }
@@ -452,19 +533,55 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
   }
 
   Widget _buildChartsRow() {
+
+    List<ChartData> downtimeData = _generateDowntimeData();
+    List<ChartData> powerData = _generatePowerConsumptionData();
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(child: _buildDowntimeChart()),
+        Expanded(child: _buildDowntimeChart(downtimeData)),
         SizedBox(width: 16),
-        Expanded(child: _buildPowerConsumptionChart()),
+        Expanded(child: _buildPowerConsumptionChart(powerData)),
       ],
     );
   }
 
-  Widget _buildDowntimeChart() {
+  List<ChartData> _generateDowntimeData() {
+
+    if (_agents.isEmpty) {
+      return [
+        ChartData('No Data', 0, Colors.grey),
+      ];
+    }
+
+    int total = _agents.length;
+    int active = _agents.where((agent) => agent.statusId?.toLowerCase().contains('active') == true).length;
+    int inactive = total - active;
+
+    return [
+      ChartData('Active', (active / total * 100), Colors.green),
+      ChartData('Inactive', (inactive / total * 100), Colors.orange),
+    ];
+  }
+
+  List<ChartData> _generatePowerConsumptionData() {
+
+    int basePower = _agents.length * 100;
+    return [
+      ChartData('Mon', (basePower * 0.8).toDouble(), Colors.blue),
+      ChartData('Tue', (basePower * 0.65).toDouble(), Colors.blue),
+      ChartData('Wed', (basePower * 0.72).toDouble(), Colors.blue),
+      ChartData('Thu', (basePower * 0.58).toDouble(), Colors.blue),
+      ChartData('Fri', (basePower * 0.69).toDouble(), Colors.blue),
+      ChartData('Sat', (basePower * 0.75).toDouble(), Colors.blue),
+      ChartData('Sun', (basePower * 0.82).toDouble(), Colors.blue),
+    ];
+  }
+
+  Widget _buildDowntimeChart(List<ChartData> data) {
     return _buildChartContainer(
-      'Downtime %',
+      'Agent Status Distribution',
       Container(
         height: 250,
         child: SfCartesianChart(
@@ -472,13 +589,7 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
           primaryYAxis: NumericAxis(title: AxisTitle(text: 'Percentage')),
           series: <CartesianSeries>[
             ColumnSeries<ChartData, String>(
-              dataSource: [
-                ChartData('Station A', 60, Colors.blue),
-                ChartData('Station B', 85, Colors.orange),
-                ChartData('Station C', 45, Colors.red),
-                ChartData('Station D', 70, Colors.green),
-                ChartData('Station E', 55, Colors.purple),
-              ],
+              dataSource: data,
               xValueMapper: (ChartData data, _) => data.x,
               yValueMapper: (ChartData data, _) => data.y,
               pointColorMapper: (ChartData data, _) => data.color,
@@ -490,25 +601,17 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
     );
   }
 
-  Widget _buildPowerConsumptionChart() {
+  Widget _buildPowerConsumptionChart(List<ChartData> data) {
     return _buildChartContainer(
-      'Power Consumption (14-day)',
+      'Weekly Activity Trend',
       Container(
         height: 250,
         child: SfCartesianChart(
-          primaryXAxis: CategoryAxis(title: AxisTitle(text: 'Date')),
-          primaryYAxis: NumericAxis(title: AxisTitle(text: 'Power (kWh)')),
+          primaryXAxis: CategoryAxis(title: AxisTitle(text: 'Day')),
+          primaryYAxis: NumericAxis(title: AxisTitle(text: 'Activity Level')),
           series: <CartesianSeries>[
             LineSeries<ChartData, String>(
-              dataSource: [
-                ChartData('Sep 26', 800, Colors.blue),
-                ChartData('Sep 28', 650, Colors.blue),
-                ChartData('Sep 30', 720, Colors.blue),
-                ChartData('Oct 2', 580, Colors.blue),
-                ChartData('Oct 4', 690, Colors.blue),
-                ChartData('Oct 6', 750, Colors.blue),
-                ChartData('Oct 8', 820, Colors.blue),
-              ],
+              dataSource: data,
               xValueMapper: (ChartData data, _) => data.x,
               yValueMapper: (ChartData data, _) => data.y,
               dataLabelSettings: DataLabelSettings(isVisible: true),
@@ -539,48 +642,55 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
     );
   }
 
-  Widget _buildSwapsTrendSection() {
-    final List<BarData> barData = [
-      BarData(800, Colors.blue, 'Mon'),
-      BarData(600, Colors.orange, 'Tue'),
-      BarData(400, Colors.orange, 'Wed'),
-      BarData(550, Colors.blue, 'Thu'),
-      BarData(300, Colors.orange, 'Fri'),
-      BarData(200, Colors.orange, 'Sat'),
-      BarData(450, Colors.orange, 'Sun'),
-    ];
+  // Widget _buildSwapsTrendSection() {
+  //
+  //   final List<BarData> barData = _generateSwapsData();
+  //
+  //   return Container(
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(12),
+  //       boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+  //     ),
+  //     padding: EdgeInsets.all(16),
+  //     child: Column(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+  //       children: [
+  //         text('Agent Activity Trend', 16, TextType.Bold),
+  //         SizedBox(height: 16),
+  //         Container(
+  //           height: 200,
+  //           child: AnimatedBuilder(
+  //             animation: _barAnimation,
+  //             builder: (context, child) {
+  //               return Row(
+  //                 crossAxisAlignment: CrossAxisAlignment.end,
+  //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //                 children: barData.map((data) {
+  //                   final animatedHeight = data.height * _barAnimation.value;
+  //                   return _buildAnimatedBar(animatedHeight, data.color, data.label);
+  //                 }).toList(),
+  //               );
+  //             },
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-      ),
-      padding: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          text('Swaps Trend', 16, TextType.Bold),
-          SizedBox(height: 16),
-          Container(
-            height: 200,
-            child: AnimatedBuilder(
-              animation: _barAnimation,
-              builder: (context, child) {
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: barData.map((data) {
-                    final animatedHeight = data.height * _barAnimation.value;
-                    return _buildAnimatedBar(animatedHeight, data.color, data.label);
-                  }).toList(),
-                );
-              },
-            ),
-          ),
-        ],
-      ),
-    );
+  List<BarData> _generateSwapsData() {
+
+    int baseActivity = _agents.length * 15;
+    return [
+      BarData(baseActivity * 0.8, Colors.blue, 'Mon'),
+      BarData(baseActivity * 0.6, Colors.orange, 'Tue'),
+      BarData(baseActivity * 0.4, Colors.orange, 'Wed'),
+      BarData(baseActivity * 0.55, Colors.blue, 'Thu'),
+      BarData(baseActivity * 0.3, Colors.orange, 'Fri'),
+      BarData(baseActivity * 0.2, Colors.orange, 'Sat'),
+      BarData(baseActivity * 0.45, Colors.orange, 'Sun'),
+    ];
   }
 
   Widget _buildAnimatedBar(double height, Color color, String label) {
@@ -588,7 +698,7 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       children: [
         Container(
           width: 20,
-          height: height / 8, // Scale down for better visualization
+          height: height / 20,
           decoration: BoxDecoration(
             color: color,
             borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
@@ -601,9 +711,11 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
   }
 
   Widget _buildAgentsSection() {
+    List<Agent> displayAgents = _agents.take(4).toList();
+
     return Container(
-      width: double.infinity,
-      height: 300, // Same height as Africa operations map
+      width: double.maxFinite,
+      height: 300,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
@@ -614,7 +726,7 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
         children: [
           Padding(
             padding: EdgeInsets.all(16),
-            child: text('On-Shift Agents', 16, TextType.Bold),
+            child: text('Recent Agents', 16, TextType.Bold),
           ),
           Container(
             padding: EdgeInsets.all(12),
@@ -624,22 +736,26 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
             ),
             child: Row(
               children: [
-                Expanded(flex: 2, child: text('ID', 12, TextType.Bold)),
                 Expanded(flex: 3, child: text('Name', 12, TextType.Bold)),
-                Expanded(flex: 3, child: text('Station', 12, TextType.Bold)),
+                Expanded(flex: 3, child: text('Email', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Status', 12, TextType.Bold)),
-                Expanded(flex: 2, child: text('Shift', 12, TextType.Bold)),
               ],
             ),
           ),
           Expanded(
-            child: ListView(
-              children: [
-                _buildAgentRow('AGQ01', 'John Doe', 'Accra Central', 'online', 'Morning'),
-                _buildAgentRow('AGQ02', 'Sarah Wilson', 'Lagos Island', 'busy', 'Morning'),
-                _buildAgentRow('AGQ03', 'Michael Chen', 'Nairobi CBD', 'online', 'Morning'),
-                _buildAgentRow('AGQ04', 'Emma Johnson', 'Kumasi Hub', 'break', 'Morning'),
-              ],
+            child: displayAgents.isEmpty
+                ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.people_outline, size: 48, color: Colors.grey),
+                  SizedBox(height: 8),
+                  text('No agents found', 14, TextType.Regular),
+                ],
+              ),
+            )
+                : ListView(
+              children: displayAgents.map((agent) => _buildAgentRow(agent)).toList(),
             ),
           ),
         ],
@@ -647,33 +763,75 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
     );
   }
 
-  Widget _buildAgentRow(String id, String name, String station, String status, String shift) {
-    Color statusColor = _getStatusColor(status);
+  Widget _buildAgentRow(Agent agent) {
+    Color statusColor = _getStatusColor(agent.statusId ?? 'inactive');
+    String agentName = '${agent.firstname ?? ''} ${agent.lastname ?? ''}'.trim();
+    if (agentName.isEmpty) agentName = 'Unknown Agent';
+
+
+    String agentEmail = agent.email ?? 'No email';
+    String agentStatus = agent.statusId ?? 'inactive';
+
     return Container(
       padding: EdgeInsets.all(12),
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.grey[100]!))),
       child: Row(
         children: [
-          Expanded(flex: 2, child: text(id, 12, TextType.Regular)),
-          Expanded(flex: 3, child: text(name, 12, TextType.Regular)),
-          Expanded(flex: 3, child: text(station, 12, TextType.Regular)),
+          Expanded(flex: 3, child: text(agentName, 12, TextType.Regular)),
+          Expanded(flex: 3, child: text(agentEmail, 12, TextType.Regular)),
           Expanded(
             flex: 2,
             child: Row(
               children: [
                 Container(width: 6, height: 6, decoration: BoxDecoration(color: statusColor, shape: BoxShape.circle)),
                 SizedBox(width: 4),
-                text(status, 12, TextType.Regular),
+                text(agentStatus, 12, TextType.Regular),
               ],
             ),
           ),
-          Expanded(flex: 2, child: text(shift, 12, TextType.Regular)),
         ],
       ),
     );
   }
 
   Widget _buildActiveAlerts() {
+    int agentCount = _agents.length;
+    bool hasLowAgents = agentCount < 5;
+    bool hasDataIssues = _agents.any((agent) => agent.email == null || agent.email!.isEmpty);
+
+    List<Map<String, dynamic>> alerts = [];
+
+    if (hasLowAgents) {
+      alerts.add({
+        'title': 'Low Agent Count',
+        'description': 'Only $agentCount agents in system. Consider adding more agents.',
+        'location': 'System • Recruitment',
+        'time': 'Today',
+        'color': Colors.orange
+      });
+    }
+
+    if (hasDataIssues) {
+      int incompleteCount = _agents.where((agent) => agent.email == null || agent.email!.isEmpty).length;
+      alerts.add({
+        'title': 'Data Quality Issues',
+        'description': '$incompleteCount agents missing contact information',
+        'location': 'Data • Validation',
+        'time': 'Today',
+        'color': Colors.red
+      });
+    }
+
+    if (alerts.isEmpty) {
+      alerts.add({
+        'title': 'System Normal',
+        'description': 'All systems operating within normal parameters',
+        'location': 'System • Status',
+        'time': 'Today',
+        'color': Colors.green
+      });
+    }
+
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
@@ -684,20 +842,24 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(padding: EdgeInsets.all(16), child: text('Active Alerts', 16, TextType.Bold)),
+          Padding(padding: EdgeInsets.all(16), child: text('System Alerts', 16, TextType.Bold)),
           Container(
             padding: EdgeInsets.symmetric(horizontal: 16),
             child: textWithColor(
-                '3 critical alerts require immediate attention',
+                '${alerts.length} ${alerts.length == 1 ? 'alert' : 'alerts'} found',
                 12,
                 TextType.SemiBold,
-                Colors.red
+                alerts.any((alert) => alert['color'] == Colors.red) ? Colors.red :
+                alerts.any((alert) => alert['color'] == Colors.orange) ? Colors.orange : Colors.green
             ),
           ),
           SizedBox(height: 16),
-          _buildAlertItem('Power Consumption High', 'Station power usage exceeds normal parameters', 'Power - Kumasi Hub • Ghana', '45 minutes ago', Colors.red),
-          SizedBox(height: 12),
-          _buildAlertItem('Connectivity Issues', 'Intermittent WiFi connectivity reported', 'Connectivity - Tamale Station • Ghana', '1 hour ago', Colors.orange),
+          ...alerts.map((alert) => Column(
+            children: [
+              _buildAlertItem(alert['title'], alert['description'], alert['location'], alert['time'], alert['color']),
+              if (alert != alerts.last) SizedBox(height: 12),
+            ],
+          )),
         ],
       ),
     );
@@ -733,12 +895,12 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
   }
 
   Color _getStatusColor(String status) {
-    switch (status) {
-      case 'online':
+    switch (status.toLowerCase()) {
+      case 'active':
         return Colors.green;
-      case 'busy':
+      case 'pending':
         return Colors.orange;
-      case 'break':
+      case 'inactive':
         return Colors.red;
       default:
         return Colors.grey;

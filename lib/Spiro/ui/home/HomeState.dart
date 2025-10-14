@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../data/internal/application/TextType.dart';
-import '../dashboard/dashboard_page.dart';
+import '../dashboard/Dashboard.dart';
 import '../agents/agents_page.dart';
 import '../stations/stations_page.dart';
 import '../batteries/batteries_page.dart';
@@ -13,18 +13,49 @@ import 'Home.dart';
 
 class HomeState extends State<Home> {
   String _selectedMenuItem = 'Dashboard';
-  Widget _currentPage = DashboardPage();
+  Widget _currentPage = Dashboard();
+
+  void _navigateToPage(String pageName) {
+    print('Navigating to: $pageName');
+
+    setState(() {
+      _selectedMenuItem = pageName;
+      switch (pageName) {
+        case 'Dashboard':
+          _currentPage = Dashboard();
+          break;
+        case 'Agents':
+          _currentPage = AgentsPage();
+          break;
+        case 'Stations':
+          _currentPage = StationsPage();
+          break;
+        case 'Batteries':
+          _currentPage = BatteriesPage();
+          break;
+        case 'Analytics':
+          _currentPage = AnalyticsPage();
+          break;
+        case 'Incidents':
+          _currentPage = IncidentsPage();
+          break;
+        case 'Reports':
+          _currentPage = ReportsPage();
+          break;
+        default:
+          _currentPage = Dashboard();
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.grey[50],
-      drawer: _selectedMenuItem == 'Dashboard' ? _buildSidebar() : null,
+      drawer: _buildSidebar(),
       body: _currentPage,
     );
   }
-
-
 
   Widget _buildSidebar() {
     return Drawer(
@@ -59,7 +90,6 @@ class HomeState extends State<Home> {
                     _buildMenuItem('Analytics', Icons.analytics),
                     _buildMenuItem('Incidents', Icons.warning),
                     _buildMenuItem('Reports', Icons.assessment),
-                    _buildMenuItem('Data Entry', Icons.data_usage),
                   ]),
                   Divider(height: 32),
                   _buildMenuSection('SYSTEM', [
@@ -90,6 +120,7 @@ class HomeState extends State<Home> {
           isSelected ? colorPrimary : Colors.grey[700]!
       ),
       selected: isSelected,
+      onTap: () => _navigateToPage(title),
     );
   }
 
@@ -133,5 +164,4 @@ class HomeState extends State<Home> {
       ),
     );
   }
-
 }

@@ -18,7 +18,6 @@ class _AgentsPageState extends State<AgentsPage> {
   final TextEditingController _middlenameController = TextEditingController();
   final TextEditingController _lastnameController = TextEditingController();
   final TextEditingController _dobController = TextEditingController();
-  final TextEditingController _nationalityController = TextEditingController();
   final TextEditingController _identificationController = TextEditingController();
   final TextEditingController _phonenumberController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -29,7 +28,6 @@ class _AgentsPageState extends State<AgentsPage> {
   final TextEditingController _editMiddlenameController = TextEditingController();
   final TextEditingController _editLastnameController = TextEditingController();
   final TextEditingController _editDobController = TextEditingController();
-  final TextEditingController _editNationalityController = TextEditingController();
   final TextEditingController _editIdentificationController = TextEditingController();
   final TextEditingController _editPhonenumberController = TextEditingController();
   final TextEditingController _editEmailController = TextEditingController();
@@ -40,6 +38,27 @@ class _AgentsPageState extends State<AgentsPage> {
   List<Agent> _agents = [];
   List<Agent> _filteredAgents = [];
   final TextEditingController _searchController = TextEditingController();
+
+  // Nationality dropdown values
+  String _selectedNationality = 'Kenya';
+  String _editSelectedNationality = 'Kenya';
+
+  // Status values - hardcoded to ACTIVE and INACTIVE
+  String _selectedStatus = 'ACTIVE';
+  String _editSelectedStatus = 'ACTIVE';
+
+  final List<String> _eastAfricaCountries = [
+    'Kenya', 'Uganda', 'Tanzania', 'Rwanda', 'Burundi',
+    'Ethiopia', 'Somalia', 'South Sudan', 'Sudan', 'Eritrea',
+    'Djibouti'
+  ];
+
+  final List<String> _westAfricaCountries = [
+    'Nigeria', 'Ghana', 'Ivory Coast', 'Senegal', 'Mali',
+    'Burkina Faso', 'Guinea', 'Benin', 'Niger', 'Togo',
+    'Sierra Leone', 'Liberia', 'Mauritania', 'Gambia',
+    'Guinea-Bissau', 'Cape Verde'
+  ];
 
   final AgentService _agentService = AgentService();
 
@@ -57,7 +76,6 @@ class _AgentsPageState extends State<AgentsPage> {
     _middlenameController.dispose();
     _lastnameController.dispose();
     _dobController.dispose();
-    _nationalityController.dispose();
     _identificationController.dispose();
     _phonenumberController.dispose();
     _emailController.dispose();
@@ -65,7 +83,6 @@ class _AgentsPageState extends State<AgentsPage> {
     _editMiddlenameController.dispose();
     _editLastnameController.dispose();
     _editDobController.dispose();
-    _editNationalityController.dispose();
     _editIdentificationController.dispose();
     _editPhonenumberController.dispose();
     _editEmailController.dispose();
@@ -113,12 +130,47 @@ class _AgentsPageState extends State<AgentsPage> {
   }
 
   String _getAgentDisplayStatus(Agent agent) {
-    switch (agent.statusId) {
-      case 'b8641bcd-07d5-4919-b459-5a081dee449b':
-        return 'online';
-    // Add more status IDs as needed
-      default:
-        return 'offline';
+    // Convert status ID to display name
+    if (agent.statusId == 'b8641bcd-07d5-4919-b459-5a081dee449b') {
+      return 'ACTIVE';
+    } else {
+      return 'INACTIVE';
+    }
+  }
+
+  Future<void> _selectDate(BuildContext context, bool isEditForm) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: ColorScheme.light(
+              primary: shawnblue,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: Colors.black,
+            ),
+            dialogBackgroundColor: Colors.white,
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final formattedDate = "${picked.year}-${picked.month.toString().padLeft(2, '0')}-${picked.day.toString().padLeft(2, '0')}";
+      if (isEditForm) {
+        setState(() {
+          _editDobController.text = formattedDate;
+        });
+      } else {
+        setState(() {
+          _dobController.text = formattedDate;
+        });
+      }
     }
   }
 
@@ -320,16 +372,20 @@ class _AgentsPageState extends State<AgentsPage> {
                       controller: _lastnameController,
                     ),
                     SizedBox(height: 12),
-                    _buildFormField(
+                    _buildDatePickerField(
                       label: 'Date of Birth *',
-                      hintText: 'e.g., 1990-05-15',
                       controller: _dobController,
+                      isEditForm: false,
                     ),
                     SizedBox(height: 12),
-                    _buildFormField(
+                    _buildNationalityDropdown(
                       label: 'Nationality *',
-                      hintText: 'e.g., Kenyan',
-                      controller: _nationalityController,
+                      selectedValue: _selectedNationality,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedNationality = newValue!;
+                        });
+                      },
                     ),
                     SizedBox(height: 12),
                     _buildFormField(
@@ -337,6 +393,16 @@ class _AgentsPageState extends State<AgentsPage> {
                       hintText: 'e.g., CFake@example.com',
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
+                    ),
+                    SizedBox(height: 12),
+                    _buildStatusRadioButtons(
+                      label: 'Status *',
+                      selectedValue: _selectedStatus,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _selectedStatus = newValue!;
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -462,22 +528,36 @@ class _AgentsPageState extends State<AgentsPage> {
                       controller: _editLastnameController,
                     ),
                     SizedBox(height: 12),
-                    _buildEditFormField(
+                    _buildDatePickerField(
                       label: 'Date of Birth',
-                      hintText: 'Enter date of birth',
                       controller: _editDobController,
+                      isEditForm: true,
                     ),
                     SizedBox(height: 12),
-                    _buildEditFormField(
+                    _buildNationalityDropdown(
                       label: 'Nationality',
-                      hintText: 'Enter nationality',
-                      controller: _editNationalityController,
+                      selectedValue: _editSelectedNationality,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _editSelectedNationality = newValue!;
+                        });
+                      },
                     ),
                     SizedBox(height: 12),
                     _buildEditFormField(
                       label: 'Email',
                       hintText: 'Enter email address',
                       controller: _editEmailController,
+                    ),
+                    SizedBox(height: 12),
+                    _buildStatusRadioButtons(
+                      label: 'Status',
+                      selectedValue: _editSelectedStatus,
+                      onChanged: (String? newValue) {
+                        setState(() {
+                          _editSelectedStatus = newValue!;
+                        });
+                      },
                     ),
                   ],
                 ),
@@ -720,6 +800,162 @@ class _AgentsPageState extends State<AgentsPage> {
     );
   }
 
+  Widget _buildDatePickerField({
+    required String label,
+    required TextEditingController controller,
+    required bool isEditForm,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text(label, 14, TextType.SemiBold),
+        SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey[400]!),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: TextField(
+            controller: controller,
+            readOnly: true,
+            decoration: InputDecoration(
+              hintText: 'YYYY-MM-DD',
+              hintStyle: TextStyle(color: Colors.grey[600]),
+              contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              border: InputBorder.none,
+              isDense: true,
+              suffixIcon: IconButton(
+                icon: Icon(Icons.calendar_today, size: 18, color: Colors.grey[600]),
+                onPressed: () => _selectDate(context, isEditForm),
+              ),
+            ),
+            style: TextStyle(fontSize: 14),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildNationalityDropdown({
+    required String label,
+    required String selectedValue,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text(label, 14, TextType.SemiBold),
+        SizedBox(height: 6),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.grey[400]!),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: selectedValue,
+              isExpanded: true,
+              items: [
+                DropdownMenuItem(
+                  value: '',
+                  enabled: false,
+                  child: text('Select Nationality', 14, TextType.Regular),
+                ),
+                // East Africa Countries
+                DropdownMenuItem(
+                  value: 'EAST_AFRICA_HEADER',
+                  enabled: false,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: text('East Africa', 14, TextType.Bold),
+                  ),
+                ),
+                ..._eastAfricaCountries.map((country) {
+                  return DropdownMenuItem<String>(
+                    value: country,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: text(country, 14, TextType.Regular),
+                    ),
+                  );
+                }).toList(),
+                // West Africa Countries
+                DropdownMenuItem(
+                  value: 'WEST_AFRICA_HEADER',
+                  enabled: false,
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: text('West Africa', 14, TextType.Bold),
+                  ),
+                ),
+                ..._westAfricaCountries.map((country) {
+                  return DropdownMenuItem<String>(
+                    value: country,
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 12),
+                      child: text(country, 14, TextType.Regular),
+                    ),
+                  );
+                }).toList(),
+              ],
+              onChanged: (String? newValue) {
+                if (newValue != null &&
+                    newValue != 'EAST_AFRICA_HEADER' &&
+                    newValue != 'WEST_AFRICA_HEADER') {
+                  onChanged(newValue);
+                }
+              },
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatusRadioButtons({
+    required String label,
+    required String selectedValue,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        text(label, 14, TextType.SemiBold),
+        SizedBox(height: 8),
+        Row(
+          children: [
+            Expanded(
+              child: Row(
+                children: [
+                  Radio<String>(
+                    value: 'ACTIVE',
+                    groupValue: selectedValue,
+                    onChanged: onChanged,
+                    activeColor: shawnblue,
+                  ),
+                  text('ACTIVE', 14, TextType.Regular),
+                ],
+              ),
+            ),
+            Expanded(
+              child: Row(
+                children: [
+                  Radio<String>(
+                    value: 'INACTIVE',
+                    groupValue: selectedValue,
+                    onChanged: onChanged,
+                    activeColor: shawnblue,
+                  ),
+                  text('INACTIVE', 14, TextType.Regular),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _buildCardIconButton(IconData icon, String tooltip, Color color, VoidCallback onPressed) {
     return Container(
       decoration: BoxDecoration(
@@ -743,6 +979,8 @@ class _AgentsPageState extends State<AgentsPage> {
       _showAddForm = false;
       _showEditForm = true;
       _currentEditingAgentId = agent.id!;
+      _editSelectedNationality = agent.nationality;
+      _editSelectedStatus = _getAgentDisplayStatus(agent);
       _populateEditFormWithAgentData(agent);
     });
   }
@@ -752,7 +990,6 @@ class _AgentsPageState extends State<AgentsPage> {
     _editMiddlenameController.text = agent.middlename;
     _editLastnameController.text = agent.lastname;
     _editDobController.text = agent.dob;
-    _editNationalityController.text = agent.nationality;
     _editIdentificationController.text = agent.identification;
     _editPhonenumberController.text = agent.phonenumber;
     _editEmailController.text = agent.email;
@@ -761,24 +998,28 @@ class _AgentsPageState extends State<AgentsPage> {
   Future<void> _saveAgentEdits() async {
     setState(() => _isLoading = true);
     try {
-      // Create updated agent using copyWith or constructor
+      // Convert status name back to ID for API
+      String statusId = _editSelectedStatus == 'ACTIVE'
+          ? 'b8641bcd-07d5-4919-b459-5a081dee449b'
+          : 'INACTIVE'; // You'll need to replace 'INACTIVE' with actual inactive status ID
+
       final updatedAgent = Agent(
         id: _currentEditingAgentId,
         firstname: _editFirstnameController.text,
         middlename: _editMiddlenameController.text,
         lastname: _editLastnameController.text,
         dob: _editDobController.text,
-        nationality: _editNationalityController.text,
+        nationality: _editSelectedNationality,
         identification: _editIdentificationController.text,
         phonenumber: _editPhonenumberController.text,
         email: _editEmailController.text,
-        statusId: 'b8641bcd-07d5-4919-b459-5a081dee449b',
+        statusId: statusId,
         createdBy: 'admin',
       );
 
       await _agentService.updateAgent(_currentEditingAgentId, updatedAgent);
       _showSuccessNotification("Agent details updated successfully!");
-      await _loadAgents(); // Refresh the list
+      await _loadAgents();
 
       setState(() {
         _showEditForm = false;
@@ -797,24 +1038,30 @@ class _AgentsPageState extends State<AgentsPage> {
         _lastnameController.text.isEmpty ||
         _identificationController.text.isEmpty ||
         _phonenumberController.text.isEmpty ||
-        _emailController.text.isEmpty) {
+        _emailController.text.isEmpty ||
+        _dobController.text.isEmpty) {
       _showErrorNotification("Please fill in all required fields");
       return;
     }
 
     setState(() => _isLoading = true);
     try {
+      // Convert status name to ID for API
+      String statusId = _selectedStatus == 'ACTIVE'
+          ? 'b8641bcd-07d5-4919-b459-5a081dee449b'
+          : 'INACTIVE'; // You'll need to replace 'INACTIVE' with actual inactive status ID
+
       final newAgent = Agent(
         id: DateTime.now().millisecondsSinceEpoch.toString(),
         firstname: _firstnameController.text,
         middlename: _middlenameController.text,
         lastname: _lastnameController.text,
         dob: _dobController.text,
-        nationality: _nationalityController.text,
+        nationality: _selectedNationality,
         identification: _identificationController.text,
         phonenumber: _phonenumberController.text,
         email: _emailController.text,
-        statusId: 'b8641bcd-07d5-4919-b459-5a081dee449b',
+        statusId: statusId,
         createdBy: 'admin',
       );
 
@@ -859,7 +1106,7 @@ class _AgentsPageState extends State<AgentsPage> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-
+                // Add delete functionality here
               },
               child: textWithColor('Delete', 14, TextType.SemiBold, Colors.red),
             ),
@@ -869,15 +1116,16 @@ class _AgentsPageState extends State<AgentsPage> {
     );
   }
 
-   void _clearAgentForm() {
+  void _clearAgentForm() {
     _firstnameController.clear();
     _middlenameController.clear();
     _lastnameController.clear();
     _dobController.clear();
-    _nationalityController.clear();
     _identificationController.clear();
     _phonenumberController.clear();
     _emailController.clear();
+    _selectedNationality = 'Kenya';
+    _selectedStatus = 'ACTIVE';
   }
 
   void _clearEditForm() {
@@ -885,10 +1133,11 @@ class _AgentsPageState extends State<AgentsPage> {
     _editMiddlenameController.clear();
     _editLastnameController.clear();
     _editDobController.clear();
-    _editNationalityController.clear();
     _editIdentificationController.clear();
     _editPhonenumberController.clear();
     _editEmailController.clear();
+    _editSelectedNationality = 'Kenya';
+    _editSelectedStatus = 'ACTIVE';
   }
 
   void _showSuccessNotification(String message) {
@@ -913,20 +1162,16 @@ class _AgentsPageState extends State<AgentsPage> {
 
   Color _getStatusColor(String status) {
     switch (status) {
-      case 'online': return Colors.green;
-      case 'busy': return Colors.orange;
-      case 'break': return Colors.blue;
-      case 'offline': return Colors.grey;
+      case 'ACTIVE': return Colors.green;
+      case 'INACTIVE': return Colors.red;
       default: return Colors.grey;
     }
   }
 
   String _getAgentStatusIcon(String status) {
     switch (status) {
-      case 'online': return '●';
-      case 'busy': return '●';
-      case 'break': return '○';
-      case 'offline': return '○';
+      case 'ACTIVE': return '●';
+      case 'INACTIVE': return '○';
       default: return '○';
     }
   }

@@ -11,21 +11,9 @@ String relayRoute = isProd ? "$spiroRouteProd/spiroRelay" : "$spiroRouteLocal:/s
 
 String registerUser = 'agents';
 
-String createBattery = 'battery/add';
+String registerStatus = 'Status';
 
-String getBatteryById = 'battery/';
 
-String getAllBatteries = 'battery/all';
-
-String updateBattery = 'battery/update';
-
-String createBatteryHistory = 'battery/history/register';
-
-String getBatteryHistoryById = 'battery/history/';
-
-String getAllBatteryHistory = 'battery/history/all';
-
-String updateBatteryHistory = 'battery/history/update';
 
 
 
