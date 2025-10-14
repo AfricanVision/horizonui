@@ -9,16 +9,18 @@ class ViewHome extends ParentViewModel {
 
   ViewHome(super.context, this.connection);
 
-  Future<bool> sendAgent(Agent userData) async {
-    try {
-      return await getDataManager().sendAgent(userData);
-    } catch (e) {
-      rethrow;
-    }
-  }
-
-  Widget getDashboard() {
-    return Dashboard();
+   sendAgent(Agent data) async {
+    hasNetwork(() => { closeNetwork(), sendAgent(data)}).then((value) => {
+      if(value){
+        showLoading("Fetching Agents....."),
+        getDataManager().sendAgent(data).then((response) => {
+          closeLoading(),
+         // connection.setProductCategories(getItemList(response.data))
+        }).onError((error, stackTrace) => {
+          handleError(error, () => {dismissError(), sendAgent(data)}, () => {dismissError()},"Retry")
+        })
+      }
+    });
   }
 
 
