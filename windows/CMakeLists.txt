@@ -2,6 +2,9 @@
 cmake_minimum_required(VERSION 3.14)
 project(horizonui LANGUAGES CXX)
 
+# Disable TLS verification for downloads to avoid certificate issues
+set(CMAKE_TLS_VERIFY FALSE)
+
 # The name of the executable created for the application. Change this to change
 # the on-disk name of your application.
 set(BINARY_NAME "horizonui")

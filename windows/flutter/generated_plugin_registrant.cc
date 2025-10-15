@@ -10,6 +10,7 @@
 #include <bitsdojo_window_windows/bitsdojo_window_plugin.h>
 #include <camera_windows/camera_windows.h>
 #include <connectivity_plus/connectivity_plus_windows_plugin.h>
+#include <file_selector_windows/file_selector_windows.h>
 #include <flutter_secure_storage_windows/flutter_secure_storage_windows_plugin.h>
 #include <local_notifier/local_notifier_plugin.h>
 #include <permission_handler_windows/permission_handler_windows_plugin.h>
@@ -24,6 +25,8 @@ void RegisterPlugins(flutter::PluginRegistry* registry) {
       registry->GetRegistrarForPlugin("CameraWindows"));
   ConnectivityPlusWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("ConnectivityPlusWindowsPlugin"));
+  FileSelectorWindowsRegisterWithRegistrar(
+      registry->GetRegistrarForPlugin("FileSelectorWindows"));
   FlutterSecureStorageWindowsPluginRegisterWithRegistrar(
       registry->GetRegistrarForPlugin("FlutterSecureStorageWindowsPlugin"));
   LocalNotifierPluginRegisterWithRegistrar(

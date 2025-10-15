@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../data/internal/application/TextType.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
@@ -19,7 +20,6 @@ class _StationsPageState extends State<StationsPage> {
       backgroundColor: Colors.grey[50],
       body: Row(
         children: [
-
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.all(24.0),
@@ -52,16 +52,19 @@ class _StationsPageState extends State<StationsPage> {
         style: ElevatedButton.styleFrom(
           backgroundColor: shawnblue,
           padding: EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
         ),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(Icons.dashboard, color: Colors.white, size: 20),
             SizedBox(width: 8),
-            textWithColor('Back to Dashboard', 16, TextType.SemiBold, Colors.white),
+            textWithColor(
+              'Back to Dashboard',
+              16,
+              TextType.SemiBold,
+              Colors.white,
+            ),
           ],
         ),
       ),
@@ -77,8 +80,6 @@ class _StationsPageState extends State<StationsPage> {
     //   (route) => false,
     // );
   }
-
-
 
   void _handleStationNavigation(String pageName) {
     print('Navigating to: $pageName');
@@ -100,16 +101,16 @@ class _StationsPageState extends State<StationsPage> {
                 children: [
                   text('Station Operations', 28, TextType.Bold),
                   SizedBox(height: 8),
-                  text('Active station issues and management', 16, TextType.Regular),
+                  text(
+                    'Monitor and manage battery swap stations',
+                    16,
+                    TextType.Regular,
+                  ),
                 ],
               ),
             ),
           ],
         ),
-        SizedBox(height: 16),
-        Divider(height: 1, color: Colors.grey[300]),
-        SizedBox(height: 16),
-        text('Active Issues', 20, TextType.Bold),
       ],
     );
   }
@@ -120,7 +121,9 @@ class _StationsPageState extends State<StationsPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
       ),
       child: Column(
         children: [
@@ -137,7 +140,10 @@ class _StationsPageState extends State<StationsPage> {
                 Expanded(flex: 2, child: text('Issue Type', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Status', 12, TextType.Bold)),
                 Expanded(flex: 2, child: text('Priority', 12, TextType.Bold)),
-                Expanded(flex: 2, child: text('Assigned Owner', 12, TextType.Bold)),
+                Expanded(
+                  flex: 2,
+                  child: text('Assigned Owner', 12, TextType.Bold),
+                ),
                 Expanded(flex: 2, child: text('Time', 12, TextType.Bold)),
               ],
             ),
@@ -227,10 +233,18 @@ class _StationsPageState extends State<StationsPage> {
           Expanded(
             flex: 2,
             child: Row(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                text(statusIcon, 12, TextType.Regular),
+                Flexible(child: text(statusIcon, 12, TextType.Regular)),
                 SizedBox(width: 4),
-                textWithColor(status, 12, TextType.Regular, statusColor),
+                Flexible(
+                  child: textWithColor(
+                    status,
+                    12,
+                    TextType.Regular,
+                    statusColor,
+                  ),
+                ),
               ],
             ),
           ),
@@ -252,7 +266,9 @@ class _StationsPageState extends State<StationsPage> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1))],
+        boxShadow: [
+          BoxShadow(color: Colors.black12, blurRadius: 2, offset: Offset(0, 1)),
+        ],
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -262,7 +278,12 @@ class _StationsPageState extends State<StationsPage> {
             children: [
               TextButton(
                 onPressed: () {},
-                child: textWithColor('Previous', 12, TextType.Regular, Colors.blue),
+                child: textWithColor(
+                  'Previous',
+                  12,
+                  TextType.Regular,
+                  Colors.blue,
+                ),
               ),
               SizedBox(width: 16),
               TextButton(
@@ -308,7 +329,12 @@ class _StationsPageState extends State<StationsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 text('Shawn Matunda', 14, TextType.Bold),
-                textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                textWithColor(
+                  'Global Admin',
+                  12,
+                  TextType.Regular,
+                  Colors.grey[600]!,
+                ),
               ],
             ),
           ),
@@ -319,28 +345,40 @@ class _StationsPageState extends State<StationsPage> {
 
   String _getStationStatusIcon(String status) {
     switch (status) {
-      case 'open': return '✔';
-      case 'check': return '○';
-      case 'retained': return '✔';
-      default: return '✔';
+      case 'open':
+        return '✔';
+      case 'check':
+        return '○';
+      case 'retained':
+        return '✔';
+      default:
+        return '✔';
     }
   }
 
   Color _getStationStatusColor(String status) {
     switch (status) {
-      case 'open': return Colors.blue;
-      case 'check': return Colors.orange;
-      case 'retained': return Colors.green;
-      default: return Colors.grey;
+      case 'open':
+        return Colors.blue;
+      case 'check':
+        return Colors.orange;
+      case 'retained':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 
   Color _getPriorityColor(String priority) {
     switch (priority.toLowerCase()) {
-      case 'high': return Colors.red;
-      case 'medium': return Colors.orange;
-      case 'low': return Colors.green;
-      default: return Colors.grey;
+      case 'high':
+        return Colors.red;
+      case 'medium':
+        return Colors.orange;
+      case 'low':
+        return Colors.green;
+      default:
+        return Colors.grey;
     }
   }
 }
