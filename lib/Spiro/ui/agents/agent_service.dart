@@ -1,12 +1,11 @@
 import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 
+import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
+import 'package:http/http.dart' as http;
 
 class AgentService {
   final String baseUrl = 'http://localhost:8080/api';
-  final String apikey = 'admin-api-key-67890';
-
+  final String apiKey = 'admin-api-key-67890';
 
   Future<List<Agent>> getAgents() async {
     try {
@@ -15,7 +14,7 @@ class AgentService {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
-          'X-API-KEY': apikey
+          'X-API-KEY': apiKey,
         },
       );
 
@@ -26,7 +25,9 @@ class AgentService {
         final List<dynamic> data = json.decode(response.body);
         return data.map((item) => Agent.fromJson(item)).toList();
       } else {
-        throw Exception('Failed to load agents: ${response.statusCode} - ${response.body}');
+        throw Exception(
+          'Failed to load agents: ${response.statusCode} - ${response.body}',
+        );
       }
     } catch (e) {
       print('Error loading agents: $e');
@@ -67,7 +68,9 @@ class AgentService {
         final Map<String, dynamic> responseData = json.decode(response.body);
         return Agent.fromJson(responseData);
       } else {
-        throw Exception('Failed to add agent: ${response.statusCode} - ${response.body}');
+        throw Exception(
+          'Failed to add agent: ${response.statusCode} - ${response.body}',
+        );
       }
     } catch (e) {
       print('Error adding agent: $e');
@@ -78,17 +81,17 @@ class AgentService {
   Future<Agent> updateAgent(String agentId, Agent agent) async {
     try {
       final Map<String, dynamic> requestBody = {
-        'id': agentId,
-        'firstname': agent.firstname,
-        'middlename': agent.middlename,
-        'lastname': agent.lastname,
-        'dob': agent.dob,
-        'nationality': agent.nationality,
-        'identification': agent.identification,
-        'phonenumber': agent.phonenumber,
-        'email': agent.email,
-        'statusId': agent.statusId,
-        'createdBy': agent.createdBy,
+        "firstname": "John",
+        "middlename": "Michael",
+        "lastname": "Doe",
+        "dob": "1990-05-15",
+        "nationality": "Kenyan",
+        "identification": "A123456789",
+        "phonenumber": "255712345678",
+        "email": "john.doe@example.com",
+        "statusId": "active-status-id",
+        "createdBy": "admin",
+        "updatedBy": "admin",
       };
 
       print('Updating agent data: ${json.encode(requestBody)}');
@@ -109,35 +112,13 @@ class AgentService {
         final Map<String, dynamic> responseData = json.decode(response.body);
         return Agent.fromJson(responseData);
       } else {
-        throw Exception('Failed to update agent: ${response.statusCode} - ${response.body}');
+        throw Exception(
+          'Failed to update agent: ${response.statusCode} - ${response.body}',
+        );
       }
     } catch (e) {
       print('Error updating agent: $e');
       throw Exception('Failed to update agent: $e');
-    }
-  }
-
-  Future<void> deleteAgent(String agentId) async {
-    try {
-      // Note: Your controller doesn't have a delete endpoint
-      // You'll need to add this to your Spring Boot controller
-      final response = await http.delete(
-        Uri.parse('$baseUrl/agents/$agentId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-      );
-
-      print('DELETE Agent Response Status: ${response.statusCode}');
-      print('DELETE Agent Response Body: ${response.body}');
-
-      if (response.statusCode != 200) {
-        throw Exception('Failed to delete agent: ${response.statusCode} - ${response.body}');
-      }
-    } catch (e) {
-      print('Error deleting agent: $e');
-      throw Exception('Failed to delete agent: $e');
     }
   }
 }

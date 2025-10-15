@@ -11,6 +11,9 @@ import 'ConnectComms.dart';
 
 class Comms implements ConnectComms {
 
+  final String apikey = 'admin-api-key-67890';
+
+
   Dio dio = Dio();
   ConnectInternalMemory helper;
 
@@ -21,11 +24,13 @@ class Comms implements ConnectComms {
     try {
 
       final response = await dio.post(
-        "http://localhost:8080/spiro/horizon/agents",
+        "http://localhost:8080/api/agents",
         data: jsonEncode(userData.toJson()),
         options: Options(
           headers: {
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
+            'X-API-KEY': apikey
           },
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
