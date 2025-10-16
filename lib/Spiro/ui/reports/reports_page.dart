@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../data/internal/application/TextType.dart';
-import '../../designs/Component.dart';
-import '../../utils/Colors.dart';
+
+import '../../utils/DesignSystem.dart';
 
 class ReportsPage extends StatefulWidget {
   const ReportsPage({super.key});
@@ -14,51 +13,119 @@ class _ReportsPageState extends State<ReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Row(
-        children: [
+      backgroundColor: SpiroDesignSystem.gray50,
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(SpiroDesignSystem.space6),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildHeader(),
+            SizedBox(height: SpiroDesignSystem.space8),
+            _buildReportsGrid(),
+          ],
+        ),
+      ),
+    );
+  }
 
-          Expanded(
-            child: SingleChildScrollView(
-              padding: EdgeInsets.all(24.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildReportsHeader(),
-                  SizedBox(height: 32),
-                  _buildReportsGrid(),
-                ],
-              ),
+  Widget _buildHeader() {
+    return Container(
+      padding: EdgeInsets.all(SpiroDesignSystem.space6),
+      decoration: SpiroDesignSystem.cardDecoration,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Reports',
+            style: SpiroDesignSystem.displayM.copyWith(
+              fontWeight: FontWeight.w700,
+              color: SpiroDesignSystem.gray900,
             ),
+          ),
+          SizedBox(height: SpiroDesignSystem.space2),
+          Text(
+            'Analytics and performance reports',
+            style: SpiroDesignSystem.bodyL.copyWith(
+              color: SpiroDesignSystem.gray600,
+            ),
+          ),
+          SizedBox(height: SpiroDesignSystem.space4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _buildHeaderButton(
+                onPressed: () {},
+                icon: Icons.date_range_outlined,
+                label: 'Select Period',
+                isPrimary: false,
+              ),
+              SizedBox(width: SpiroDesignSystem.space3),
+              _buildHeaderButton(
+                onPressed: () {},
+                icon: Icons.file_download_outlined,
+                label: 'Export All',
+                isPrimary: true,
+              ),
+            ],
           ),
         ],
       ),
     );
   }
 
-
-
-  Widget _buildReportsHeader() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            backButtonWithAction(context, () {}),
-            SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  text('Reports', 28, TextType.Bold),
-                  SizedBox(height: 8),
-                  text('Analytics and performance reports', 16, TextType.Regular),
-                ],
-              ),
+  Widget _buildHeaderButton({
+    required VoidCallback onPressed,
+    required IconData icon,
+    required String label,
+    required bool isPrimary,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        gradient: isPrimary ? SpiroDesignSystem.primaryGradient : null,
+        color: isPrimary ? null : Colors.white,
+        borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
+        boxShadow: isPrimary
+            ? SpiroDesignSystem.shadowPrimary
+            : SpiroDesignSystem.shadowSm,
+        border: isPrimary
+            ? null
+            : Border.all(color: SpiroDesignSystem.gray300, width: 1),
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: onPressed,
+          borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
+          child: Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: SpiroDesignSystem.space4,
+              vertical: SpiroDesignSystem.space3,
             ),
-          ],
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  icon,
+                  color: isPrimary
+                      ? Colors.white
+                      : SpiroDesignSystem.primaryBlue600,
+                  size: 18,
+                ),
+                SizedBox(width: SpiroDesignSystem.space2),
+                Text(
+                  label,
+                  style: SpiroDesignSystem.bodyL.copyWith(
+                    color: isPrimary
+                        ? Colors.white
+                        : SpiroDesignSystem.primaryBlue600,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
-      ],
+      ),
     );
   }
 
@@ -67,95 +134,149 @@ class _ReportsPageState extends State<ReportsPage> {
       shrinkWrap: true,
       physics: NeverScrollableScrollPhysics(),
       crossAxisCount: 3,
-      crossAxisSpacing: 16,
-      mainAxisSpacing: 16,
+      crossAxisSpacing: SpiroDesignSystem.space4,
+      mainAxisSpacing: SpiroDesignSystem.space4,
       childAspectRatio: 1.2,
       children: [
-        _buildReportCard('Daily Operations', Icons.assessment, Colors.blue),
-        _buildReportCard('Agent Performance', Icons.people, Colors.green),
-        _buildReportCard('Battery Health', Icons.battery_std, Colors.orange),
-        _buildReportCard('Station Metrics', Icons.ev_station, Colors.purple),
-        _buildReportCard('Financial Summary', Icons.attach_money, Colors.teal),
-        _buildReportCard('Incident Logs', Icons.warning, Colors.red),
+        _buildReportCard(
+          'Daily Operations',
+          Icons.assessment_outlined,
+          SpiroDesignSystem.primaryBlue600,
+          'Track daily activities',
+        ),
+        _buildReportCard(
+          'Agent Performance',
+          Icons.people_outline,
+          SpiroDesignSystem.success600,
+          'View agent metrics',
+        ),
+        _buildReportCard(
+          'Battery Health',
+          Icons.battery_std_outlined,
+          SpiroDesignSystem.warning600,
+          'Monitor battery status',
+        ),
+        _buildReportCard(
+          'Station Metrics',
+          Icons.ev_station_outlined,
+          SpiroDesignSystem.info600,
+          'Station performance data',
+        ),
+        _buildReportCard(
+          'Financial Summary',
+          Icons.attach_money_outlined,
+          SpiroDesignSystem.success600,
+          'Revenue and costs',
+        ),
+        _buildReportCard(
+          'Incident Logs',
+          Icons.warning_outlined,
+          SpiroDesignSystem.danger600,
+          'Incident history',
+        ),
       ],
     );
   }
 
-  Widget _buildReportCard(String title, IconData icon, Color color) {
+  Widget _buildReportCard(
+    String title,
+    IconData icon,
+    Color color,
+    String subtitle,
+  ) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
+        borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusLg),
+        boxShadow: SpiroDesignSystem.shadowMd,
+        border: Border.all(color: color.withValues(alpha: 0.1), width: 1),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, color: color, size: 24),
-          ),
-          SizedBox(height: 12),
-          text(title, 16, TextType.SemiBold),
-          SizedBox(height: 8),
-          textWithColor('Generate Report', 12, TextType.Regular, Colors.blue),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildReportsMenuItem(String title, IconData icon) {
-    return ListTile(
-      leading: Icon(icon, color: Colors.grey[700], size: 20),
-      title: text(title, 14, TextType.Regular),
-      onTap: () {
-        print('Selected: $title');
-      },
-    );
-  }
-
-  Widget _buildMenuSection(String title, List<Widget> items) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: EdgeInsets.fromLTRB(16, 20, 16, 8),
-          child: textWithColor(title, 12, TextType.Bold, Colors.grey[600]!),
-        ),
-        ...items,
-      ],
-    );
-  }
-
-  Widget _buildUserSection() {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey[300]!)),
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(
-            backgroundColor: colorPrimary,
-            child: Icon(Icons.person, color: Colors.white, size: 20),
-            radius: 20,
-          ),
-          SizedBox(width: 12),
-          Expanded(
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () {
+            _showReportMessage(title);
+          },
+          borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusLg),
+          child: Padding(
+            padding: EdgeInsets.all(SpiroDesignSystem.space5),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                text('Shawn Matunda', 14, TextType.Bold),
-                textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                Container(
+                  width: 60,
+                  height: 60,
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: color, size: 28),
+                ),
+                SizedBox(height: SpiroDesignSystem.space3),
+                Text(
+                  title,
+                  style: SpiroDesignSystem.titleM.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: SpiroDesignSystem.gray900,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: SpiroDesignSystem.space2),
+                Text(
+                  subtitle,
+                  style: SpiroDesignSystem.bodyS.copyWith(
+                    color: SpiroDesignSystem.gray600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                SizedBox(height: SpiroDesignSystem.space3),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: SpiroDesignSystem.space3,
+                    vertical: SpiroDesignSystem.space2,
+                  ),
+                  decoration: BoxDecoration(
+                    color: color.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(
+                      SpiroDesignSystem.radiusSm,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.download_outlined, color: color, size: 16),
+                      SizedBox(width: SpiroDesignSystem.space1),
+                      Text(
+                        'Generate',
+                        style: SpiroDesignSystem.bodyS.copyWith(
+                          color: color,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
-        ],
+        ),
+      ),
+    );
+  }
+
+  void _showReportMessage(String reportName) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.info_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Text('Generating $reportName report...'),
+          ],
+        ),
+        backgroundColor: SpiroDesignSystem.primaryBlue600,
+        behavior: SnackBarBehavior.floating,
+        duration: Duration(seconds: 2),
       ),
     );
   }

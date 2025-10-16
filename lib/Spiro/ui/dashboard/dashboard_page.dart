@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
-import '../../utils/DesignSystem.dart'; // Updated import
+import '../../utils/DesignSystem.dart';
 import '../agents/agents_page.dart';
 import '../analytics/analytics_page.dart';
 import '../batteries/batteries_page.dart';
@@ -118,7 +118,6 @@ class _DashboardPageState extends State<DashboardPage>
                         children: [
                           // Enhanced Header with glassmorphism
                           Container(
-                            height: 120,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
@@ -130,10 +129,11 @@ class _DashboardPageState extends State<DashboardPage>
                                 ],
                               ),
                             ),
-                            padding: EdgeInsets.all(SpiroDesignSystem.space4),
+                            padding: EdgeInsets.all(SpiroDesignSystem.space3),
                             child: Column(
-                              mainAxisAlignment: MainAxisAlignment.end,
+                              mainAxisAlignment: MainAxisAlignment.center,
                               crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
                                   'Spiro Control',
@@ -141,13 +141,17 @@ class _DashboardPageState extends State<DashboardPage>
                                     color: Colors.white,
                                     fontWeight: FontWeight.w700,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ).fadeIn(),
-                                SizedBox(height: SpiroDesignSystem.space1),
+                                SizedBox(height: SpiroDesignSystem.space0_5),
                                 Text(
                                   'Operations Control Tower',
                                   style: SpiroDesignSystem.bodyL.copyWith(
                                     color: Colors.white70,
                                   ),
+                                  overflow: TextOverflow.ellipsis,
+                                  maxLines: 1,
                                 ).fadeIn(),
                               ],
                             ),
@@ -216,8 +220,8 @@ class _DashboardPageState extends State<DashboardPage>
 
                           // Enhanced User Profile Section with glassmorphism
                           Container(
-                            margin: EdgeInsets.all(SpiroDesignSystem.space3),
-                            padding: EdgeInsets.all(SpiroDesignSystem.space4),
+                            margin: EdgeInsets.all(SpiroDesignSystem.space2),
+                            padding: EdgeInsets.all(SpiroDesignSystem.space3),
                             decoration:
                                 SpiroDesignSystem.glassMorphismDecoration,
                             child: Row(
@@ -233,16 +237,17 @@ class _DashboardPageState extends State<DashboardPage>
                                     child: Icon(
                                       Icons.person,
                                       color: Colors.white,
-                                      size: 20,
+                                      size: 18,
                                     ),
-                                    radius: 20,
+                                    radius: 18,
                                   ),
                                 ),
-                                SizedBox(width: SpiroDesignSystem.space3),
+                                SizedBox(width: SpiroDesignSystem.space2),
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
                                     children: [
                                       Text(
                                         'Shawn Matunda',
@@ -250,16 +255,19 @@ class _DashboardPageState extends State<DashboardPage>
                                           fontWeight: FontWeight.w600,
                                           color: Colors.white,
                                         ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                       Text(
                                         'Global Admin',
                                         style: SpiroDesignSystem.bodyS.copyWith(
                                           color: Colors.white70,
                                         ),
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ],
                                   ),
                                 ),
+                                SizedBox(width: SpiroDesignSystem.space1),
                                 Container(
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.2),
@@ -270,9 +278,11 @@ class _DashboardPageState extends State<DashboardPage>
                                   child: IconButton(
                                     icon: Icon(
                                       Icons.logout,
-                                      size: 18,
+                                      size: 16,
                                       color: Colors.white,
                                     ),
+                                    padding: EdgeInsets.all(8),
+                                    constraints: BoxConstraints(),
                                     onPressed: () => _handleLogout(),
                                   ),
                                 ),

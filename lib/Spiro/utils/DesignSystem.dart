@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
 
-/// Spiro Dashboard Design System - Futuristic Control Tower Theme
-/// Professional enterprise SaaS quality with subtle sci-fi elements
+/// Spiro Dashboard Design System
 class SpiroDesignSystem {
-  // ============================================================================
-  // COLORS - Futuristic Tech Palette
-  // ============================================================================
-
   // Primary Blue Palette (replacing orange)
   static const Color primaryBlue50 = Color(0xFFEBF3FF);
   static const Color primaryBlue100 = Color(0xFFDBEAFE);
@@ -181,6 +176,13 @@ class SpiroDesignSystem {
     fontSize: fontSize24,
     fontWeight: FontWeight.w600,
     height: 1.3,
+  );
+
+  // Add titleS as an alias for consistency
+  static const TextStyle titleS = TextStyle(
+    fontSize: fontSize16,
+    fontWeight: FontWeight.w500,
+    height: 1.4,
   );
 
   // ============================================================================
