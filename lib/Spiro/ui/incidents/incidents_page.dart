@@ -286,58 +286,140 @@ class _IncidentsPageState extends State<IncidentsPage> {
   }
 
   Widget _buildStatisticsCards() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'Total',
-            '$_totalIncidents',
-            'incidents',
-            SpiroDesignSystem.primaryBlue600,
-            Icons.analytics_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Open',
-            '$_openIncidents',
-            'incidents',
-            SpiroDesignSystem.danger600,
-            Icons.folder_open_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'In Progress',
-            '$_inProgressIncidents',
-            'incidents',
-            SpiroDesignSystem.warning600,
-            Icons.sync_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Critical',
-            '$_criticalIncidents',
-            'incidents',
-            SpiroDesignSystem.red600,
-            Icons.warning_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Resolved',
-            '$_resolvedIncidents',
-            'incidents',
-            SpiroDesignSystem.success600,
-            Icons.check_circle_outline,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          // Stack cards vertically on smaller screens
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Total',
+                      '$_totalIncidents',
+                      'incidents',
+                      SpiroDesignSystem.primaryBlue600,
+                      Icons.analytics_outlined,
+                    ),
+                  ),
+                  SizedBox(width: SpiroDesignSystem.space4),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Open',
+                      '$_openIncidents',
+                      'incidents',
+                      SpiroDesignSystem.danger600,
+                      Icons.folder_open_outlined,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: SpiroDesignSystem.space4),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'In Progress',
+                      '$_inProgressIncidents',
+                      'incidents',
+                      SpiroDesignSystem.warning600,
+                      Icons.sync_outlined,
+                    ),
+                  ),
+                  SizedBox(width: SpiroDesignSystem.space4),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Critical',
+                      '$_criticalIncidents',
+                      'incidents',
+                      SpiroDesignSystem.red600,
+                      Icons.warning_outlined,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: SpiroDesignSystem.space4),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Resolved',
+                      '$_resolvedIncidents',
+                      'incidents',
+                      SpiroDesignSystem.success600,
+                      Icons.check_circle_outline,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        } else {
+          // Horizontal scrollable layout for larger screens
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 180, maxWidth: 220),
+                  child: _buildStatCard(
+                    'Total',
+                    '$_totalIncidents',
+                    'incidents',
+                    SpiroDesignSystem.primaryBlue600,
+                    Icons.analytics_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 180, maxWidth: 220),
+                  child: _buildStatCard(
+                    'Open',
+                    '$_openIncidents',
+                    'incidents',
+                    SpiroDesignSystem.danger600,
+                    Icons.folder_open_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 180, maxWidth: 220),
+                  child: _buildStatCard(
+                    'In Progress',
+                    '$_inProgressIncidents',
+                    'incidents',
+                    SpiroDesignSystem.warning600,
+                    Icons.sync_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 180, maxWidth: 220),
+                  child: _buildStatCard(
+                    'Critical',
+                    '$_criticalIncidents',
+                    'incidents',
+                    SpiroDesignSystem.red600,
+                    Icons.warning_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 180, maxWidth: 220),
+                  child: _buildStatCard(
+                    'Resolved',
+                    '$_resolvedIncidents',
+                    'incidents',
+                    SpiroDesignSystem.success600,
+                    Icons.check_circle_outline,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 

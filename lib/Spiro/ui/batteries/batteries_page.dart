@@ -456,56 +456,131 @@ class _BatteriesPageState extends State<BatteriesPage> {
   }
 
   Widget _buildBatteryStatsGrid() {
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'Total Batteries',
-            '15,420',
-            'In circulation',
-            '+2.1%',
-            true,
-            SpiroDesignSystem.primaryBlue600,
-            Icons.battery_full_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Avg Cycle Count',
-            '1,247',
-            'Per battery',
-            '+3.5%',
-            true,
-            SpiroDesignSystem.info600,
-            Icons.sync_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Battery Health',
-            '89%',
-            'Overall condition',
-            '+1.2%',
-            true,
-            SpiroDesignSystem.success600,
-            Icons.favorite_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Replacement Rate',
-            '2.1%',
-            'Monthly',
-            '-0.9%',
-            false,
-            SpiroDesignSystem.warning600,
-            Icons.warning_outlined,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        if (constraints.maxWidth < 800) {
+          // Stack cards vertically on smaller screens
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Total Batteries',
+                      '15,420',
+                      'In circulation',
+                      '+2.1%',
+                      true,
+                      SpiroDesignSystem.primaryBlue600,
+                      Icons.battery_full_outlined,
+                    ),
+                  ),
+                  SizedBox(width: SpiroDesignSystem.space4),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Avg Cycle Count',
+                      '1,247',
+                      'Per battery',
+                      '+3.5%',
+                      true,
+                      SpiroDesignSystem.info600,
+                      Icons.sync_outlined,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: SpiroDesignSystem.space4),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Battery Health',
+                      '89%',
+                      'Overall condition',
+                      '+1.2%',
+                      true,
+                      SpiroDesignSystem.success600,
+                      Icons.favorite_outlined,
+                    ),
+                  ),
+                  SizedBox(width: SpiroDesignSystem.space4),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Replacement Rate',
+                      '2.1%',
+                      'Monthly',
+                      '-0.9%',
+                      false,
+                      SpiroDesignSystem.warning600,
+                      Icons.warning_outlined,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        } else {
+          // Horizontal scrollable layout for larger screens
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Total Batteries',
+                    '15,420',
+                    'In circulation',
+                    '+2.1%',
+                    true,
+                    SpiroDesignSystem.primaryBlue600,
+                    Icons.battery_full_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Avg Cycle Count',
+                    '1,247',
+                    'Per battery',
+                    '+3.5%',
+                    true,
+                    SpiroDesignSystem.info600,
+                    Icons.sync_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Battery Health',
+                    '89%',
+                    'Overall condition',
+                    '+1.2%',
+                    true,
+                    SpiroDesignSystem.success600,
+                    Icons.favorite_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Replacement Rate',
+                    '2.1%',
+                    'Monthly',
+                    '-0.9%',
+                    false,
+                    SpiroDesignSystem.warning600,
+                    Icons.warning_outlined,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
