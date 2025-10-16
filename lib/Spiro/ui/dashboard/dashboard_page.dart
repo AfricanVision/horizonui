@@ -125,11 +125,13 @@ class _DashboardPageState extends State<DashboardPage>
               AnimatedBuilder(
                 animation: _sidebarAnimation,
                 builder: (context, child) {
+                  final sidebarWidth = (_isSidebarOpen
+                      ? (constraints.maxWidth > 1200 ? 280.0 : 250.0) *
+                            _sidebarAnimation.value
+                      : 0.0);
+
                   return Container(
-                    width: _isSidebarOpen
-                        ? (constraints.maxWidth > 1200 ? 280 : 250) *
-                              _sidebarAnimation.value
-                        : 0,
+                    width: sidebarWidth,
                     decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -141,213 +143,228 @@ class _DashboardPageState extends State<DashboardPage>
                       ),
                       boxShadow: SpiroDesignSystem.shadowXl,
                     ),
-                    child: _isSidebarOpen
-                        ? Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Enhanced Header with glassmorphism - FIXED TEXT OVERFLOW
-                              Container(
-                                width: double.infinity,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
-                                    colors: [
-                                      SpiroDesignSystem.primaryBlue500,
-                                      SpiroDesignSystem.primaryBlue600,
-                                    ],
-                                  ),
-                                ),
-                                padding: EdgeInsets.all(
-                                  SpiroDesignSystem.space3,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        'Spiro Control',
-                                        style: SpiroDesignSystem.titleL
-                                            .copyWith(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.w700,
-                                            ),
-                                      ).fadeIn(),
+                    child: ClipRect(
+                      child: Opacity(
+                        opacity: _sidebarAnimation.value,
+                        child: sidebarWidth > 100
+                            ? Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  // Enhanced Header with glassmorphism - FIXED TEXT OVERFLOW
+                                  Container(
+                                    width: double.infinity,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          SpiroDesignSystem.primaryBlue500,
+                                          SpiroDesignSystem.primaryBlue600,
+                                        ],
+                                      ),
                                     ),
-                                    SizedBox(
-                                      height: SpiroDesignSystem.space0_5,
+                                    padding: EdgeInsets.all(
+                                      SpiroDesignSystem.space3,
                                     ),
-                                    FittedBox(
-                                      fit: BoxFit.scaleDown,
-                                      child: Text(
-                                        'Operations Control Tower',
-                                        style: SpiroDesignSystem.bodyL.copyWith(
-                                          color: Colors.white70,
-                                        ),
-                                      ).fadeIn(),
-                                    ),
-                                  ],
-                                ),
-                              ),
-
-                              // Enhanced Navigation Menu - FIXED SCROLLING ISSUES
-                              Expanded(
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      begin: Alignment.topCenter,
-                                      end: Alignment.bottomCenter,
-                                      colors: [
-                                        SpiroDesignSystem.primaryBlue600,
-                                        SpiroDesignSystem.primaryBlue700,
-                                      ],
-                                    ),
-                                  ),
-                                  child: ScrollConfiguration(
-                                    behavior: ScrollConfiguration.of(
-                                      context,
-                                    ).copyWith(scrollbars: false),
-                                    child: ListView(
-                                      padding: EdgeInsets.zero,
-                                      physics: ClampingScrollPhysics(),
+                                    child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        _buildMenuItem(
-                                          'Dashboard',
-                                          Icons.dashboard_outlined,
-                                          Icons.dashboard,
+                                        FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            'Spiro Control',
+                                            style: SpiroDesignSystem.titleL
+                                                .copyWith(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                          ).fadeIn(),
                                         ),
-                                        _buildMenuItem(
-                                          'Agents',
-                                          Icons.people_outline,
-                                          Icons.people,
+                                        SizedBox(
+                                          height: SpiroDesignSystem.space0_5,
                                         ),
-                                        _buildMenuItem(
-                                          'Stations',
-                                          Icons.ev_station_outlined,
-                                          Icons.ev_station,
-                                        ),
-                                        _buildMenuItem(
-                                          'Batteries',
-                                          Icons.battery_std_outlined,
-                                          Icons.battery_std,
-                                        ),
-                                        _buildMenuItem(
-                                          'Analytics',
-                                          Icons.analytics_outlined,
-                                          Icons.analytics,
-                                        ),
-                                        _buildMenuItem(
-                                          'Incidents',
-                                          Icons.warning_amber_outlined,
-                                          Icons.warning_amber,
-                                        ),
-                                        _buildMenuItem(
-                                          'Reports',
-                                          Icons.assessment_outlined,
-                                          Icons.assessment,
-                                        ),
-                                        _buildMenuItem(
-                                          'Settings',
-                                          Icons.settings_outlined,
-                                          Icons.settings,
+                                        FittedBox(
+                                          fit: BoxFit.scaleDown,
+                                          child: Text(
+                                            'Operations Control Tower',
+                                            style: SpiroDesignSystem.bodyL
+                                                .copyWith(
+                                                  color: Colors.white70,
+                                                ),
+                                          ).fadeIn(),
                                         ),
                                       ],
                                     ),
                                   ),
-                                ),
-                              ),
 
-                              // Enhanced User Profile Section - FIXED OVERFLOW
-                              Container(
-                                margin: EdgeInsets.all(
-                                  SpiroDesignSystem.space2,
-                                ),
-                                padding: EdgeInsets.all(
-                                  SpiroDesignSystem.space3,
-                                ),
-                                decoration:
-                                    SpiroDesignSystem.glassMorphismDecoration,
-                                child: IntrinsicHeight(
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          gradient:
-                                              SpiroDesignSystem.primaryGradient,
-                                          boxShadow:
-                                              SpiroDesignSystem.shadowPrimary,
-                                        ),
-                                        child: CircleAvatar(
-                                          backgroundColor: Colors.transparent,
-                                          child: Icon(
-                                            Icons.person,
-                                            color: Colors.white,
-                                            size: 18,
-                                          ),
-                                          radius: 18,
+                                  // Enhanced Navigation Menu - FIXED SCROLLING ISSUES
+                                  Expanded(
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
+                                          colors: [
+                                            SpiroDesignSystem.primaryBlue600,
+                                            SpiroDesignSystem.primaryBlue700,
+                                          ],
                                         ),
                                       ),
-                                      SizedBox(width: SpiroDesignSystem.space2),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          mainAxisSize: MainAxisSize.min,
+                                      child: ScrollConfiguration(
+                                        behavior: ScrollConfiguration.of(
+                                          context,
+                                        ).copyWith(scrollbars: false),
+                                        child: ListView(
+                                          padding: EdgeInsets.zero,
+                                          physics: ClampingScrollPhysics(),
                                           children: [
-                                            Text(
-                                              'Shawn Matunda',
-                                              style: SpiroDesignSystem.bodyL
-                                                  .copyWith(
-                                                    fontWeight: FontWeight.w600,
-                                                    color: Colors.white,
-                                                  ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
+                                            _buildMenuItem(
+                                              'Dashboard',
+                                              Icons.dashboard_outlined,
+                                              Icons.dashboard,
                                             ),
-                                            Text(
-                                              'Global Admin',
-                                              style: SpiroDesignSystem.bodyS
-                                                  .copyWith(
-                                                    color: Colors.white70,
-                                                  ),
-                                              overflow: TextOverflow.ellipsis,
-                                              maxLines: 1,
+                                            _buildMenuItem(
+                                              'Agents',
+                                              Icons.people_outline,
+                                              Icons.people,
+                                            ),
+                                            _buildMenuItem(
+                                              'Stations',
+                                              Icons.ev_station_outlined,
+                                              Icons.ev_station,
+                                            ),
+                                            _buildMenuItem(
+                                              'Batteries',
+                                              Icons.battery_std_outlined,
+                                              Icons.battery_std,
+                                            ),
+                                            _buildMenuItem(
+                                              'Analytics',
+                                              Icons.analytics_outlined,
+                                              Icons.analytics,
+                                            ),
+                                            _buildMenuItem(
+                                              'Incidents',
+                                              Icons.warning_amber_outlined,
+                                              Icons.warning_amber,
+                                            ),
+                                            _buildMenuItem(
+                                              'Reports',
+                                              Icons.assessment_outlined,
+                                              Icons.assessment,
+                                            ),
+                                            _buildMenuItem(
+                                              'Settings',
+                                              Icons.settings_outlined,
+                                              Icons.settings,
                                             ),
                                           ],
                                         ),
                                       ),
-                                      Container(
-                                        width: 32,
-                                        height: 32,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white.withValues(
-                                            alpha: 0.2,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            SpiroDesignSystem.radiusMd,
-                                          ),
-                                        ),
-                                        child: IconButton(
-                                          icon: Icon(
-                                            Icons.logout,
-                                            size: 16,
-                                            color: Colors.white,
-                                          ),
-                                          padding: EdgeInsets.zero,
-                                          onPressed: () => _handleLogout(),
-                                        ),
-                                      ),
-                                    ],
+                                    ),
                                   ),
-                                ),
-                              ).slideIn(),
-                            ],
-                          )
-                        : SizedBox.shrink(),
+
+                                  // Enhanced User Profile Section - FIXED OVERFLOW
+                                  Container(
+                                    margin: EdgeInsets.all(
+                                      SpiroDesignSystem.space2,
+                                    ),
+                                    padding: EdgeInsets.all(
+                                      SpiroDesignSystem.space3,
+                                    ),
+                                    decoration: SpiroDesignSystem
+                                        .glassMorphismDecoration,
+                                    child: IntrinsicHeight(
+                                      child: Row(
+                                        children: [
+                                          Container(
+                                            decoration: BoxDecoration(
+                                              shape: BoxShape.circle,
+                                              gradient: SpiroDesignSystem
+                                                  .primaryGradient,
+                                              boxShadow: SpiroDesignSystem
+                                                  .shadowPrimary,
+                                            ),
+                                            child: CircleAvatar(
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              child: Icon(
+                                                Icons.person,
+                                                color: Colors.white,
+                                                size: 18,
+                                              ),
+                                              radius: 18,
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            width: SpiroDesignSystem.space2,
+                                          ),
+                                          Expanded(
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
+                                              mainAxisSize: MainAxisSize.min,
+                                              children: [
+                                                Text(
+                                                  'Shawn Matunda',
+                                                  style: SpiroDesignSystem.bodyL
+                                                      .copyWith(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                                Text(
+                                                  'Global Admin',
+                                                  style: SpiroDesignSystem.bodyS
+                                                      .copyWith(
+                                                        color: Colors.white70,
+                                                      ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 32,
+                                            height: 32,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white.withValues(
+                                                alpha: 0.2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                    SpiroDesignSystem.radiusMd,
+                                                  ),
+                                            ),
+                                            child: IconButton(
+                                              icon: Icon(
+                                                Icons.logout,
+                                                size: 16,
+                                                color: Colors.white,
+                                              ),
+                                              padding: EdgeInsets.zero,
+                                              onPressed: () => _handleLogout(),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ).slideIn(),
+                                ],
+                              )
+                            : SizedBox.shrink(),
+                      ),
+                    ),
                   );
                 },
               ),
@@ -433,13 +450,17 @@ class _DashboardPageState extends State<DashboardPage>
           onTap: () => _navigateToPage(title),
           borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusLg),
           child: ListTile(
-            leading: AnimatedSwitcher(
-              duration: SpiroDesignSystem.duration150,
-              child: Icon(
-                isSelected ? filledIcon : outlineIcon,
-                color: Colors.white,
-                size: 20,
-                key: ValueKey(isSelected),
+            leading: SizedBox(
+              width: 24,
+              height: 24,
+              child: AnimatedSwitcher(
+                duration: SpiroDesignSystem.duration150,
+                child: Icon(
+                  isSelected ? filledIcon : outlineIcon,
+                  color: Colors.white,
+                  size: 20,
+                  key: ValueKey(isSelected),
+                ),
               ),
             ),
             title: Text(

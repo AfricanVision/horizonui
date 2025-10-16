@@ -101,16 +101,20 @@ class _AgentsPageState extends State<AgentsPage> {
   }
 
   Future<void> _loadAgents() async {
+    if (!mounted) return;
     setState(() => _isLoading = true);
     try {
       final agents = await _agentService.getAgents();
+      if (!mounted) return;
       setState(() {
         _agents = agents;
         _filteredAgents = agents;
       });
     } catch (e) {
+      if (!mounted) return;
       _showErrorNotification('Failed to load agents: $e');
     } finally {
+      if (!mounted) return;
       setState(() => _isLoading = false);
     }
   }

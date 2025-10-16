@@ -72,6 +72,7 @@ class _IncidentsPageState extends State<IncidentsPage> {
   }
 
   Future<void> _loadStations() async {
+    if (!mounted) return;
     setState(() {
       _isLoadingStations = true;
     });
@@ -106,6 +107,7 @@ class _IncidentsPageState extends State<IncidentsPage> {
   }
 
   Future<void> _loadIncidents() async {
+    if (!mounted) return;
     setState(() {
       _isLoadingIncidents = true;
     });

@@ -83,10 +83,14 @@ class HomeState extends State<Home> implements ConnectHome {
   Widget _buildMenuItem(String title, IconData icon) {
     bool isSelected = _selectedMenuItem == title;
     return ListTile(
-      leading: Icon(
-        icon,
-        color: isSelected ? colorPrimary : Colors.grey[700],
-        size: 20,
+      leading: SizedBox(
+        width: 24,
+        height: 24,
+        child: Icon(
+          icon,
+          color: isSelected ? colorPrimary : Colors.grey[700],
+          size: 20,
+        ),
       ),
       title: textWithColor(
         title,
