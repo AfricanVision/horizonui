@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 import 'package:horizonui/Spiro/ui/agents/agent_service.dart';
+import 'package:intl/intl.dart';
 
 import '../../utils/DesignSystem.dart';
 
@@ -152,6 +153,113 @@ class _AgentsPageState extends State<AgentsPage> {
     }
   }
 
+  Future<void> _selectDate(
+    TextEditingController controller, {
+    bool isEdit = false,
+  }) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now().subtract(
+        Duration(days: 365 * 25),
+      ), // Default to 25 years ago
+      firstDate: DateTime(1900),
+      lastDate: DateTime.now(),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            colorScheme: ColorScheme.light(
+              primary: SpiroDesignSystem.primaryBlue600,
+              onPrimary: Colors.white,
+              surface: Colors.white,
+              onSurface: SpiroDesignSystem.gray900,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null) {
+      final formattedDate = DateFormat('yyyy-MM-dd').format(picked);
+      controller.text = formattedDate;
+      setState(() {});
+    }
+  }
+
+  Widget _buildDateFormField({
+    required String label,
+    required String hintText,
+    required TextEditingController controller,
+    bool isRequired = true,
+    bool isEdit = false,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        RichText(
+          text: TextSpan(
+            text: label,
+            style: SpiroDesignSystem.bodyL.copyWith(
+              fontWeight: FontWeight.w600,
+              color: SpiroDesignSystem.gray900,
+            ),
+            children: isRequired
+                ? [
+                    TextSpan(
+                      text: ' *',
+                      style: TextStyle(
+                        color: SpiroDesignSystem.danger600,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ]
+                : [],
+          ),
+        ),
+        SizedBox(height: SpiroDesignSystem.space2),
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: SpiroDesignSystem.gray300),
+            borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
+          ),
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: () => _selectDate(controller, isEdit: isEdit),
+              borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: SpiroDesignSystem.space3,
+                  vertical: SpiroDesignSystem.space3,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        controller.text.isEmpty ? hintText : controller.text,
+                        style: SpiroDesignSystem.bodyL.copyWith(
+                          color: controller.text.isEmpty
+                              ? SpiroDesignSystem.gray500
+                              : SpiroDesignSystem.gray900,
+                        ),
+                      ),
+                    ),
+                    Icon(
+                      Icons.calendar_today_outlined,
+                      color: SpiroDesignSystem.primaryBlue600,
+                      size: 20,
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -216,6 +324,7 @@ class _AgentsPageState extends State<AgentsPage> {
             ],
           ),
           SizedBox(height: SpiroDesignSystem.space4),
+          // FIXED: Match incidents pattern with Row and Flexible
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -316,48 +425,116 @@ class _AgentsPageState extends State<AgentsPage> {
         .length;
     int activeAgents = onlineAgents;
 
-    return Row(
-      children: [
-        Expanded(
-          child: _buildStatCard(
-            'Total Agents',
-            totalAgents.toString(),
-            'registered',
-            SpiroDesignSystem.primaryBlue600,
-            Icons.people_outline,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Online',
-            onlineAgents.toString(),
-            'active now',
-            SpiroDesignSystem.success600,
-            Icons.check_circle_outline,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Offline',
-            offlineAgents.toString(),
-            'inactive',
-            SpiroDesignSystem.gray500,
-            Icons.cancel_outlined,
-          ),
-        ),
-        SizedBox(width: SpiroDesignSystem.space4),
-        Expanded(
-          child: _buildStatCard(
-            'Active Today',
-            activeAgents.toString(),
-            'working',
-            SpiroDesignSystem.warning600,
-            Icons.work_outline,
-          ),
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Use different layouts based on screen width
+        if (constraints.maxWidth < 800) {
+          // Stack cards vertically on smaller screens
+          return Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Total Agents',
+                      totalAgents.toString(),
+                      'registered',
+                      SpiroDesignSystem.primaryBlue600,
+                      Icons.people_outline,
+                    ),
+                  ),
+                  SizedBox(width: SpiroDesignSystem.space4),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Online',
+                      onlineAgents.toString(),
+                      'active now',
+                      SpiroDesignSystem.success600,
+                      Icons.check_circle_outline,
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: SpiroDesignSystem.space4),
+              Row(
+                children: [
+                  Expanded(
+                    child: _buildStatCard(
+                      'Offline',
+                      offlineAgents.toString(),
+                      'inactive',
+                      SpiroDesignSystem.gray500,
+                      Icons.cancel_outlined,
+                    ),
+                  ),
+                  SizedBox(width: SpiroDesignSystem.space4),
+                  Expanded(
+                    child: _buildStatCard(
+                      'Active Today',
+                      activeAgents.toString(),
+                      'working',
+                      SpiroDesignSystem.warning600,
+                      Icons.work_outline,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          );
+        } else {
+          // Horizontal layout for larger screens
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: [
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Total Agents',
+                    totalAgents.toString(),
+                    'registered',
+                    SpiroDesignSystem.primaryBlue600,
+                    Icons.people_outline,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Online',
+                    onlineAgents.toString(),
+                    'active now',
+                    SpiroDesignSystem.success600,
+                    Icons.check_circle_outline,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Offline',
+                    offlineAgents.toString(),
+                    'inactive',
+                    SpiroDesignSystem.gray500,
+                    Icons.cancel_outlined,
+                  ),
+                ),
+                SizedBox(width: SpiroDesignSystem.space4),
+                ConstrainedBox(
+                  constraints: BoxConstraints(minWidth: 200, maxWidth: 250),
+                  child: _buildStatCard(
+                    'Active Today',
+                    activeAgents.toString(),
+                    'working',
+                    SpiroDesignSystem.warning600,
+                    Icons.work_outline,
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -473,24 +650,26 @@ class _AgentsPageState extends State<AgentsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Add New Agent',
-                    style: SpiroDesignSystem.displayS.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: SpiroDesignSystem.gray900,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Add New Agent',
+                      style: SpiroDesignSystem.displayS.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: SpiroDesignSystem.gray900,
+                      ),
                     ),
-                  ),
-                  SizedBox(height: SpiroDesignSystem.space1),
-                  Text(
-                    'Fill in the agent details below',
-                    style: SpiroDesignSystem.bodyL.copyWith(
-                      color: SpiroDesignSystem.gray600,
+                    SizedBox(height: SpiroDesignSystem.space1),
+                    Text(
+                      'Fill in the agent details below',
+                      style: SpiroDesignSystem.bodyL.copyWith(
+                        color: SpiroDesignSystem.gray600,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
               IconButton(
                 icon: Icon(
@@ -508,12 +687,12 @@ class _AgentsPageState extends State<AgentsPage> {
             ],
           ),
           SizedBox(height: SpiroDesignSystem.space6),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // Fixed: Make form responsive
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 600) {
+                // Single column layout for smaller screens
+                return Column(
                   children: [
                     _buildFormField(
                       label: 'First Name',
@@ -530,6 +709,20 @@ class _AgentsPageState extends State<AgentsPage> {
                     ),
                     SizedBox(height: SpiroDesignSystem.space4),
                     _buildFormField(
+                      label: 'Last Name',
+                      hintText: 'e.g., Fake',
+                      controller: _lastnameController,
+                      isRequired: true,
+                    ),
+                    SizedBox(height: SpiroDesignSystem.space4),
+                    _buildDateFormField(
+                      label: 'Date of Birth',
+                      hintText: 'e.g., 1990-05-15',
+                      controller: _dobController,
+                      isRequired: true,
+                    ),
+                    SizedBox(height: SpiroDesignSystem.space4),
+                    _buildFormField(
                       label: 'Phone Number',
                       hintText: 'e.g., 0712345678',
                       controller: _phonenumberController,
@@ -541,27 +734,6 @@ class _AgentsPageState extends State<AgentsPage> {
                       label: 'National ID',
                       hintText: 'e.g., ID123456',
                       controller: _identificationController,
-                      isRequired: true,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: SpiroDesignSystem.space4),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildFormField(
-                      label: 'Last Name',
-                      hintText: 'e.g., Fake',
-                      controller: _lastnameController,
-                      isRequired: true,
-                    ),
-                    SizedBox(height: SpiroDesignSystem.space4),
-                    _buildFormField(
-                      label: 'Date of Birth',
-                      hintText: 'e.g., 1990-05-15',
-                      controller: _dobController,
                       isRequired: true,
                     ),
                     SizedBox(height: SpiroDesignSystem.space4),
@@ -580,37 +752,122 @@ class _AgentsPageState extends State<AgentsPage> {
                       isRequired: true,
                     ),
                   ],
-                ),
-              ),
-            ],
+                );
+              } else {
+                // Two column layout for larger screens
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildFormField(
+                            label: 'First Name',
+                            hintText: 'e.g., Cynthia',
+                            controller: _firstnameController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Middle Name',
+                            hintText: 'e.g., Situma',
+                            controller: _middlenameController,
+                            isRequired: false,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Phone Number',
+                            hintText: 'e.g., 0712345678',
+                            controller: _phonenumberController,
+                            keyboardType: TextInputType.phone,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'National ID',
+                            hintText: 'e.g., ID123456',
+                            controller: _identificationController,
+                            isRequired: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: SpiroDesignSystem.space4),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildFormField(
+                            label: 'Last Name',
+                            hintText: 'e.g., Fake',
+                            controller: _lastnameController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildDateFormField(
+                            label: 'Date of Birth',
+                            hintText: 'e.g., 1990-05-15',
+                            controller: _dobController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Nationality',
+                            hintText: 'e.g., Kenyan',
+                            controller: _nationalityController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Email Address',
+                            hintText: 'e.g., CFake@example.com',
+                            controller: _emailController,
+                            keyboardType: TextInputType.emailAddress,
+                            isRequired: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
           SizedBox(height: SpiroDesignSystem.space6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _showAddForm = false;
-                    _clearAgentForm();
-                  });
-                },
-                child: Text(
-                  'Cancel',
-                  style: SpiroDesignSystem.bodyL.copyWith(
-                    color: SpiroDesignSystem.gray600,
-                    fontWeight: FontWeight.w500,
+          // Fixed: Make action buttons responsive
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _showAddForm = false;
+                      _clearAgentForm();
+                    });
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: SpiroDesignSystem.bodyL.copyWith(
+                      color: SpiroDesignSystem.gray600,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: SpiroDesignSystem.space3),
-              _buildHeaderButton(
-                onPressed: _isLoading ? () {} : _submitAgentForm,
-                icon: Icons.person_add_outlined,
-                label: _isLoading ? 'Registering...' : 'Register Agent',
-                isPrimary: true,
-              ),
-            ],
+                SizedBox(width: SpiroDesignSystem.space3),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 200),
+                  child: _buildHeaderButton(
+                    onPressed: _isLoading ? () {} : _submitAgentForm,
+                    icon: Icons.person_add_outlined,
+                    label: _isLoading ? 'Registering...' : 'Register Agent',
+                    isPrimary: true,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),
@@ -629,26 +886,28 @@ class _AgentsPageState extends State<AgentsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Edit Agent Details',
-                    style: SpiroDesignSystem.displayS.copyWith(
-                      fontWeight: FontWeight.w700,
-                      color: SpiroDesignSystem.gray900,
-                    ),
-                  ),
-                  if (_currentEditingAgentId.isNotEmpty) ...[
-                    SizedBox(height: SpiroDesignSystem.space1),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
                     Text(
-                      'Editing Agent ID: $_currentEditingAgentId',
-                      style: SpiroDesignSystem.bodyL.copyWith(
-                        color: SpiroDesignSystem.gray600,
+                      'Edit Agent Details',
+                      style: SpiroDesignSystem.displayS.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: SpiroDesignSystem.gray900,
                       ),
                     ),
+                    if (_currentEditingAgentId.isNotEmpty) ...[
+                      SizedBox(height: SpiroDesignSystem.space1),
+                      Text(
+                        'Editing Agent ID: $_currentEditingAgentId',
+                        style: SpiroDesignSystem.bodyL.copyWith(
+                          color: SpiroDesignSystem.gray600,
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
               IconButton(
                 icon: Icon(
@@ -667,12 +926,12 @@ class _AgentsPageState extends State<AgentsPage> {
             ],
           ),
           SizedBox(height: SpiroDesignSystem.space6),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+          // Fixed: Make edit form responsive too
+          LayoutBuilder(
+            builder: (context, constraints) {
+              if (constraints.maxWidth < 600) {
+                // Single column layout for smaller screens
+                return Column(
                   children: [
                     _buildFormField(
                       label: 'First Name',
@@ -689,6 +948,21 @@ class _AgentsPageState extends State<AgentsPage> {
                     ),
                     SizedBox(height: SpiroDesignSystem.space4),
                     _buildFormField(
+                      label: 'Last Name',
+                      hintText: 'Enter last name',
+                      controller: _editLastnameController,
+                      isRequired: true,
+                    ),
+                    SizedBox(height: SpiroDesignSystem.space4),
+                    _buildDateFormField(
+                      label: 'Date of Birth',
+                      hintText: 'Enter date of birth',
+                      controller: _editDobController,
+                      isRequired: true,
+                      isEdit: true,
+                    ),
+                    SizedBox(height: SpiroDesignSystem.space4),
+                    _buildFormField(
                       label: 'Phone Number',
                       hintText: 'Enter phone number',
                       controller: _editPhonenumberController,
@@ -700,27 +974,6 @@ class _AgentsPageState extends State<AgentsPage> {
                       label: 'National ID',
                       hintText: 'Enter national ID',
                       controller: _editIdentificationController,
-                      isRequired: true,
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(width: SpiroDesignSystem.space4),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildFormField(
-                      label: 'Last Name',
-                      hintText: 'Enter last name',
-                      controller: _editLastnameController,
-                      isRequired: true,
-                    ),
-                    SizedBox(height: SpiroDesignSystem.space4),
-                    _buildFormField(
-                      label: 'Date of Birth',
-                      hintText: 'Enter date of birth',
-                      controller: _editDobController,
                       isRequired: true,
                     ),
                     SizedBox(height: SpiroDesignSystem.space4),
@@ -739,38 +992,124 @@ class _AgentsPageState extends State<AgentsPage> {
                       isRequired: true,
                     ),
                   ],
-                ),
-              ),
-            ],
+                );
+              } else {
+                // Two column layout for larger screens
+                return Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildFormField(
+                            label: 'First Name',
+                            hintText: 'Enter first name',
+                            controller: _editFirstnameController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Middle Name',
+                            hintText: 'Enter middle name',
+                            controller: _editMiddlenameController,
+                            isRequired: false,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Phone Number',
+                            hintText: 'Enter phone number',
+                            controller: _editPhonenumberController,
+                            keyboardType: TextInputType.phone,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'National ID',
+                            hintText: 'Enter national ID',
+                            controller: _editIdentificationController,
+                            isRequired: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(width: SpiroDesignSystem.space4),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildFormField(
+                            label: 'Last Name',
+                            hintText: 'Enter last name',
+                            controller: _editLastnameController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildDateFormField(
+                            label: 'Date of Birth',
+                            hintText: 'Enter date of birth',
+                            controller: _editDobController,
+                            isRequired: true,
+                            isEdit: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Nationality',
+                            hintText: 'Enter nationality',
+                            controller: _editNationalityController,
+                            isRequired: true,
+                          ),
+                          SizedBox(height: SpiroDesignSystem.space4),
+                          _buildFormField(
+                            label: 'Email',
+                            hintText: 'Enter email address',
+                            controller: _editEmailController,
+                            keyboardType: TextInputType.emailAddress,
+                            isRequired: true,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
+              }
+            },
           ),
           SizedBox(height: SpiroDesignSystem.space6),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              TextButton(
-                onPressed: () {
-                  setState(() {
-                    _showEditForm = false;
-                    _currentEditingAgentId = '';
-                    _clearEditForm();
-                  });
-                },
-                child: Text(
-                  'Cancel',
-                  style: SpiroDesignSystem.bodyL.copyWith(
-                    color: SpiroDesignSystem.gray600,
-                    fontWeight: FontWeight.w500,
+          // Fixed: Make action buttons responsive
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    setState(() {
+                      _showEditForm = false;
+                      _currentEditingAgentId = '';
+                      _clearEditForm();
+                    });
+                  },
+                  child: Text(
+                    'Cancel',
+                    style: SpiroDesignSystem.bodyL.copyWith(
+                      color: SpiroDesignSystem.gray600,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
-              ),
-              SizedBox(width: SpiroDesignSystem.space3),
-              _buildHeaderButton(
-                onPressed: _isLoading ? () {} : _saveAgentEdits,
-                icon: Icons.save_outlined,
-                label: _isLoading ? 'Saving...' : 'Save Changes',
-                isPrimary: true,
-              ),
-            ],
+                SizedBox(width: SpiroDesignSystem.space3),
+                ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: 200),
+                  child: _buildHeaderButton(
+                    onPressed: _isLoading ? () {} : _saveAgentEdits,
+                    icon: Icons.save_outlined,
+                    label: _isLoading ? 'Saving...' : 'Save Changes',
+                    isPrimary: true,
+                  ),
+                ),
+              ],
+            ),
           ),
         ],
       ),

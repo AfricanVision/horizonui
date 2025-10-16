@@ -53,18 +53,22 @@ class _ReportsPageState extends State<ReportsPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              _buildHeaderButton(
-                onPressed: () {},
-                icon: Icons.date_range_outlined,
-                label: 'Select Period',
-                isPrimary: false,
+              Flexible(
+                child: _buildHeaderButton(
+                  onPressed: () {},
+                  icon: Icons.date_range_outlined,
+                  label: 'Select Period',
+                  isPrimary: false,
+                ),
               ),
               SizedBox(width: SpiroDesignSystem.space3),
-              _buildHeaderButton(
-                onPressed: () {},
-                icon: Icons.file_download_outlined,
-                label: 'Export All',
-                isPrimary: true,
+              Flexible(
+                child: _buildHeaderButton(
+                  onPressed: () {},
+                  icon: Icons.file_download_outlined,
+                  label: 'Export All',
+                  isPrimary: true,
+                ),
               ),
             ],
           ),

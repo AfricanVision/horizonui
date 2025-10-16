@@ -14,9 +14,22 @@ import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
 import '../data/internal/application/TextType.dart';
+import '../data/models/Payment.dart';
 import '../utils/Colors.dart';
 import '../utils/Images.dart';
 import '../utils/ScreenUtils.dart' as Responsive;
+
+String formatAmount(String amount) {
+  if (amount.isEmpty) return "0.00";
+
+  double value = double.tryParse(amount) ?? 0.0;
+  return value
+      .toStringAsFixed(2)
+      .replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+        (Match m) => '${m[1]},',
+      );
+}
 
 text(String text, double textSize, TextType type) {
   String textType = getTextType(type);
@@ -1203,7 +1216,7 @@ selectFieldCustom(
         right: 16.0,
       ),
       prefixIconConstraints: const BoxConstraints(minWidth: 35, minHeight: 35),
-      fillColor: colorGrey.withOpacity(0.2),
+      fillColor: colorGrey.withValues(alpha: 0.2),
       filled: true,
       labelText: label,
       helperText: helpers,
@@ -1502,6 +1515,22 @@ datePicker(
       errorMaxLines: 5,
       helperMaxLines: 5,
       isDense: true,
+      suffixIcon: Padding(
+        padding: const EdgeInsets.fromLTRB(0, 0, 4, 0),
+        child: GestureDetector(
+          onTap: () {
+            controller.clear();
+          },
+          child: Padding(
+            padding: const EdgeInsets.only(left: 8, right: 16),
+            child: Icon(
+              CupertinoIcons.clear_thick,
+              size: 20,
+              color: colorPrimaryDark,
+            ),
+          ),
+        ),
+      ),
       contentPadding: const EdgeInsets.only(
         top: 16.0,
         bottom: 16.0,
@@ -1763,7 +1792,7 @@ dateTimePicker(
             data: Theme.of(context).copyWith(
               colorScheme: ColorScheme.light(
                 primary: colorPrimary, // header background color
-                onPrimary: colorMilkWhite, // header text color
+                onPrimary: colorPrimaryDark, // header text color
                 surface: colorPrimaryDark, // background color
                 onSurface: colorPrimaryDark, // text color
               ),
@@ -2220,7 +2249,7 @@ roundedStyleIconButton(IconData icon, VoidCallback? onPressed) {
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(
       elevation: 3,
-      backgroundColor: colorPrimary.withOpacity(0.0),
+      backgroundColor: colorPrimary.withValues(alpha: 0.0),
       padding: const EdgeInsets.all(24),
       shape: CircleBorder(side: BorderSide(color: colorPrimary, width: 1)),
     ),
@@ -2699,188 +2728,159 @@ newsLetterCard(NewsLetter news, VoidCallback? onPressed){
         padding: EdgeInsets.zero,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16),),
       ),
-      onPressed: onPressed, child: ClipPath(
-    clipper: MiniCurveClipper(),
-    child: Container(
-      padding: const EdgeInsets.all(16),
-      decoration: const BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(16)),
-        color: colorWhite,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black26,
-            blurRadius: 10,
-            offset: Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-
-
-          Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-
-              Row(
+      onPressed: onPressed,
+      child: Container(
+        decoration: BoxDecoration(
+          color: colorPrimaryDark,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisSize: MainAxisSize.max,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: textWithColor(news.title ?? "", 16, TextType.Bold, colorMilkWhite),
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorPrimary,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  child: textWithColor(news.category ?? "", 10, TextType.Bold, colorPrimaryDark),
+                ),
+              ],
+            ),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: textWithColor(news.description ?? "", 12, TextType.Regular, colorGrey),
+            ),
+            if (tagsList.isNotEmpty)
+              Padding(
+                padding: const EdgeInsets.only(top: 8),
+                child: Wrap(children: tagsList),
+              ),
+            Padding(
+              padding: const EdgeInsets.only(top: 12),
+              child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.max,
                 children: [
-
-                  Padding(padding: const EdgeInsets.only(right: 8),
-                    child:    Icon( (news.isRead ??= false) ? Icons.bookmark : Icons.bookmark_border ,
-                      color: colorTinted,
-                      size: 20,),),
-
-                  Padding(padding: const EdgeInsets.only(right: 8),
-                    child:    Icon( (news.isLiked ??= false) ? Icons.favorite_outlined : Icons.favorite_border ,
-                      color: colorPrimaryLight,
-                      size: 20,),),
+                  textWithColor(news.author ?? "", 10, TextType.Regular, colorGrey),
+                  textWithColor(news.publishedDate ?? "", 10, TextType.Regular, colorGrey),
                 ],
               ),
-
-              Padding(padding: const EdgeInsets.only(top: 8, bottom: 4),
-                child: textWithColorAndLimit((news.name ?? "").toUpperCase(), 18, TextType.Bold, 1,colorPrimaryDark, TextAlign.start),),
-
-              Padding(padding: const EdgeInsets.only(top: 4),
-                child: textWithColorAndLimit((news.type?.name ?? "").toUpperCase(), 10, TextType.Bold, 1, colorTinted, TextAlign.start),),
-
-            ],),
-
-          Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-
-              Padding(padding: const EdgeInsets.only(bottom: 12),
-                child: textWithColorAndLimit(news.message ?? "", 8,  TextType.Regular,2,colorPrimaryDark, TextAlign.start),),
-
-              Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.start,
-                children: [
-                  textWithColor("TAGS. (${news.tags?.length ?? 0})", 8, TextType.Bold, colorPrimaryLight),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 24,
-                    child: ListView.builder(
-                      padding: EdgeInsets.zero,
-                      itemCount: tagsList.length,
-                      scrollDirection: Axis.horizontal,
-                      shrinkWrap: true,
-                      itemBuilder: (context, index) => tagsList.elementAt(index),
-                    ),),
-
-                ],),
-            ],
-          ),
-
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-
-              textWithColor(toDateString(news.effectiveFrom, 5), 8, TextType.Bold, colorGrey2),
-
-              textWithColor("Read more.", 12, TextType.Bold, colorPositive),
-
-
-            ],)
-
-        ],
+            ),
+          ],
+        ),
       ),
-    ),
-  ));
+  );
 }
+*/
 
-
-Widget paymentCard(Payment payment, VoidCallback? onPressed){
-
+Widget paymentCard(Payment payment, VoidCallback? onPressed) {
   return Container(
     margin: const EdgeInsets.only(bottom: 16),
-    child: ElevatedButton(onPressed: onPressed,
-        style: ElevatedButton.styleFrom(
-            backgroundColor: colorPrimaryDark2,
-            elevation: 2,
-            padding: EdgeInsets.zero,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            )),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            border: Border(
-                right: BorderSide(
-                    color:  payment.type == PaymentType.Income ? colorPositive: colorNegative,
-                    width: 1.5,
-                    style: BorderStyle.solid)),
+    child: ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: colorPrimaryDark2,
+        elevation: 2,
+        padding: EdgeInsets.zero,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          border: Border(
+            right: BorderSide(
+              color: payment.type == PaymentType.Income
+                  ? colorPositive
+                  : colorNegative,
+              width: 1.5,
+              style: BorderStyle.solid,
+            ),
           ),
-          child: Column(mainAxisSize: MainAxisSize.max,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.max,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            textWithColor(
+              (payment.type?.name ?? "").toUpperCase(),
+              14,
+              TextType.Bold,
+              payment.type == PaymentType.Expenditure
+                  ? colorNegative
+                  : colorPositive,
+            ),
 
-                textWithColor((payment.type?.name ?? "").toUpperCase(), 14, TextType.Bold,
-                    payment.type == PaymentType.Expenditure ? colorNegative : colorPositive),
-
-
-
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: colorTinted,
-                      fontFamily: getTextType(TextType.Bold),
-                      fontSize: 18,
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: colorTinted,
+                  fontFamily: getTextType(TextType.Bold),
+                  fontSize: 18,
+                ),
+                children: [
+                  TextSpan(
+                    text: payment.currency ?? "",
+                    style: TextStyle(fontFamily: getTextType(TextType.Bold)),
+                  ),
+                  TextSpan(
+                    text: " ${formatAmount(payment.amountPaid.toString())}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
                     ),
-                    children: [
+                  ),
+                ],
+              ),
+            ),
 
-                      TextSpan(text: payment.currency ?? "",
-                          style: TextStyle(fontFamily: getTextType(
-                              TextType.Bold))),
-                      TextSpan(text: " ${formatAmount(payment.amountPaid.toString())}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20)),
-
-                    ],
-                  ),),
-
-                RichText(
-                  text: TextSpan(
-                    style: TextStyle(
-                      color: colorAccent,
-                      fontFamily: getTextType(TextType.Bold),
+            RichText(
+              text: TextSpan(
+                style: TextStyle(
+                  color: colorAccent,
+                  fontFamily: getTextType(TextType.Bold),
+                  fontSize: 10,
+                ),
+                children: [
+                  TextSpan(
+                    text: payment.currency ?? "",
+                    style: TextStyle(fontFamily: getTextType(TextType.Bold)),
+                  ),
+                  TextSpan(
+                    text: " ${formatAmount(payment.amount.toString())}",
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
                       fontSize: 10,
                     ),
-                    children: [
+                  ),
+                ],
+              ),
+            ),
 
-                      TextSpan(text: payment.currency ?? "",
-                          style: TextStyle(fontFamily: getTextType(
-                              TextType.Bold))),
-                      TextSpan(text: " ${formatAmount(payment.amount.toString())}",
-                          style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 10)),
-
-                    ],
-                  ),),
-
-                textWithColor((payment.status?.status ?? "").toUpperCase(), 10, TextType.Bold,
-                    getColorFromHex(payment.status?.color ?? "")),
-
-              ]
-          ),)),);
-}*/
+            textWithColor(
+              (payment.status?.status ?? "").toUpperCase(),
+              10,
+              TextType.Bold,
+              getColorFromHex(payment.status?.color ?? ""),
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
 
 class MiniCurveClipper extends CustomClipper<Path> {
   @override

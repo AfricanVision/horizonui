@@ -128,11 +128,11 @@ class _StationsPageState extends State<StationsPage> {
             ],
           ),
           SizedBox(height: SpiroDesignSystem.space4),
+
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               Flexible(
-                flex: 1,
                 child: _buildHeaderButton(
                   onPressed: () {},
                   icon: Icons.file_download_outlined,
@@ -142,7 +142,6 @@ class _StationsPageState extends State<StationsPage> {
               ),
               SizedBox(width: SpiroDesignSystem.space3),
               Flexible(
-                flex: 1,
                 child: _buildHeaderButton(
                   onPressed: () {
                     setState(() {
@@ -191,7 +190,6 @@ class _StationsPageState extends State<StationsPage> {
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   icon,
@@ -201,17 +199,13 @@ class _StationsPageState extends State<StationsPage> {
                   size: 18,
                 ),
                 SizedBox(width: SpiroDesignSystem.space2),
-                Flexible(
-                  child: Text(
-                    label,
-                    style: SpiroDesignSystem.bodyL.copyWith(
-                      color: isPrimary
-                          ? Colors.white
-                          : SpiroDesignSystem.primaryBlue600,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
+                Text(
+                  label,
+                  style: SpiroDesignSystem.bodyL.copyWith(
+                    color: isPrimary
+                        ? Colors.white
+                        : SpiroDesignSystem.primaryBlue600,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -223,6 +217,7 @@ class _StationsPageState extends State<StationsPage> {
   }
 
   Widget _buildStatisticsCards() {
+    // FIXED: Simplified to match incidents pattern
     return Row(
       children: [
         Expanded(
