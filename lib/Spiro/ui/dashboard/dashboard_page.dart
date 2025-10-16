@@ -9,6 +9,7 @@ import '../analytics/analytics_page.dart';
 import '../batteries/batteries_page.dart';
 import '../incidents/incidents_page.dart';
 import '../reports/reports_page.dart';
+import '../settings/settings_page.dart';
 import '../stations/stations_page.dart';
 import 'DashboardService.dart';
 
@@ -95,6 +96,9 @@ class _DashboardPageState extends State<DashboardPage>
           break;
         case 'Reports':
           _currentPage = ReportsPage();
+          break;
+        case 'Settings':
+          _currentPage = SettingsPage();
           break;
         default:
           _currentPage = DashboardPageContent();
@@ -201,7 +205,6 @@ class _DashboardPageState extends State<DashboardPage>
                                     ),
                                   ),
 
-                                  // Enhanced Navigation Menu - FIXED SCROLLING ISSUES
                                   Expanded(
                                     child: Container(
                                       decoration: BoxDecoration(

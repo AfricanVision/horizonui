@@ -56,7 +56,7 @@ class _BatteriesPageState extends State<BatteriesPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _showBatteryForm ? 'Add Battery' : 'Battery Analytics',
+                'Battery Analytics',
                 style: SpiroDesignSystem.displayM.copyWith(
                   fontWeight: FontWeight.w700,
                   color: SpiroDesignSystem.gray900,
@@ -64,9 +64,7 @@ class _BatteriesPageState extends State<BatteriesPage> {
               ),
               SizedBox(height: SpiroDesignSystem.space2),
               Text(
-                _showBatteryForm
-                    ? 'Add new battery to inventory'
-                    : 'Battery performance and health metrics',
+                'Battery performance and health metrics',
                 style: SpiroDesignSystem.bodyL.copyWith(
                   color: SpiroDesignSystem.gray600,
                 ),
@@ -77,43 +75,16 @@ class _BatteriesPageState extends State<BatteriesPage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              if (!_showBatteryForm) ...[
-                Flexible(
-                  child: _buildHeaderButton(
-                    onPressed: () {},
-                    icon: Icons.file_download_outlined,
-                    label: 'Export Report',
-                    isPrimary: false,
-                  ),
+              Flexible(
+                child: _buildHeaderButton(
+                  onPressed: () {
+                    _showSuccessMessage('Report exported successfully');
+                  },
+                  icon: Icons.file_download_outlined,
+                  label: 'Export Report',
+                  isPrimary: false,
                 ),
-                SizedBox(width: SpiroDesignSystem.space3),
-                Flexible(
-                  child: _buildHeaderButton(
-                    onPressed: () {
-                      setState(() {
-                        _showBatteryForm = true;
-                      });
-                    },
-                    icon: Icons.add_circle_outline,
-                    label: 'Add Battery',
-                    isPrimary: true,
-                  ),
-                ),
-              ] else ...[
-                Flexible(
-                  child: _buildHeaderButton(
-                    onPressed: () {
-                      setState(() {
-                        _showBatteryForm = false;
-                        _clearBatteryForm();
-                      });
-                    },
-                    icon: Icons.arrow_back,
-                    label: 'Back to Analytics',
-                    isPrimary: false,
-                  ),
-                ),
-              ],
+              ),
             ],
           ),
         ],
