@@ -1,16 +1,14 @@
 import '../configs/Env.dart';
 
 
-bool isProd = false;
 
-String baseUrl =  isProd ? "$spiroRouteProd/" : "$spiroRouteLocal:8080/";
-
+String baseUrl = "http://localhost:8080/api/";
+String getAgentsUrl = "agents";
 
 String registerUser = 'agents';
 
 String registerStatus = 'Status';
 
-String getAgentsUrl =  '';
 
 
 

@@ -194,17 +194,17 @@ class Comms implements ConnectComms {
     }
   }
 
-  @override
-  Future<Response> getAgents() async {
-
-      Pair navigation = await getRequestHeaders(getAgentsUrl, "");
-      dio.options.headers = navigation.value;
-
-      return await dio.get(navigation.key, options: Options(
-          headers: dio.options.headers
-      ));
-
-  }
+  // @override
+  // Future<Response> getAgents() async {
+  //
+  //     Pair navigation = await getRequestHeaders(getAgentsUrl, "");
+  //     dio.options.headers = navigation.value;
+  //
+  //     return await dio.get(navigation.key, options: Options(
+  //         headers: dio.options.headers
+  //     ));
+  //
+  // }
 
   Future<Pair> getRequestHeaders(String url, String urlData) async{
 
@@ -222,12 +222,34 @@ class Comms implements ConnectComms {
 
     dio.options.headers["X-API-KEY"] = apikey;
 
-    dio.options.headers["version"] = localisedAppVersion;
+    // dio.options.headers["version"] = localisedAppVersion;
 
     url = baseUrl + url;
 
     return Future.value(Pair(url, dio.options.headers));
 
+  }
+
+  @override
+  Future<Response> getAgents() async {
+    try {
+      Pair navigation = await getRequestHeaders(getAgentsUrl, "");
+      dio.options.headers = navigation.value;
+
+      print('Making API call to: ${navigation.key}'); // Debug log
+
+      final response = await dio.get(navigation.key, options: Options(
+          headers: dio.options.headers
+      ));
+
+      print('API Response status: ${response.statusCode}'); // Debug log
+      print('API Response data: ${response.data}'); // Debug log
+
+      return response;
+    } catch (e) {
+      print('Error in getAgents API call: $e'); // Debug log
+      rethrow;
+    }
   }
 
 

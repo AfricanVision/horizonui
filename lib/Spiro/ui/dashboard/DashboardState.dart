@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:horizonui/Spiro/ui/dashboard/ConnectDashBoard.dart';
-import 'package:horizonui/Spiro/ui/home/ConnectHome.dart';
 import 'package:stacked/stacked.dart';
 import '../../data/internal/application/TextType.dart';
 import '../../designs/Component.dart';
@@ -9,9 +8,8 @@ import '../../utils/Colors.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../data/internal/application/Agents.dart';
 
-import '../agents/agent_service.dart';
+
 import '../agents/agents_page.dart';
-import '../home/ViewHome.dart';
 import '../stations/stations_page.dart';
 import '../batteries/batteries_page.dart';
 import '../analytics/analytics_page.dart';
@@ -22,10 +20,173 @@ import 'ViewDashboard.dart';
 
 class DashboardState extends State<Dashboard> implements ConnectDashBoard{
   String _selectedMenuItem = 'Dashboard';
-  Widget _currentPage = DashboardPageContent();
+  Widget _currentPage = DashboardPageContent(model: null, agents: [],);
   bool _isSidebarOpen = true;
 
   ViewDashboard? _model;
+  List<Agent> _agents = [];
+
+
+
+  @override
+  Widget build(BuildContext context) {
+    return ViewModelBuilder<ViewDashboard>.reactive(
+      viewModelBuilder: () => ViewDashboard(context, this),
+      onViewModelReady: (viewModel) => {
+        _model = viewModel,
+        _initialiseView()
+      },
+      builder: (context, viewModel, child) => PopScope(canPop: false,
+          onPopInvokedWithResult: (didPop, result) {
+            if (!didPop) {
+              if (viewModel.loadingEntry == null && viewModel.errorEntry == null) {
+                _closeApp();
+              }
+            }
+          },child: Scaffold(
+            body: LayoutBuilder(
+                builder: (BuildContext context, BoxConstraints viewportConstraints) {
+                  return Responsive(
+                    mobile: _mobileView(viewportConstraints),
+                    desktop: _desktopView(viewportConstraints),
+                    tablet: _desktopView(viewportConstraints),
+                  );
+                }),)),);
+  }
+
+  _initialiseView() async {
+    _model?.getAgents();
+  }
+
+  _mobileView(BoxConstraints viewportConstraints){
+    return DashboardPageContent(model: _model, agents: _agents);
+  }
+
+  _desktopView(BoxConstraints viewportConstraints){
+    return Row(
+      children: [
+        AnimatedContainer(
+          duration: Duration(milliseconds: 300),
+          width: _isSidebarOpen ? 280 : 0,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border(right: BorderSide(color: Colors.grey[300]!)),
+          ),
+          child: _isSidebarOpen
+              ? Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              Container(
+                height: 120,
+                width: double.infinity,
+                color: shawnblue,
+                padding: EdgeInsets.all(16),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    textWithColor('Spiro App', 20, TextType.Bold, Colors.white),
+                    SizedBox(height: 4),
+                    textWithColor('Control Tower', 14, TextType.Regular, Colors.white),
+                  ],
+                ),
+              ),
+
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _buildMenuSection('MAIN MENU', [
+                      _buildMenuItem('Dashboard', Icons.dashboard),
+                      _buildMenuItem('Agents', Icons.people),
+                      _buildMenuItem('Stations', Icons.ev_station),
+                      _buildMenuItem('Batteries', Icons.battery_std),
+                      _buildMenuItem('Analytics', Icons.analytics),
+                      _buildMenuItem('Incidents', Icons.warning),
+                      _buildMenuItem('Reports', Icons.assessment),
+                    ]),
+                    Divider(height: 32),
+                    _buildMenuSection('SYSTEM', [
+                      _buildMenuItem('Settings', Icons.settings),
+                    ]),
+                  ],
+                ),
+              ),
+
+              Container(
+                padding: EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: Colors.grey[300]!)),
+                ),
+                child: Row(
+                  children: [
+                    CircleAvatar(
+                      backgroundColor: shawnblue,
+                      child: Icon(Icons.person, color: Colors.white, size: 20),
+                      radius: 20,
+                    ),
+                    SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          text('Shawn Matunda', 14, TextType.Bold),
+                          textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
+                        ],
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.logout, size: 20, color: Colors.grey[600]),
+                      onPressed: () => _handleLogout(),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          )
+              : SizedBox.shrink(),
+        ),
+
+        Expanded(
+          child: Stack(
+            children: [
+              _currentPage,
+
+              Positioned(
+                left: 16,
+                top: 16,
+                child: InkWell(
+                  onTap: _toggleSidebar,
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: shawnblue,
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black26,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      _isSidebarOpen ? Icons.chevron_left : Icons.chevron_right,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
 
   void _navigateToPage(String pageName) {
     print('Navigating to: $pageName');
@@ -34,7 +195,7 @@ class DashboardState extends State<Dashboard> implements ConnectDashBoard{
       _selectedMenuItem = pageName;
       switch (pageName) {
         case 'Dashboard':
-          _currentPage = DashboardPageContent();
+          _currentPage = DashboardPageContent(model: _model, agents: _agents,);
           break;
         case 'Agents':
           _currentPage = AgentsPage();
@@ -55,303 +216,18 @@ class DashboardState extends State<Dashboard> implements ConnectDashBoard{
           _currentPage = ReportsPage();
           break;
         default:
-          _currentPage = DashboardPageContent();
+          _currentPage = DashboardPageContent(model: _model, agents: _agents,);
       }
     });
   }
+
+
+
 
   void _toggleSidebar() {
     setState(() {
       _isSidebarOpen = !_isSidebarOpen;
     });
-  }
-
-/*  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Row(
-        children: [
-          AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            width: _isSidebarOpen ? 280 : 0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(right: BorderSide(color: Colors.grey[300]!)),
-            ),
-            child: _isSidebarOpen
-                ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                Container(
-                  height: 120,
-                  width: double.infinity,
-                  color: shawnblue,
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      textWithColor('Spiro App', 20, TextType.Bold, Colors.white),
-                      SizedBox(height: 4),
-                      textWithColor('Control Tower', 14, TextType.Regular, Colors.white),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      _buildMenuSection('MAIN MENU', [
-                        _buildMenuItem('Dashboard', Icons.dashboard),
-                        _buildMenuItem('Agents', Icons.people),
-                        _buildMenuItem('Stations', Icons.ev_station),
-                        _buildMenuItem('Batteries', Icons.battery_std),
-                        _buildMenuItem('Analytics', Icons.analytics),
-                        _buildMenuItem('Incidents', Icons.warning),
-                        _buildMenuItem('Reports', Icons.assessment),
-                      ]),
-                      Divider(height: 32),
-                      _buildMenuSection('SYSTEM', [
-                        _buildMenuItem('Settings', Icons.settings),
-                      ]),
-                    ],
-                  ),
-                ),
-
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: Colors.grey[300]!)),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: shawnblue,
-                        child: Icon(Icons.person, color: Colors.white, size: 20),
-                        radius: 20,
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            text('Shawn Matunda', 14, TextType.Bold),
-                            textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.logout, size: 20, color: Colors.grey[600]),
-                        onPressed: () => _handleLogout(),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-                : SizedBox.shrink(),
-          ),
-
-          Expanded(
-            child: Stack(
-              children: [
-                _currentPage,
-
-                Positioned(
-                  left: 16,
-                  top: 16,
-                  child: InkWell(
-                    onTap: _toggleSidebar,
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: shawnblue,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        _isSidebarOpen ? Icons.chevron_left : Icons.chevron_right,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }*/
-
-  @override
-  Widget build(BuildContext context) {
-    return ViewModelBuilder<ViewDashboard>.reactive(
-        viewModelBuilder: () => ViewDashboard(context, this),
-        onViewModelReady: (viewModel) => {
-          _model = viewModel,
-          _initialiseView()
-        },
-        builder: (context, viewModel, child) => PopScope(canPop: false, // Prevents auto pop
-          onPopInvokedWithResult: (didPop, result) {
-            if (!didPop) {
-              if (_model?.loadingEntry == null && _model?.errorEntry == null) {
-                _closeApp();
-              }
-            }
-          },child: Scaffold(
-              body: LayoutBuilder(
-                  builder: (BuildContext context, BoxConstraints viewportConstraints) {
-                    return Responsive(mobile: _mobileView(viewportConstraints),desktop: _desktopView(viewportConstraints),tablet: _desktopView(viewportConstraints),);})),));
-  }
-
-  _initialiseView() async {
-     _model?.getAgents();
-  }
-
-  _mobileView(BoxConstraints viewportConstraints){
-    return Column();
-  }
-
-  _desktopView(BoxConstraints viewportConstraints){
-    return Scaffold(
-      backgroundColor: Colors.grey[50],
-      body: Row(
-        children: [
-          AnimatedContainer(
-            duration: Duration(milliseconds: 300),
-            width: _isSidebarOpen ? 280 : 0,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(right: BorderSide(color: Colors.grey[300]!)),
-            ),
-            child: _isSidebarOpen
-                ? Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-
-                Container(
-                  height: 120,
-                  width: double.infinity,
-                  color: shawnblue,
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      textWithColor('Spiro App', 20, TextType.Bold, Colors.white),
-                      SizedBox(height: 4),
-                      textWithColor('Control Tower', 14, TextType.Regular, Colors.white),
-                    ],
-                  ),
-                ),
-
-                Expanded(
-                  child: ListView(
-                    padding: EdgeInsets.zero,
-                    children: [
-                      _buildMenuSection('MAIN MENU', [
-                        _buildMenuItem('Dashboard', Icons.dashboard),
-                        _buildMenuItem('Agents', Icons.people),
-                        _buildMenuItem('Stations', Icons.ev_station),
-                        _buildMenuItem('Batteries', Icons.battery_std),
-                        _buildMenuItem('Analytics', Icons.analytics),
-                        _buildMenuItem('Incidents', Icons.warning),
-                        _buildMenuItem('Reports', Icons.assessment),
-                      ]),
-                      Divider(height: 32),
-                      _buildMenuSection('SYSTEM', [
-                        _buildMenuItem('Settings', Icons.settings),
-                      ]),
-                    ],
-                  ),
-                ),
-
-                Container(
-                  padding: EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    border: Border(top: BorderSide(color: Colors.grey[300]!)),
-                  ),
-                  child: Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: shawnblue,
-                        child: Icon(Icons.person, color: Colors.white, size: 20),
-                        radius: 20,
-                      ),
-                      SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            text('Shawn Matunda', 14, TextType.Bold),
-                            textWithColor('Global Admin', 12, TextType.Regular, Colors.grey[600]!),
-                          ],
-                        ),
-                      ),
-                      IconButton(
-                        icon: Icon(Icons.logout, size: 20, color: Colors.grey[600]),
-                        onPressed: () => _handleLogout(),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )
-                : SizedBox.shrink(),
-          ),
-
-          Expanded(
-            child: Stack(
-              children: [
-                _currentPage,
-
-                Positioned(
-                  left: 16,
-                  top: 16,
-                  child: InkWell(
-                    onTap: _toggleSidebar,
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        color: shawnblue,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black26,
-                            blurRadius: 4,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        _isSidebarOpen ? Icons.chevron_left : Icons.chevron_right,
-                        color: Colors.white,
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildMenuItem(String title, IconData icon) {
@@ -398,16 +274,28 @@ class DashboardState extends State<Dashboard> implements ConnectDashBoard{
     print('Logging out...');
   }
 
-  void _closeApp() {}
+  void _closeApp() {
+
+  }
 
   @override
   void setAgents(List<Agent> response) {
-    print(response);
-  }
-}
+    print('Agents received in DashboardState: ${response.length}');
+
+    setState(() {
+      _agents = response;
+    });
+
+    for (var agent in response) {
+      print('Agent: ${agent.firstname} ${agent.lastname} - ${agent.email} - ${agent.statusId}');
+    }
+  }}
 
 class DashboardPageContent extends StatefulWidget {
-  const DashboardPageContent({super.key});
+  final ViewDashboard? model;
+  final List<Agent> agents;
+
+  const DashboardPageContent({super.key, required this.model, required this.agents});
 
   @override
   State<DashboardPageContent> createState() => _DashboardPageContentState();
@@ -418,10 +306,13 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
   late Animation<double> _barAnimation;
   bool _animationPlayed = false;
 
-  final AgentService _agentService = AgentService();
-  List<Agent> _agents = [];
-  bool _isLoading = true;
-  String _errorMessage = '';
+  ViewDashboard? get _model => widget.model;
+
+  // FIXED: Use widget.agents instead of _model?.agents to get the actual data passed from parent
+  List<Agent> get _agents => widget.agents;
+
+  bool get _isLoading => _model?.isLoading ?? false;
+  String get _errorMessage => _model?.errorMessage ?? '';
 
   @override
   void initState() {
@@ -436,34 +327,24 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       curve: Curves.easeOutCubic,
     );
 
-    _loadDashboardData().then((_) {
+    // FIXED: Use widget.agents directly for initial check
+    if (widget.agents.isNotEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (!_animationPlayed) {
           _animationController.forward();
           _animationPlayed = true;
         }
       });
-    });
+    }
   }
 
-  Future<void> _loadDashboardData() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _errorMessage = '';
-      });
-
-      _agents = await _agentService.getAgents();
-
-      setState(() {
-        _isLoading = false;
-      });
-    } catch (e) {
-      print('Error loading dashboard data: $e');
-      setState(() {
-        _isLoading = false;
-        _errorMessage = 'Failed to load data: $e';
-      });
+  @override
+  void didUpdateWidget(DashboardPageContent oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // FIXED: Compare widget.agents directly for updates
+    if (widget.agents != oldWidget.agents && widget.agents.isNotEmpty) {
+      _animationController.reset();
+      _animationController.forward();
     }
   }
 
@@ -514,7 +395,6 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
           ),
           SizedBox(height: 24),
 
-
           if (_errorMessage.isNotEmpty)
             Container(
               padding: EdgeInsets.all(16),
@@ -532,7 +412,7 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
                   ),
                   IconButton(
                     icon: Icon(Icons.refresh, color: Colors.red),
-                    onPressed: _loadDashboardData,
+                    onPressed: () => _model?.getAgents(),
                   ),
                 ],
               ),
@@ -561,10 +441,8 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
                 _buildStatsGrid(),
                 SizedBox(height: 24),
 
-
                 _buildAfricaMapSection(),
                 SizedBox(height: 24),
-
 
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -583,18 +461,25 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
 
   void _refreshData() {
     print('Refreshing data...');
-
     _animationController.reset();
     _animationController.forward();
-    _loadDashboardData();
+    _model?.getAgents();
   }
 
   Widget _buildStatsGrid() {
+    // DEBUG: Print agent data to verify it's reaching the stats grid
+    print('Building stats grid with ${_agents.length} agents');
+    if (_agents.isNotEmpty) {
+      print('Sample agents: ${_agents.take(2).map((a) => '${a.firstname} ${a.lastname}').toList()}');
+    }
 
     int totalAgents = _agents.length;
     int activeAgents = _agents.where((agent) => agent.statusId?.toLowerCase().contains('active') == true).length;
     int agentsWithEmail = _agents.where((agent) => agent.email != null && agent.email!.isNotEmpty).length;
     double activePercentage = totalAgents > 0 ? (activeAgents / totalAgents * 100) : 0;
+
+    // DEBUG: Print calculated stats
+    print('Stats - Total: $totalAgents, Active: $activeAgents, With Email: $agentsWithEmail');
 
     return GridView.count(
       shrinkWrap: true,
@@ -690,7 +575,6 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
       children: [
         _buildChartsRow(),
         SizedBox(height: 24),
-        // _buildSwapsTrendSection(),
       ],
     );
   }
@@ -815,76 +699,12 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
     );
   }
 
-  // Widget _buildSwapsTrendSection() {
-  //
-  //   final List<BarData> barData = _generateSwapsData();
-  //
-  //   return Container(
-  //     decoration: BoxDecoration(
-  //       color: Colors.white,
-  //       borderRadius: BorderRadius.circular(12),
-  //       boxShadow: [BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2))],
-  //     ),
-  //     padding: EdgeInsets.all(16),
-  //     child: Column(
-  //       crossAxisAlignment: CrossAxisAlignment.start,
-  //       children: [
-  //         text('Agent Activity Trend', 16, TextType.Bold),
-  //         SizedBox(height: 16),
-  //         Container(
-  //           height: 200,
-  //           child: AnimatedBuilder(
-  //             animation: _barAnimation,
-  //             builder: (context, child) {
-  //               return Row(
-  //                 crossAxisAlignment: CrossAxisAlignment.end,
-  //                 mainAxisAlignment: MainAxisAlignment.spaceAround,
-  //                 children: barData.map((data) {
-  //                   final animatedHeight = data.height * _barAnimation.value;
-  //                   return _buildAnimatedBar(animatedHeight, data.color, data.label);
-  //                 }).toList(),
-  //               );
-  //             },
-  //           ),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
-
-  List<BarData> _generateSwapsData() {
-
-    int baseActivity = _agents.length * 15;
-    return [
-      BarData(baseActivity * 0.8, Colors.blue, 'Mon'),
-      BarData(baseActivity * 0.6, Colors.orange, 'Tue'),
-      BarData(baseActivity * 0.4, Colors.orange, 'Wed'),
-      BarData(baseActivity * 0.55, Colors.blue, 'Thu'),
-      BarData(baseActivity * 0.3, Colors.orange, 'Fri'),
-      BarData(baseActivity * 0.2, Colors.orange, 'Sat'),
-      BarData(baseActivity * 0.45, Colors.orange, 'Sun'),
-    ];
-  }
-
-  Widget _buildAnimatedBar(double height, Color color, String label) {
-    return Column(
-      children: [
-        Container(
-          width: 20,
-          height: height / 20,
-          decoration: BoxDecoration(
-            color: color,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(4)),
-          ),
-        ),
-        SizedBox(height: 4),
-        text(label, 10, TextType.Regular),
-      ],
-    );
-  }
-
   Widget _buildAgentsSection() {
+    // DEBUG: Print agent data for recent agents section
+    print('Building agents section with ${_agents.length} total agents');
+
     List<Agent> displayAgents = _agents.take(4).toList();
+    print('Displaying ${displayAgents.length} agents in recent agents section');
 
     return Container(
       width: double.maxFinite,
@@ -940,7 +760,6 @@ class _DashboardPageContentState extends State<DashboardPageContent> with Single
     Color statusColor = _getStatusColor(agent.statusId ?? 'inactive');
     String agentName = '${agent.firstname ?? ''} ${agent.lastname ?? ''}'.trim();
     if (agentName.isEmpty) agentName = 'Unknown Agent';
-
 
     String agentEmail = agent.email ?? 'No email';
     String agentStatus = agent.statusId ?? 'inactive';

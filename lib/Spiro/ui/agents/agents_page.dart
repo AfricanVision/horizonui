@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../data/internal/application/TextType.dart';
 import '../../designs/Component.dart';
 import '../../utils/Colors.dart';
-import 'package:horizonui/Spiro/ui/agents/agent_service.dart';
 import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 
 class AgentsPage extends StatefulWidget {
@@ -60,7 +59,7 @@ class _AgentsPageState extends State<AgentsPage> {
     'Guinea-Bissau', 'Cape Verde'
   ];
 
-  final AgentService _agentService = AgentService();
+  // final AgentService _agentService = AgentService();
 
   @override
   void initState() {
@@ -92,10 +91,10 @@ class _AgentsPageState extends State<AgentsPage> {
   Future<void> _loadAgents() async {
     setState(() => _isLoading = true);
     try {
-      final agents = await _agentService.getAgents();
+      // final agents = await _agentService.getAgents();
       setState(() {
-        _agents = agents;
-        _filteredAgents = agents;
+        // _agents = agents;
+        // _filteredAgents = agents;
       });
     } catch (e) {
       _showErrorNotification('Failed to load agents: $e');
@@ -1017,9 +1016,9 @@ class _AgentsPageState extends State<AgentsPage> {
         createdBy: 'admin',
       );
 
-      await _agentService.updateAgent(_currentEditingAgentId, updatedAgent);
-      _showSuccessNotification("Agent details updated successfully!");
-      await _loadAgents();
+      // await _agentService.updateAgent(_currentEditingAgentId, updatedAgent);
+      // _showSuccessNotification("Agent details updated successfully!");
+      // await _loadAgents();
 
       setState(() {
         _showEditForm = false;
@@ -1065,9 +1064,9 @@ class _AgentsPageState extends State<AgentsPage> {
         createdBy: 'admin',
       );
 
-      await _agentService.addAgent(newAgent);
-      _showSuccessNotification("Agent registered successfully!");
-      await _loadAgents();
+      // await _agentService.addAgent(newAgent);
+      // _showSuccessNotification("Agent registered successfully!");
+      // await _loadAgents();
 
       setState(() {
         _showAddForm = false;
