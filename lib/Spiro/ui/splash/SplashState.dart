@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/dashboard/Dashboard.dart';
 import 'package:stacked/stacked.dart';
 import '../../data/internal/application/NavigatorType.dart';
 import '../../data/internal/application/NotificationType.dart';
@@ -9,7 +10,6 @@ import '../../designs/Component.dart';
 import '../../designs/Responsive.dart';
 import '../../utils/Colors.dart';
 import '../../utils/Images.dart';
-import '../home/Home.dart';
 import 'ConnectSplash.dart';
 import 'Splash.dart';
 import 'ViewSplash.dart';
@@ -109,7 +109,7 @@ class SplashState extends State<Splash> implements ConnectSplash {
   _initialize() {
     Timer(const
     Duration(seconds: 2),
-            () => SpiroNavigation().navigateToPage(NavigatorType.openFully, const Home(), context));
+            () => SpiroNavigation().navigateToPage(NavigatorType.openFully, const Dashboard(), context));
 
   }
 
