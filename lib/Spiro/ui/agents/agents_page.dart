@@ -1572,6 +1572,7 @@ class _AgentsPageState extends State<AgentsPage> {
                 ),
               ),
             ),
+
             SizedBox(width: SpiroDesignSystem.space2),
             Container(
               decoration: BoxDecoration(
@@ -1591,12 +1592,14 @@ class _AgentsPageState extends State<AgentsPage> {
                   ),
                 ),
               ),
+
             ),
           ],
         );
       },
     );
   }
+
 
   Widget _buildFormField({
     required String label,
@@ -1674,6 +1677,7 @@ class _AgentsPageState extends State<AgentsPage> {
       maxLines: maxLines,
       isRequired: true,
     );
+
   }
 
   Widget _buildCardIconButton(
