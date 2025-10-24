@@ -1,14 +1,10 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
-import 'package:horizonui/Spiro/data/models/StationsRequest.dart';
 
 import '../configs/Env.dart';
 import '../data/internal/application/Agents.dart';
-import '../data/internal/application/Agents.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
-import '../data/internal/application/BatteryHistoryRequest.dart';
-import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/application/Pair.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
@@ -20,6 +16,32 @@ class Comms implements ConnectComms {
   ConnectInternalMemory helper;
 
   Comms(this.helper);
+
+  Future<Pair> getRequestHeaders(String url, String urlData) async {
+    dio.options.headers = <String, dynamic>{};
+
+    /*MeDescription data = await helper.getMyDescription();
+
+    if(data.token.isNotEmpty && url != deviceToken){
+      dio.options.headers["Authorization"] = "Bearer ${data.token}";
+    }*/
+
+    url = baseUrl + url;
+
+    dio.options.contentType = Headers.jsonContentType;
+
+    dio.options.responseType = ResponseType.json;
+
+    dio.options.headers["X-API-KEY"] = apiKey;
+
+    dio.options.headers["version"] = localisedAppVersion;
+
+    /*  if(url == logoutRequest){
+      dio.options.headers.remove("Authorization");
+    }*/
+
+    return Future.value(Pair(url, dio.options.headers));
+  }
 
   @override
   Future<bool> sendAgent(Agent userData) async {
@@ -202,85 +224,48 @@ class Comms implements ConnectComms {
   }
 
   @override
-  Future<Response> saveStations() async {
-    try {
-      final response = await dio.get(
-        "$baseUrl$saveStations",
-        options: Options(
-          headers: {'Content-Type': 'application/json'},
-          sendTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-          validateStatus: (status) => true,
-        ),
-      );
-
-      Future<Response> createBattery(BatteryRequest data) async {
-        Pair navigation = await getRequestHeaders(verifyRegCredentials, "");
-        dio.options.headers = navigation.value;
-        return await dio.post(navigation.key, data: data);
-      }
-
-      @override
-      Future<Response> getStations() async {
-        Pair navigation = await getRequestHeaders(
-          getIdentificationTypesProspects,
-          "",
-        );
-        dio.options.headers = navigation.value;
-
-        return await dio.get(
-          navigation.key,
-          options: Options(headers: dio.options.headers),
-        );
-      }
-
-      Future<Pair> getRequestHeaders(String url, String urlData) async {
-        dio.options.headers = <String, dynamic>{};
-
-        /*MeDescription data = await helper.getMyDescription();
-
-    if(data.token.isNotEmpty && url != deviceToken){
-      dio.options.headers["Authorization"] = "Bearer ${data.token}";
-    }*/
-
-        dio.options.contentType = Headers.jsonContentType;
-
-        dio.options.responseType = ResponseType.json;
-
-        dio.options.headers["what"] = apiKey;
-
-        dio.options.headers["version"] = localisedAppVersion;
-
-        /*  if(url == logoutRequest){
-      dio.options.headers.remove("Authorization");
-    }*/
-
-        return Future.value(Pair(url, dio.options.headers));
-      }
-
-      return response;
-    } catch (e) {
-      print("Error saving stations: $e");
-      rethrow;
-    }
+  Future<Response> createBattery(BatteryRequest data) async {
+    Pair navigation = await getRequestHeaders(createBatteryUrl, "");
+    dio.options.headers = navigation.value;
+    return await dio.post(navigation.key, data: data);
   }
 
   @override
-  Future<List<StationsRequest>> getStations() async {
-    try {
-      final response = await dio.get(
-        "$baseUrl$getStationsUrl",
-        options: Options(
-          sendTimeout: const Duration(seconds: 30),
-          receiveTimeout: const Duration(seconds: 30),
-          validateStatus: (status) => true,
-        ),
-      );
+  Future<Response> getStations() async {
+    Pair navigation = await getRequestHeaders(getStationsUrl, "");
+    dio.options.headers = navigation.value;
 
-      final List<dynamic> dataList = response.data;
-      return dataList.map((e) => StationsRequest.fromJson(e)).toList();
-    } catch (e) {
-      rethrow;
-    }
+    return await dio.get(
+      navigation.key,
+      options: Options(headers: dio.options.headers),
+    );
+  }
+
+  @override
+  Future<Response> getStationTypes() async {
+    Pair navigation = await getRequestHeaders(getStationTypeUrl, "");
+    dio.options.headers = navigation.value;
+
+    return await dio.get(
+      navigation.key,
+      options: Options(headers: dio.options.headers),
+    );
+  }
+
+  @override
+  Future<Response> getStatus() async {
+    Pair navigation = await getRequestHeaders(getStatusUrl, "");
+    dio.options.headers = navigation.value;
+
+    return await dio.get(
+      navigation.key,
+      options: Options(headers: dio.options.headers),
+    );
+  }
+
+  @override
+  Future<Response> saveStations() {
+    // TODO: implement saveStations
+    throw UnimplementedError();
   }
 }

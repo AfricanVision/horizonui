@@ -1,10 +1,8 @@
-import 'package:horizonui/Spiro/ui/stations/Stations.dart';
-
 import 'Country.dart';
 import 'StationType.dart';
 import 'Status.dart';
 
-class StationsRequest extends Stations {
+class Station {
   String id;
   String name;
   double longitude;
@@ -17,7 +15,7 @@ class StationsRequest extends Stations {
   Country country;
   StationType stationType;
 
-  StationsRequest({
+  Station({
     required this.id,
     required this.name,
     required this.longitude,
@@ -47,8 +45,8 @@ class StationsRequest extends Stations {
     };
   }
 
-  factory StationsRequest.fromJson(Map<String, dynamic> json) {
-    return StationsRequest(
+  factory Station.fromJson(Map<String, dynamic> json) {
+    return Station(
       id: json['id'] ?? '',
       name: json['name'] ?? '',
       longitude: (json['longitude'] ?? 0).toDouble(),

@@ -9,7 +9,6 @@ import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/file/ConnectFileStorage.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import '../endpoints/ConnectComms.dart';
-import '../ui/stations/Stations.dart';
 import 'DataManager.dart';
 
 class AppDataManager implements DataManager {
@@ -44,7 +43,7 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<bool> createBattery(BatteryRequest batteryRequest) async {
+  Future<Response> createBattery(BatteryRequest batteryRequest) async {
     return await connectComms.createBattery(batteryRequest);
   }
 
@@ -94,11 +93,21 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<List<Stations>> getStations() async {
+  Future<Response> getStations() async {
     return await connectComms.getStations();
+  }
+
+  @override
+  Future<Response> getStationTypes() async {
+    return await connectComms.getStationTypes();
   }
 
   Future<Response> saveStations() {
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getStatus() async {
+    return await connectComms.getStatus();
   }
 }

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/data/models/Station.dart';
+import 'package:horizonui/Spiro/data/models/StationType.dart';
 import 'package:horizonui/Spiro/designs/Responsive.dart';
 import 'package:horizonui/Spiro/ui/stations/ViewStations.dart';
 import 'package:stacked/stacked.dart';
 
+import '../../data/models/Status.dart';
 import '../../utils/DesignSystem.dart';
 import 'ConnectStations.dart';
 import 'Stations.dart';
@@ -22,7 +25,11 @@ class StationsState extends State<Stations> implements ConnectStations {
   final TextEditingController _stationIdController = TextEditingController();
   final TextEditingController _updatedByController = TextEditingController();
 
-  List<Map<String, dynamic>> _stations = [];
+  List<Station> _stations = [];
+
+  List<StationType> _types = [];
+
+  List<Status> _status = [];
 
   final _formKey = GlobalKey<FormState>();
 
@@ -42,7 +49,7 @@ class StationsState extends State<Stations> implements ConnectStations {
 
   void _clearStationForm() {
     _nameController.clear();
-    _attendantController.clear();
+    _statusIdController.clear();
     _createdByController.clear();
     _updatedByController.clear();
     _createdAtController.dispose();
@@ -50,26 +57,13 @@ class StationsState extends State<Stations> implements ConnectStations {
     _stationIdController.dispose();
     _updatedByController.dispose();
 
-    setState(() {
-      _selectedCountry = 'Kenya';
-      _selectedStatus = 'Active';
-    });
+    _model?.notifyListeners();
   }
 
   void _addStation() {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        _stations.add({
-          'id':
-              'ST${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
-          'name': _stationNameController.text,
-          'country': _selectedCountry,
-          'attendant': _attendantController.text,
-          'status': _selectedStatus,
-          'createdBy': _createdByController.text,
-          'updatedBy': _updatedByController.text,
-          'timestamp': DateTime.now(),
-        });
+        //  _stations.add();
         _showAddForm = false;
       });
       _clearStationForm();
@@ -560,7 +554,7 @@ class StationsState extends State<Stations> implements ConnectStations {
                   child: _buildFormField(
                     'Station Name',
                     _buildTextFormField(
-                      controller: _stationNameController,
+                      controller: _nameController,
                       hintText: 'Enter station name',
                       icon: Icons.location_city_outlined,
                       validator: (value) {
@@ -574,22 +568,22 @@ class StationsState extends State<Stations> implements ConnectStations {
                   ),
                 ),
                 SizedBox(width: SpiroDesignSystem.space4),
-                Expanded(
+                /*  Expanded(
                   child: _buildFormField(
                     'Country',
                     _buildFormDropdown(
-                      value: _selectedCountry,
+                      value: _selectedStatusFilter,
                       items: ['Kenya', 'Uganda', 'Rwanda', 'Tanzania'],
                       onChanged: (String? newValue) {
                         setState(() {
-                          _selectedCountry = newValue!;
+                          _selectedStatusFilter = newValue!;
                         });
                       },
                       icon: Icons.public,
                     ),
                     isRequired: true,
                   ),
-                ),
+                ),*/
               ],
             ),
             SizedBox(height: SpiroDesignSystem.space3),
@@ -601,7 +595,7 @@ class StationsState extends State<Stations> implements ConnectStations {
                   child: _buildFormField(
                     'Attendant Name',
                     _buildTextFormField(
-                      controller: _attendantController,
+                      controller: _nameController,
                       hintText: 'Enter attendant name',
                       icon: Icons.person_outline,
                       validator: (value) {
@@ -615,22 +609,23 @@ class StationsState extends State<Stations> implements ConnectStations {
                   ),
                 ),
                 SizedBox(width: SpiroDesignSystem.space4),
-                Expanded(
+
+                /* Expanded(
                   child: _buildFormField(
                     'Status',
                     _buildFormDropdown(
-                      value: _selectedStatus,
-                      items: ['Active', 'Inactive'],
+                      value: _selectedStatusFilter,
+                      items: _status.map((item) => item.name).toList(),
                       onChanged: (String? newValue) {
                         setState(() {
-                          _selectedStatus = newValue!;
+                          _selectedStatusFilter = newValue!;
                         });
                       },
                       icon: Icons.power_settings_new_outlined,
                     ),
                     isRequired: true,
                   ),
-                ),
+                ),*/
               ],
             ),
             SizedBox(height: SpiroDesignSystem.space3),
@@ -931,13 +926,13 @@ class StationsState extends State<Stations> implements ConnectStations {
             _buildTableHeader(),
             ..._stations.map((station) {
               return _buildStationRow(
-                id: station['id'],
-                station: station['name'],
+                id: station.id,
+                station: station.name,
                 issueType: 'Battery Mismatch', // Placeholder
-                status: station['status'],
+                status: station.statusId.name,
                 priority: 'High', // Placeholder
-                owner: station['attendant'],
-                time: station['timestamp'].toString().substring(
+                owner: "station['attendant']",
+                time: station.updatedAt.toString().substring(
                   0,
                   10,
                 ), // Placeholder
@@ -1115,11 +1110,26 @@ class StationsState extends State<Stations> implements ConnectStations {
   }
 
   @override
-  void setStations(List<Stations> stationsList) {
+  void setStations(List<Station> stationsList) {
+    _stations = stationsList;
+    _model?.getStationTypes();
     print(stationsList);
   }
 
-  _initialize() {
+  void _initialize() {
     _model?.getStations();
+  }
+
+  @override
+  void setStationTypes(List<StationType> stationTypeList) {
+    _types = stationTypeList;
+    _model?.notifyListeners();
+    _model?.getStatus();
+  }
+
+  @override
+  void setStatus(List<Status> status) {
+    _status = status;
+    _model?.notifyListeners();
   }
 }

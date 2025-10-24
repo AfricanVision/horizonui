@@ -2,11 +2,13 @@ import '../configs/Env.dart';
 
 bool isProd = false;
 
-String baseUrl = isProd ? spiroRouteProd : spiroRouteLocal;
+String baseUrl = isProd
+    ? "${spiroRouteProd}spiro/horizon/"
+    : "${spiroRouteLocal}spiro/horizon/";
 
 String registerUser = 'agents';
 
-String createBattery = 'battery/add';
+String createBatteryUrl = 'battery/add';
 
 String getBatteryById = 'battery/';
 
@@ -22,6 +24,10 @@ String getAllBatteryHistory = 'battery/history/all';
 
 String updateBatteryHistory = 'battery/history/update';
 
-String getStationsUrl = 'stations';
+String getStationsUrl = 'station/all';
+
+String getStationTypeUrl = 'station-types/all';
 
 String saveStations = 'stations';
+
+String getStatusUrl = 'status/all';
