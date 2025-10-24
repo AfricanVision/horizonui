@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/analytics/ConnectAnalytics.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../utils/DesignSystem.dart';
+import 'Analytics.dart';
 
-class AnalyticsPage extends StatefulWidget {
-  const AnalyticsPage({super.key});
-
-  @override
-  State<AnalyticsPage> createState() => _AnalyticsPageState();
-}
-
-class _AnalyticsPageState extends State<AnalyticsPage> {
+class AnalyticsPageState extends State<AnalyticsPage>
+    implements ConnectAnalytics {
   String _selectedPeriod = 'Last 7 Days';
 
   @override

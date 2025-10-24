@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
-import 'package:horizonui/Spiro/ui/agents/agent_view_model.dart';
+import 'package:horizonui/Spiro/ui/agents/ConnectAgents.dart';
+import 'package:horizonui/Spiro/ui/agents/ViewAgents.dart';
 import 'package:intl/intl.dart';
 
 import '../../utils/DesignSystem.dart';
+import 'Agents.dart';
 
-class AgentsPage extends StatefulWidget {
-  const AgentsPage({super.key});
-
-  @override
-  State<AgentsPage> createState() => _AgentsPageState();
-}
-
-class _AgentsPageState extends State<AgentsPage> {
+class AgentsPageState extends State<AgentsPage> implements ConnectAgents {
   // Controllers for agent management
   final TextEditingController _firstnameController = TextEditingController();
   final TextEditingController _middlenameController = TextEditingController();

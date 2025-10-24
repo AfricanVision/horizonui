@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/reports/ConnectReports.dart';
 
 import '../../utils/DesignSystem.dart';
+import 'Reports.dart';
 
-class ReportsPage extends StatefulWidget {
-  const ReportsPage({super.key});
-
-  @override
-  State<ReportsPage> createState() => _ReportsPageState();
-}
-
-class _ReportsPageState extends State<ReportsPage> {
+class ReportsPageState extends State<ReportsPage> implements ConnectReports {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

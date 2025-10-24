@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:horizonui/Spiro/ui/batteries/batteries_page.dart';
+import 'package:horizonui/Spiro/ui/batteries/BatteriesPage.dart';
 
-class Batteries extends StatelessWidget {
-  const Batteries({super.key});
+class BatteriesPage extends StatefulWidget {
+  const BatteriesPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const BatteriesPage();
-  }
+  State<BatteriesPage> createState() => BatteriesPageState();
 }

@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/batteries/ConnectBatteries.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
 import '../../designs/Component.dart';
 import '../../utils/DesignSystem.dart';
+import 'Batteries.dart';
 
-class BatteriesPage extends StatefulWidget {
-  const BatteriesPage({super.key});
-
-  @override
-  State<BatteriesPage> createState() => _BatteriesPageState();
-}
-
-class _BatteriesPageState extends State<BatteriesPage> {
+class BatteriesPageState extends State<BatteriesPage>
+    implements ConnectBatteries {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _oemController = TextEditingController();
   final TextEditingController _serialNumberController = TextEditingController();

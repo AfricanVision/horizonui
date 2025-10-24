@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:horizonui/Spiro/ui/analytics/analytics_page.dart';
+import 'package:horizonui/Spiro/ui/analytics/AnalyticsPage.dart';
 
-class Analytics extends StatelessWidget {
-  const Analytics({super.key});
+class AnalyticsPage extends StatefulWidget {
+  const AnalyticsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const AnalyticsPage();
-  }
+  State<AnalyticsPage> createState() => AnalyticsPageState();
 }

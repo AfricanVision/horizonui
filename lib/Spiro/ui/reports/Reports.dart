@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:horizonui/Spiro/ui/reports/reports_page.dart';
+import 'package:horizonui/Spiro/ui/reports/ReportsPage.dart';
 
-class Reports extends StatelessWidget {
-  const Reports({super.key});
+class ReportsPage extends StatefulWidget {
+  const ReportsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const ReportsPage();
-  }
+  State<ReportsPage> createState() => ReportsPageState();
 }

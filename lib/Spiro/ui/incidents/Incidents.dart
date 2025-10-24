@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:horizonui/Spiro/ui/incidents/incidents_page.dart';
 
-class Incidents extends StatelessWidget {
-  const Incidents({super.key});
+import 'IncidentsPage.dart';
+
+class IncidentsPage extends StatefulWidget {
+  const IncidentsPage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return const IncidentsPage();
-  }
+  State<IncidentsPage> createState() => IncidentsPageState();
 }

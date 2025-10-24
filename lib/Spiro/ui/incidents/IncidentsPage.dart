@@ -1,20 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/incidents/ConnectIncidents.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../data/internal/application/TextType.dart';
 import '../../designs/Component.dart';
 import '../../utils/DesignSystem.dart';
+import 'Incidents.dart';
 
-class IncidentsPage extends StatefulWidget {
-  const IncidentsPage({super.key});
-
-  @override
-  State<IncidentsPage> createState() => _IncidentsPageState();
-}
-
-class _IncidentsPageState extends State<IncidentsPage> {
+class IncidentsPageState extends State<IncidentsPage>
+    implements ConnectIncidents {
   String _selectedStatusFilter = 'All Statuses';
   bool _showNewIncidentForm = false;
 
