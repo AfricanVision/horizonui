@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
-import 'package:horizonui/Spiro/ui/agents/agent_service.dart';
+import 'package:horizonui/Spiro/ui/agents/agent_view_model.dart';
 import 'package:intl/intl.dart';
 
 import '../../utils/DesignSystem.dart';
@@ -47,7 +47,7 @@ class _AgentsPageState extends State<AgentsPage> {
   List<Agent> _filteredAgents = [];
   final TextEditingController _searchController = TextEditingController();
 
-  final AgentService _agentService = AgentService();
+  final AgentViewModel _agentViewModel = AgentViewModel();
 
   @override
   void initState() {
@@ -104,7 +104,7 @@ class _AgentsPageState extends State<AgentsPage> {
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      final agents = await _agentService.getAgents();
+      final agents = await _agentViewModel.getAgents();
       if (!mounted) return;
       setState(() {
         _agents = agents;
@@ -1439,7 +1439,7 @@ class _AgentsPageState extends State<AgentsPage> {
         createdBy: 'admin',
       );
 
-      await _agentService.updateAgent(_currentEditingAgentId, updatedAgent);
+      await _agentViewModel.updateAgent(_currentEditingAgentId, updatedAgent);
       _showSuccessNotification("Agent details updated successfully!");
       await _loadAgents(); // Refresh the list
 
@@ -1481,7 +1481,7 @@ class _AgentsPageState extends State<AgentsPage> {
         createdBy: 'admin',
       );
 
-      await _agentService.addAgent(newAgent);
+      await _agentViewModel.addAgent(newAgent);
       _showSuccessNotification("Agent registered successfully!");
       await _loadAgents();
 

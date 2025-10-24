@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
 import 'package:http/http.dart' as http;
 
-class AgentService {
+class AgentViewModel {
   final String baseUrl = 'http://localhost:8080/api';
   final String apiKey = 'admin-api-key-67890';
 
+  // API Methods moved from AgentService
   Future<List<Agent>> getAgents() async {
     try {
       final response = await http.get(
