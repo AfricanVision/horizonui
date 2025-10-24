@@ -1125,36 +1125,6 @@ class _IncidentsPageState extends State<IncidentsPage> {
     );
   }
 
-  Widget raisedButton(String text, VoidCallback onPressed) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: SpiroDesignSystem.space3,
-        horizontal: SpiroDesignSystem.space6,
-      ),
-      decoration: BoxDecoration(
-        gradient: SpiroDesignSystem.primaryGradient,
-        borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
-        boxShadow: SpiroDesignSystem.shadowPrimary,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
-          child: Center(
-            child: Text(
-              text,
-              style: SpiroDesignSystem.bodyL.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Widget outlinedButton(VoidCallback onPressed, String text) {
     return Container(
       padding: EdgeInsets.symmetric(

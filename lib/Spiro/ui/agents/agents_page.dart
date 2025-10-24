@@ -328,7 +328,7 @@ class _AgentsPageState extends State<AgentsPage> {
             ],
           ),
           SizedBox(height: SpiroDesignSystem.space4),
-          // FIXED: Match incidents pattern with Row and Flexible
+          // Action buttons with responsive layout
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [

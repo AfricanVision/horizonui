@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 
+import '../../designs/Component.dart';
 import '../../utils/DesignSystem.dart';
 
 class BatteriesPage extends StatefulWidget {
@@ -255,7 +256,7 @@ class _BatteriesPageState extends State<BatteriesPage> {
                 ),
                 SizedBox(width: SpiroDesignSystem.space4),
                 Expanded(
-                  child: _raisedButton('Add Battery', () {
+                  child: raisedButton('Add Battery', () {
                     if (_formKey.currentState!.validate()) {
                       _submitBatteryForm();
                     } else {
@@ -361,36 +362,6 @@ class _BatteriesPageState extends State<BatteriesPage> {
           errorStyle: TextStyle(color: SpiroDesignSystem.red600, fontSize: 12),
         ),
         validator: validator,
-      ),
-    );
-  }
-
-  Widget _raisedButton(String text, VoidCallback onPressed) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: SpiroDesignSystem.space3,
-        horizontal: SpiroDesignSystem.space6,
-      ),
-      decoration: BoxDecoration(
-        gradient: SpiroDesignSystem.primaryGradient,
-        borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
-        boxShadow: SpiroDesignSystem.shadowPrimary,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
-          child: Center(
-            child: Text(
-              text,
-              style: SpiroDesignSystem.bodyL.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ),
       ),
     );
   }
