@@ -8,6 +8,7 @@ import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/file/ConnectFileStorage.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
+import '../data/models/Station.dart';
 import '../endpoints/ConnectComms.dart';
 import 'DataManager.dart';
 
@@ -102,7 +103,8 @@ class AppDataManager implements DataManager {
     return await connectComms.getStationTypes();
   }
 
-  Future<Response> saveStations() {
+  @override
+  Future<Response> saveStations(Station data) {
     throw UnimplementedError();
   }
 

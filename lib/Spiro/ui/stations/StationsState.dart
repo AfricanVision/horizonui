@@ -710,7 +710,7 @@ class StationsState extends State<Stations> implements ConnectStations {
                     color: Colors.transparent,
                     child: InkWell(
                       onTap: () {
-                        _addStation();
+                        _model?.saveStations();
                       },
                       borderRadius: BorderRadius.circular(
                         SpiroDesignSystem.radiusMd,
@@ -1131,5 +1131,13 @@ class StationsState extends State<Stations> implements ConnectStations {
   void setStatus(List<Status> status) {
     _status = status;
     _model?.notifyListeners();
+  }
+
+  @override
+  void saveStationResponse(Station station) {
+    _stations.add(station);
+    _model?.notifyListeners();
+
+    ///
   }
 }

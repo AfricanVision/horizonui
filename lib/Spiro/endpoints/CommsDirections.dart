@@ -28,6 +28,6 @@ String getStationsUrl = 'station/all';
 
 String getStationTypeUrl = 'station-types/all';
 
-String saveStations = 'stations';
+String saveStationsUrl = 'stations';
 
 String getStatusUrl = 'status/all';

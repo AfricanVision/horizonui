@@ -8,6 +8,7 @@ import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/application/Pair.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
+import '../data/models/Station.dart';
 import 'CommsDirections.dart';
 import 'ConnectComms.dart';
 
@@ -264,8 +265,9 @@ class Comms implements ConnectComms {
   }
 
   @override
-  Future<Response> saveStations() {
-    // TODO: implement saveStations
-    throw UnimplementedError();
+  Future<Response> saveStations(Station data) async {
+    Pair navigation = await getRequestHeaders(saveStationsUrl, "");
+    dio.options.headers = navigation.value;
+    return await dio.post(navigation.key, data: data);
   }
 }

@@ -9,4 +9,6 @@ abstract class ConnectStations {
   void setStationTypes(List<StationType> stationTypeList);
 
   void setStatus(List<Status> status);
+
+  void saveStationResponse(Station station);
 }

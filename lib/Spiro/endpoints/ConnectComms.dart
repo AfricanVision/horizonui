@@ -3,6 +3,7 @@ import 'package:dio/dio.dart';
 import '../data/internal/application/Agents.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
+import '../data/models/Station.dart';
 
 abstract class ConnectComms {
   Future<bool> sendAgent(Agent userData);
@@ -20,7 +21,7 @@ abstract class ConnectComms {
   );
   Future<Response> getStations();
 
-  Future<Response> saveStations();
+  Future<Response> saveStations(Station data);
 
   Future<Response> getStationTypes();
 
