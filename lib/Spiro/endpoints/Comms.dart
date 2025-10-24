@@ -1,38 +1,59 @@
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+
 import '../configs/Env.dart';
+import '../data/internal/application/Agents.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
-import '../data/internal/application/Agents.dart';
 import '../data/internal/application/Pair.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import 'CommsDirections.dart';
 import 'ConnectComms.dart';
 
 class Comms implements ConnectComms {
-
-  final String apikey = '';
-
-
   Dio dio = Dio();
   ConnectInternalMemory helper;
 
   Comms(this.helper);
 
+  Future<Pair> getRequestHeaders(String url, String urlData) async {
+    dio.options.headers = <String, dynamic>{};
+
+    /*MeDescription data = await helper.getMyDescription();
+
+    if(data.token.isNotEmpty && url != deviceToken){
+      dio.options.headers["Authorization"] = "Bearer ${data.token}";
+    }*/
+
+    url = baseUrl + url;
+
+    dio.options.contentType = Headers.jsonContentType;
+
+    dio.options.responseType = ResponseType.json;
+
+    dio.options.headers["X-API-KEY"] = apiKey;
+
+    dio.options.headers["version"] = localisedAppVersion;
+
+    /*  if(url == logoutRequest){
+      dio.options.headers.remove("Authorization");
+    }*/
+
+    return Future.value(Pair(url, dio.options.headers));
+  }
+
   @override
   Future<bool> sendAgent(Agent userData) async {
     try {
-
       final response = await dio.post(
-        "http://localhost:8080/api/agents",
+        "$baseUrl$updateBattery",
         data: jsonEncode(userData.toJson()),
         options: Options(
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'X-API-KEY': apikey
+            'X-API-KEY': apiKey,
           },
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -54,7 +75,7 @@ class Comms implements ConnectComms {
   Future<bool> createBattery(BatteryRequest batteryRequest) async {
     try {
       final response = await dio.post(
-        "http://localhost:8080/spiro/horizon/battery/add",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -73,7 +94,7 @@ class Comms implements ConnectComms {
   Future<BatteryRequest> getBatteryById(String id) async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getBatteryById$id",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -90,14 +111,16 @@ class Comms implements ConnectComms {
   Future<List<BatteryRequest>> getAllBatteries() async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getAllBatteries",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
           validateStatus: (status) => true,
         ),
       );
-      return (response.data as List).map((item) => BatteryRequest.fromJson(item)).toList();
+      return (response.data as List)
+          .map((item) => BatteryRequest.fromJson(item))
+          .toList();
     } catch (e) {
       rethrow;
     }
@@ -107,7 +130,7 @@ class Comms implements ConnectComms {
   Future<bool> updateBattery(BatteryRequest batteryRequest) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$updateBattery",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -123,10 +146,12 @@ class Comms implements ConnectComms {
   }
 
   @override
-  Future<bool> createBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> createBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$createBatteryHistory",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryHistoryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -145,7 +170,7 @@ class Comms implements ConnectComms {
   Future<BatteryHistoryRequest> getBatteryHistoryById(String id) async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getBatteryHistoryById$id",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -162,24 +187,28 @@ class Comms implements ConnectComms {
   Future<List<BatteryHistoryRequest>> getAllBatteryHistory() async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getAllBatteryHistory",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
           validateStatus: (status) => true,
         ),
       );
-      return (response.data as List).map((item) => BatteryHistoryRequest.fromJson(item)).toList();
+      return (response.data as List)
+          .map((item) => BatteryHistoryRequest.fromJson(item))
+          .toList();
     } catch (e) {
       rethrow;
     }
   }
 
   @override
-  Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> updateBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$updateBatteryHistory",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryHistoryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -195,48 +224,48 @@ class Comms implements ConnectComms {
   }
 
   @override
-  Future<Response> createBattery(BatteryRequest data) async{
-    Pair navigation = await getRequestHeaders(verifyRegCredentials, "");
+  Future<Response> createBattery(BatteryRequest data) async {
+    Pair navigation = await getRequestHeaders(createBatteryUrl, "");
     dio.options.headers = navigation.value;
     return await dio.post(navigation.key, data: data);
   }
 
   @override
-  Future<Response> getStations() async{
-
-    Pair navigation = await getRequestHeaders(getIdentificationTypesProspects, "");
+  Future<Response> getStations() async {
+    Pair navigation = await getRequestHeaders(getStationsUrl, "");
     dio.options.headers = navigation.value;
 
-    return await dio.get(navigation.key, options: Options(
-        headers: dio.options.headers
-    ));
+    return await dio.get(
+      navigation.key,
+      options: Options(headers: dio.options.headers),
+    );
   }
 
-  Future<Pair> getRequestHeaders(String url, String urlData) async{
+  @override
+  Future<Response> getStationTypes() async {
+    Pair navigation = await getRequestHeaders(getStationTypeUrl, "");
+    dio.options.headers = navigation.value;
 
-    dio.options.headers = <String, dynamic>{};
-
-    /*MeDescription data = await helper.getMyDescription();
-
-    if(data.token.isNotEmpty && url != deviceToken){
-      dio.options.headers["Authorization"] = "Bearer ${data.token}";
-    }*/
-
-    dio.options.contentType = Headers.jsonContentType;
-
-    dio.options.responseType = ResponseType.json;
-
-    dio.options.headers["what"] = apiKey;
-
-    dio.options.headers["version"] = localisedAppVersion;
-
-  /*  if(url == logoutRequest){
-      dio.options.headers.remove("Authorization");
-    }*/
-
-
-    return Future.value(Pair(url, dio.options.headers));
-
+    return await dio.get(
+      navigation.key,
+      options: Options(headers: dio.options.headers),
+    );
   }
 
+  @override
+  Future<Response> getStatus() async {
+    Pair navigation = await getRequestHeaders(getStatusUrl, "");
+    dio.options.headers = navigation.value;
+
+    return await dio.get(
+      navigation.key,
+      options: Options(headers: dio.options.headers),
+    );
+  }
+
+  @override
+  Future<Response> saveStations() {
+    // TODO: implement saveStations
+    throw UnimplementedError();
+  }
 }
