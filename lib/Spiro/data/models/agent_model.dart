@@ -1,5 +1,3 @@
-// This is the simplified Agent model used for dashboard display
-// For full agent management, use the Agent class from Agents.dart
 class DashboardAgent {
   final String id;
   final String name;
