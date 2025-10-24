@@ -1,66 +1,69 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/data/models/Station.dart';
+import 'package:horizonui/Spiro/data/models/StationType.dart';
+import 'package:horizonui/Spiro/designs/Responsive.dart';
+import 'package:horizonui/Spiro/ui/stations/ViewStations.dart';
+import 'package:stacked/stacked.dart';
 
+import '../../data/models/Status.dart';
 import '../../utils/DesignSystem.dart';
+import 'ConnectStations.dart';
+import 'Stations.dart';
 
-class StationsPage extends StatefulWidget {
-  const StationsPage({super.key});
-
-  @override
-  State<StationsPage> createState() => _StationsPageState();
-}
-
-class _StationsPageState extends State<StationsPage> {
+class StationsState extends State<Stations> implements ConnectStations {
   String _selectedStatusFilter = 'All Statuses';
   bool _isLoading = false;
   bool _showAddForm = false;
 
-  // Form controllers for Add Station
-  final TextEditingController _stationNameController = TextEditingController();
-  final TextEditingController _attendantController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _statusIdController = TextEditingController();
+  final TextEditingController _latitudeController = TextEditingController();
+  final TextEditingController _longitudeController = TextEditingController();
   final TextEditingController _createdByController = TextEditingController();
+  final TextEditingController _createdAtController = TextEditingController();
+  final TextEditingController _countryController = TextEditingController();
+  final TextEditingController _stationIdController = TextEditingController();
   final TextEditingController _updatedByController = TextEditingController();
 
-  String _selectedCountry = 'Kenya';
-  String _selectedStatus = 'Active';
+  List<Station> _stations = [];
 
-  List<Map<String, dynamic>> _stations = [];
+  List<StationType> _types = [];
+
+  List<Status> _status = [];
 
   final _formKey = GlobalKey<FormState>();
 
   @override
   void dispose() {
-    _stationNameController.dispose();
-    _attendantController.dispose();
-    _createdByController.dispose();
+    _nameController.dispose();
+    _statusIdController.dispose();
+    _latitudeController.dispose();
+    _longitudeController.dispose();
+    _createdAtController.dispose();
+    _countryController.dispose();
+    _stationIdController.dispose();
     _updatedByController.dispose();
+
     super.dispose();
   }
 
   void _clearStationForm() {
-    _stationNameController.clear();
-    _attendantController.clear();
+    _nameController.clear();
+    _statusIdController.clear();
     _createdByController.clear();
     _updatedByController.clear();
-    setState(() {
-      _selectedCountry = 'Kenya';
-      _selectedStatus = 'Active';
-    });
+    _createdAtController.dispose();
+    _countryController.dispose();
+    _stationIdController.dispose();
+    _updatedByController.dispose();
+
+    _model?.notifyListeners();
   }
 
   void _addStation() {
     if (_formKey.currentState!.validate()) {
       setState(() {
-        _stations.add({
-          'id':
-              'ST${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
-          'name': _stationNameController.text,
-          'country': _selectedCountry,
-          'attendant': _attendantController.text,
-          'status': _selectedStatus,
-          'createdBy': _createdByController.text,
-          'updatedBy': _updatedByController.text,
-          'timestamp': DateTime.now(),
-        });
+        //  _stations.add();
         _showAddForm = false;
       });
       _clearStationForm();
@@ -77,26 +80,57 @@ class _StationsPageState extends State<StationsPage> {
     }
   }
 
+  ViewStations? _model;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: SpiroDesignSystem.gray50,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(SpiroDesignSystem.space6),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildHeader(),
-            SizedBox(height: SpiroDesignSystem.space8),
-            _buildStatisticsCards(),
-            SizedBox(height: SpiroDesignSystem.space6),
-            _buildFiltersSection(),
-            SizedBox(height: SpiroDesignSystem.space6),
-            if (_showAddForm) _buildAddStationForm(),
-            if (_showAddForm) SizedBox(height: SpiroDesignSystem.space6),
-            _buildStationsTable(),
-          ],
+    return ViewModelBuilder<ViewStations>.reactive(
+      viewModelBuilder: () => ViewStations(context, this),
+      onViewModelReady: (viewModel) => {_model = viewModel, _initialize()},
+      builder: (context, viewModel, child) => PopScope(
+        canPop: false, // Prevents auto pop
+        onPopInvokedWithResult: (didPop, result) {
+          if (!didPop) {
+            if (_model?.loadingEntry == null && _model?.errorEntry == null) {}
+          }
+        },
+        child: Scaffold(
+          backgroundColor: SpiroDesignSystem.gray50,
+          body: LayoutBuilder(
+            builder:
+                (BuildContext context, BoxConstraints viewportConstraints) {
+                  return Responsive(
+                    mobile: _mobileView(viewportConstraints),
+                    desktop: _desktopView(viewportConstraints),
+                    tablet: _desktopView(viewportConstraints),
+                  );
+                },
+          ),
         ),
+      ),
+    );
+  }
+
+  _mobileView(BoxConstraints viewportConstraints) {
+    return Column();
+  }
+
+  _desktopView(BoxConstraints viewportConstraints) {
+    return SingleChildScrollView(
+      padding: EdgeInsets.all(SpiroDesignSystem.space6),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildHeader(),
+          SizedBox(height: SpiroDesignSystem.space8),
+          _buildStatisticsCards(),
+          SizedBox(height: SpiroDesignSystem.space6),
+          _buildFiltersSection(),
+          SizedBox(height: SpiroDesignSystem.space6),
+          if (_showAddForm) _buildAddStationForm(),
+          if (_showAddForm) SizedBox(height: SpiroDesignSystem.space6),
+          _buildStationsTable(),
+        ],
       ),
     );
   }
@@ -520,7 +554,7 @@ class _StationsPageState extends State<StationsPage> {
                   child: _buildFormField(
                     'Station Name',
                     _buildTextFormField(
-                      controller: _stationNameController,
+                      controller: _nameController,
                       hintText: 'Enter station name',
                       icon: Icons.location_city_outlined,
                       validator: (value) {
@@ -534,22 +568,22 @@ class _StationsPageState extends State<StationsPage> {
                   ),
                 ),
                 SizedBox(width: SpiroDesignSystem.space4),
-                Expanded(
+                /*  Expanded(
                   child: _buildFormField(
                     'Country',
                     _buildFormDropdown(
-                      value: _selectedCountry,
+                      value: _selectedStatusFilter,
                       items: ['Kenya', 'Uganda', 'Rwanda', 'Tanzania'],
                       onChanged: (String? newValue) {
                         setState(() {
-                          _selectedCountry = newValue!;
+                          _selectedStatusFilter = newValue!;
                         });
                       },
                       icon: Icons.public,
                     ),
                     isRequired: true,
                   ),
-                ),
+                ),*/
               ],
             ),
             SizedBox(height: SpiroDesignSystem.space3),
@@ -561,7 +595,7 @@ class _StationsPageState extends State<StationsPage> {
                   child: _buildFormField(
                     'Attendant Name',
                     _buildTextFormField(
-                      controller: _attendantController,
+                      controller: _nameController,
                       hintText: 'Enter attendant name',
                       icon: Icons.person_outline,
                       validator: (value) {
@@ -575,22 +609,23 @@ class _StationsPageState extends State<StationsPage> {
                   ),
                 ),
                 SizedBox(width: SpiroDesignSystem.space4),
-                Expanded(
+
+                /* Expanded(
                   child: _buildFormField(
                     'Status',
                     _buildFormDropdown(
-                      value: _selectedStatus,
-                      items: ['Active', 'Inactive'],
+                      value: _selectedStatusFilter,
+                      items: _status.map((item) => item.name).toList(),
                       onChanged: (String? newValue) {
                         setState(() {
-                          _selectedStatus = newValue!;
+                          _selectedStatusFilter = newValue!;
                         });
                       },
                       icon: Icons.power_settings_new_outlined,
                     ),
                     isRequired: true,
                   ),
-                ),
+                ),*/
               ],
             ),
             SizedBox(height: SpiroDesignSystem.space3),
@@ -891,13 +926,13 @@ class _StationsPageState extends State<StationsPage> {
             _buildTableHeader(),
             ..._stations.map((station) {
               return _buildStationRow(
-                id: station['id'],
-                station: station['name'],
+                id: station.id,
+                station: station.name,
                 issueType: 'Battery Mismatch', // Placeholder
-                status: station['status'],
+                status: station.statusId.name,
                 priority: 'High', // Placeholder
-                owner: station['attendant'],
-                time: station['timestamp'].toString().substring(
+                owner: "station['attendant']",
+                time: station.updatedAt.toString().substring(
                   0,
                   10,
                 ), // Placeholder
@@ -1072,5 +1107,29 @@ class _StationsPageState extends State<StationsPage> {
         fontWeight: FontWeight.w600,
       ),
     );
+  }
+
+  @override
+  void setStations(List<Station> stationsList) {
+    _stations = stationsList;
+    _model?.getStationTypes();
+    print(stationsList);
+  }
+
+  void _initialize() {
+    _model?.getStations();
+  }
+
+  @override
+  void setStationTypes(List<StationType> stationTypeList) {
+    _types = stationTypeList;
+    _model?.notifyListeners();
+    _model?.getStatus();
+  }
+
+  @override
+  void setStatus(List<Status> status) {
+    _status = status;
+    _model?.notifyListeners();
   }
 }

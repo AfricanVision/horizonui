@@ -1567,6 +1567,7 @@ class AgentsPageState extends State<AgentsPage> implements ConnectAgents {
                 ),
               ),
             ),
+
             SizedBox(width: SpiroDesignSystem.space2),
             Container(
               decoration: BoxDecoration(
@@ -1586,12 +1587,14 @@ class AgentsPageState extends State<AgentsPage> implements ConnectAgents {
                   ),
                 ),
               ),
+
             ),
           ],
         );
       },
     );
   }
+
 
   Widget _buildFormField({
     required String label,
@@ -1669,6 +1672,7 @@ class AgentsPageState extends State<AgentsPage> implements ConnectAgents {
       maxLines: maxLines,
       isRequired: true,
     );
+
   }
 
   Widget _buildCardIconButton(

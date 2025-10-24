@@ -12,7 +12,7 @@ import '../clamp/ClampBox.dart';
 import '../incidents/Incidents.dart';
 import '../reports/Reports.dart';
 import '../settings/Settings.dart';
-import '../stations/stations_page.dart';
+import '../stations/Stations.dart';
 import 'Dashboard.dart';
 import 'content/DashboardPageContent.dart';
 
@@ -373,7 +373,7 @@ class DashboardPageState extends State<Dashboard>
           _currentPage = AgentsPage();
           break;
         case 'Stations':
-          _currentPage = StationsPage();
+          _currentPage = Stations();
           break;
         case 'Batteries':
           _currentPage = BatteriesPage();

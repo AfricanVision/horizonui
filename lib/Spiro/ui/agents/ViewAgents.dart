@@ -58,6 +58,7 @@ class AgentViewModel {
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
+          'X-API-KEY': apiKey
         },
         body: json.encode(requestBody),
       );

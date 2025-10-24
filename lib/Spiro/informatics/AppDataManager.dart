@@ -1,22 +1,26 @@
 import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
+
 import '../data/internal/additionaldetails/FIleSaver.dart';
+import '../data/internal/application/Agents.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/file/ConnectFileStorage.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import '../endpoints/ConnectComms.dart';
-import '../data/internal/application/Agents.dart';
 import 'DataManager.dart';
 
 class AppDataManager implements DataManager {
-
   ConnectInternalMemory connectInternalMemory;
   ConnectComms connectComms;
   ConnectFileStorage connectFileStorage;
 
-  AppDataManager(this.connectInternalMemory, this.connectComms, this.connectFileStorage);
-
+  AppDataManager(
+    this.connectInternalMemory,
+    this.connectComms,
+    this.connectFileStorage,
+  );
 
   @override
   Future<bool> sendUserRegistration(Agent userData) async {
@@ -39,7 +43,7 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<bool> createBattery(BatteryRequest batteryRequest) async {
+  Future<Response> createBattery(BatteryRequest batteryRequest) async {
     return await connectComms.createBattery(batteryRequest);
   }
 
@@ -59,7 +63,9 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<bool> createBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> createBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     return await connectComms.createBatteryHistory(batteryHistoryRequest);
   }
 
@@ -74,7 +80,9 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> updateBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     return await connectComms.updateBatteryHistory(batteryHistoryRequest);
   }
 
@@ -82,5 +90,24 @@ class AppDataManager implements DataManager {
   Future<bool> sendAgent(Agent userData) {
     // TODO: implement sendAgent
     throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getStations() async {
+    return await connectComms.getStations();
+  }
+
+  @override
+  Future<Response> getStationTypes() async {
+    return await connectComms.getStationTypes();
+  }
+
+  Future<Response> saveStations() {
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Response> getStatus() async {
+    return await connectComms.getStatus();
   }
 }
