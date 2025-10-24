@@ -1,13 +1,8 @@
 import '../configs/Env.dart';
 
-
 bool isProd = false;
 
-String prospectRoute =  isProd ? "$spiroRouteProd/Prospect/" : "$spiroRouteLocal:20002/Prospect/";
-
-String partnersRoute = isProd ? "$spiroRouteProd/Partners/" : "$spiroRouteLocal:20005/Partners/";
-
-String relayRoute = isProd ? "$spiroRouteProd/spiroRelay" : "$spiroRouteLocal:/spiroRelay";
+String baseUrl = isProd ? spiroRouteProd : spiroRouteLocal;
 
 String registerUser = 'agents';
 
@@ -27,10 +22,6 @@ String getAllBatteryHistory = 'battery/history/all';
 
 String updateBatteryHistory = 'battery/history/update';
 
+String getStationsUrl = 'stations';
 
-
-
-
-
-
-
+String saveStations = 'stations';

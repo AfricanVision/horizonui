@@ -1,5 +1,1 @@
-
-
-abstract class ConnectInternalMemory {
-
-}
+abstract class ConnectInternalMemory {}

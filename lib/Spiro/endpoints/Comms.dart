@@ -1,18 +1,17 @@
-
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import 'package:horizonui/Spiro/data/models/StationsRequest.dart';
+
+import '../data/internal/application/Agents.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
-import '../data/internal/application/Agents.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import 'CommsDirections.dart';
 import 'ConnectComms.dart';
 
 class Comms implements ConnectComms {
-
   final String apikey = 'admin-api-key-67890';
-
 
   Dio dio = Dio();
   ConnectInternalMemory helper;
@@ -22,15 +21,14 @@ class Comms implements ConnectComms {
   @override
   Future<bool> sendAgent(Agent userData) async {
     try {
-
       final response = await dio.post(
-        "http://localhost:8080/api/agents",
+        "$baseUrl$updateBattery",
         data: jsonEncode(userData.toJson()),
         options: Options(
           headers: {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
-            'X-API-KEY': apikey
+            'X-API-KEY': apikey,
           },
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -52,7 +50,7 @@ class Comms implements ConnectComms {
   Future<bool> createBattery(BatteryRequest batteryRequest) async {
     try {
       final response = await dio.post(
-        "http://localhost:8080/spiro/horizon/battery/add",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -71,7 +69,7 @@ class Comms implements ConnectComms {
   Future<BatteryRequest> getBatteryById(String id) async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getBatteryById$id",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -88,14 +86,16 @@ class Comms implements ConnectComms {
   Future<List<BatteryRequest>> getAllBatteries() async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getAllBatteries",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
           validateStatus: (status) => true,
         ),
       );
-      return (response.data as List).map((item) => BatteryRequest.fromJson(item)).toList();
+      return (response.data as List)
+          .map((item) => BatteryRequest.fromJson(item))
+          .toList();
     } catch (e) {
       rethrow;
     }
@@ -105,7 +105,7 @@ class Comms implements ConnectComms {
   Future<bool> updateBattery(BatteryRequest batteryRequest) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$updateBattery",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -121,10 +121,12 @@ class Comms implements ConnectComms {
   }
 
   @override
-  Future<bool> createBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> createBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$createBatteryHistory",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryHistoryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -143,7 +145,7 @@ class Comms implements ConnectComms {
   Future<BatteryHistoryRequest> getBatteryHistoryById(String id) async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getBatteryHistoryById$id",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
@@ -160,24 +162,28 @@ class Comms implements ConnectComms {
   Future<List<BatteryHistoryRequest>> getAllBatteryHistory() async {
     try {
       final response = await dio.get(
-        "$partnersRoute$getAllBatteryHistory",
+        "$baseUrl$updateBattery",
         options: Options(
           sendTimeout: const Duration(seconds: 30),
           receiveTimeout: const Duration(seconds: 30),
           validateStatus: (status) => true,
         ),
       );
-      return (response.data as List).map((item) => BatteryHistoryRequest.fromJson(item)).toList();
+      return (response.data as List)
+          .map((item) => BatteryHistoryRequest.fromJson(item))
+          .toList();
     } catch (e) {
       rethrow;
     }
   }
 
   @override
-  Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> updateBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     try {
       final response = await dio.post(
-        "$partnersRoute$updateBatteryHistory",
+        "$baseUrl$updateBattery",
         data: jsonEncode(batteryHistoryRequest.toJson()),
         options: Options(
           headers: {'Content-Type': 'application/json'},
@@ -192,5 +198,42 @@ class Comms implements ConnectComms {
     }
   }
 
+  @override
+  Future<Response> saveStations() async {
+    try {
+      final response = await dio.get(
+        "$baseUrl$saveStations",
+        options: Options(
+          headers: {'Content-Type': 'application/json'},
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
 
+      return response;
+    } catch (e) {
+      print("Error saving stations: $e");
+      rethrow;
+    }
+  }
+
+  @override
+  Future<List<StationsRequest>> getStations() async {
+    try {
+      final response = await dio.get(
+        "$baseUrl$getStationsUrl",
+        options: Options(
+          sendTimeout: const Duration(seconds: 30),
+          receiveTimeout: const Duration(seconds: 30),
+          validateStatus: (status) => true,
+        ),
+      );
+
+      final List<dynamic> dataList = response.data;
+      return dataList.map((e) => StationsRequest.fromJson(e)).toList();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

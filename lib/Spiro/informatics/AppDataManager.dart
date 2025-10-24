@@ -1,22 +1,27 @@
 import 'dart:typed_data';
+
 import 'package:dio/dio.dart';
+
 import '../data/internal/additionaldetails/FIleSaver.dart';
+import '../data/internal/application/Agents.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/file/ConnectFileStorage.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import '../endpoints/ConnectComms.dart';
-import '../data/internal/application/Agents.dart';
+import '../ui/stations/Stations.dart';
 import 'DataManager.dart';
 
 class AppDataManager implements DataManager {
-
   ConnectInternalMemory connectInternalMemory;
   ConnectComms connectComms;
   ConnectFileStorage connectFileStorage;
 
-  AppDataManager(this.connectInternalMemory, this.connectComms, this.connectFileStorage);
-
+  AppDataManager(
+    this.connectInternalMemory,
+    this.connectComms,
+    this.connectFileStorage,
+  );
 
   @override
   Future<bool> sendUserRegistration(Agent userData) async {
@@ -59,7 +64,9 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<bool> createBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> createBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     return await connectComms.createBatteryHistory(batteryHistoryRequest);
   }
 
@@ -74,13 +81,24 @@ class AppDataManager implements DataManager {
   }
 
   @override
-  Future<bool> updateBatteryHistory(BatteryHistoryRequest batteryHistoryRequest) async {
+  Future<bool> updateBatteryHistory(
+    BatteryHistoryRequest batteryHistoryRequest,
+  ) async {
     return await connectComms.updateBatteryHistory(batteryHistoryRequest);
   }
 
   @override
   Future<bool> sendAgent(Agent userData) {
     // TODO: implement sendAgent
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<List<Stations>> getStations() async {
+    return await connectComms.getStations();
+  }
+
+  Future<Response> saveStations() {
     throw UnimplementedError();
   }
 }
