@@ -2,16 +2,18 @@
 import 'dart:convert';
 
 import 'package:dio/dio.dart';
+import '../configs/Env.dart';
 import '../data/internal/application/BatteryHistoryRequest.dart';
 import '../data/internal/application/BatteryRequest.dart';
 import '../data/internal/application/Agents.dart';
+import '../data/internal/application/Pair.dart';
 import '../data/internal/memory/ConnectInternalMemory.dart';
 import 'CommsDirections.dart';
 import 'ConnectComms.dart';
 
 class Comms implements ConnectComms {
 
-  final String apikey = 'admin-api-key-67890';
+  final String apikey = '';
 
 
   Dio dio = Dio();
@@ -48,7 +50,7 @@ class Comms implements ConnectComms {
     }
   }
 
-  @override
+  /*@override
   Future<bool> createBattery(BatteryRequest batteryRequest) async {
     try {
       final response = await dio.post(
@@ -65,7 +67,7 @@ class Comms implements ConnectComms {
     } catch (e) {
       rethrow;
     }
-  }
+  }*/
 
   @override
   Future<BatteryRequest> getBatteryById(String id) async {
@@ -192,5 +194,49 @@ class Comms implements ConnectComms {
     }
   }
 
+  @override
+  Future<Response> createBattery(BatteryRequest data) async{
+    Pair navigation = await getRequestHeaders(verifyRegCredentials, "");
+    dio.options.headers = navigation.value;
+    return await dio.post(navigation.key, data: data);
+  }
+
+  @override
+  Future<Response> getStations() async{
+
+    Pair navigation = await getRequestHeaders(getIdentificationTypesProspects, "");
+    dio.options.headers = navigation.value;
+
+    return await dio.get(navigation.key, options: Options(
+        headers: dio.options.headers
+    ));
+  }
+
+  Future<Pair> getRequestHeaders(String url, String urlData) async{
+
+    dio.options.headers = <String, dynamic>{};
+
+    /*MeDescription data = await helper.getMyDescription();
+
+    if(data.token.isNotEmpty && url != deviceToken){
+      dio.options.headers["Authorization"] = "Bearer ${data.token}";
+    }*/
+
+    dio.options.contentType = Headers.jsonContentType;
+
+    dio.options.responseType = ResponseType.json;
+
+    dio.options.headers["what"] = apiKey;
+
+    dio.options.headers["version"] = localisedAppVersion;
+
+  /*  if(url == logoutRequest){
+      dio.options.headers.remove("Authorization");
+    }*/
+
+
+    return Future.value(Pair(url, dio.options.headers));
+
+  }
 
 }
