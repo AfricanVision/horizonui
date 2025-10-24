@@ -148,15 +148,6 @@ class DashboardPageContentState extends State<DashboardPageContent>
             ),
           ];
         });
-
-        // Show a snackbar to indicate fallback data is being used
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Using offline data - API server not available'),
-            backgroundColor: SpiroDesignSystem.warning600,
-            duration: Duration(seconds: 3),
-          ),
-        );
       }
       debugPrint('Error loading dashboard data: $e');
     }
