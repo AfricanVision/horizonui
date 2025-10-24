@@ -1,15 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/settings/ConnectSettings.dart';
 
 import '../../utils/DesignSystem.dart';
+import 'Settings.dart';
 
-class SettingsPage extends StatefulWidget {
-  const SettingsPage({super.key});
-
-  @override
-  State<SettingsPage> createState() => _SettingsPageState();
-}
-
-class _SettingsPageState extends State<SettingsPage> {
+class SettingsPageState extends State<SettingsPage> implements ConnectSettings {
   bool _notificationsEnabled = true;
   bool _emailNotifications = true;
   bool _pushNotifications = false;

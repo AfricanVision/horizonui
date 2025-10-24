@@ -1,20 +1,16 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:horizonui/Spiro/ui/incidents/ConnectIncidents.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../data/internal/application/TextType.dart';
 import '../../designs/Component.dart';
 import '../../utils/DesignSystem.dart';
+import 'Incidents.dart';
 
-class IncidentsPage extends StatefulWidget {
-  const IncidentsPage({super.key});
-
-  @override
-  State<IncidentsPage> createState() => _IncidentsPageState();
-}
-
-class _IncidentsPageState extends State<IncidentsPage> {
+class IncidentsPageState extends State<IncidentsPage>
+    implements ConnectIncidents {
   String _selectedStatusFilter = 'All Statuses';
   bool _showNewIncidentForm = false;
 
@@ -1120,36 +1116,6 @@ class _IncidentsPageState extends State<IncidentsPage> {
             ),
           ),
           contentPadding: EdgeInsets.all(16),
-        ),
-      ),
-    );
-  }
-
-  Widget raisedButton(String text, VoidCallback onPressed) {
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: SpiroDesignSystem.space3,
-        horizontal: SpiroDesignSystem.space6,
-      ),
-      decoration: BoxDecoration(
-        gradient: SpiroDesignSystem.primaryGradient,
-        borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
-        boxShadow: SpiroDesignSystem.shadowPrimary,
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: onPressed,
-          borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
-          child: Center(
-            child: Text(
-              text,
-              style: SpiroDesignSystem.bodyL.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
         ),
       ),
     );

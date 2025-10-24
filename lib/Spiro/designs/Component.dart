@@ -16,8 +16,19 @@ import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import '../data/internal/application/TextType.dart';
 import '../data/models/Payment.dart';
 import '../utils/Colors.dart';
+import '../utils/DesignSystem.dart';
 import '../utils/Images.dart';
 import '../utils/ScreenUtils.dart' as Responsive;
+
+// Helper function to get color from hex
+Color getColorFromHex(String hexColor) {
+  if (hexColor.isEmpty) return SpiroDesignSystem.gray500;
+  hexColor = hexColor.toUpperCase().replaceAll("#", "");
+  if (hexColor.length == 6) {
+    hexColor = "FF$hexColor";
+  }
+  return Color(int.parse(hexColor, radix: 16));
+}
 
 String formatAmount(String amount) {
   if (amount.isEmpty) return "0.00";
@@ -39,7 +50,7 @@ text(String text, double textSize, TextType type) {
     textAlign: TextAlign.left,
     style: TextStyle(
       decoration: TextDecoration.none,
-      color: colorPrimaryDark,
+      color: SpiroDesignSystem.gray900,
       fontSize: textSize,
       fontFamily: textType,
     ),
@@ -65,7 +76,7 @@ expansionListTitle(Widget? icon, String title, String description, bool flip) {
           left: flip ? 14 : 0,
           right: !flip ? 24 : 0,
         ),
-        child: Divider(color: colorPrimary),
+        child: Divider(color: SpiroDesignSystem.primaryBlue600),
       ),
     ],
   );
@@ -80,7 +91,7 @@ navigatorHeader(bool state, Widget image, String title) {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: colorPrimaryDark2,
+            color: SpiroDesignSystem.gray800,
             borderRadius: BorderRadius.circular(5),
           ),
           margin: const EdgeInsets.all(8),
@@ -99,7 +110,7 @@ navigatorHeader(bool state, Widget image, String title) {
           14,
           TextType.Bold,
           1,
-          colorMilkWhite,
+          Colors.white,
           TextAlign.center,
         ),
       ],
@@ -107,7 +118,7 @@ navigatorHeader(bool state, Widget image, String title) {
   } else {
     return Container(
       decoration: BoxDecoration(
-        color: colorPrimaryDark2,
+        color: SpiroDesignSystem.gray800,
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.all(8),
@@ -130,7 +141,7 @@ navigatorFooter(
   if (state) {
     return Container(
       decoration: BoxDecoration(
-        color: colorPrimaryDark,
+        color: SpiroDesignSystem.gray900,
         borderRadius: BorderRadius.circular(8),
       ),
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -141,7 +152,7 @@ navigatorFooter(
         children: [
           Container(
             decoration: BoxDecoration(
-              color: colorPrimaryDark2,
+              color: SpiroDesignSystem.gray800,
               borderRadius: BorderRadius.circular(5),
             ),
             margin: const EdgeInsets.all(8),
@@ -161,14 +172,14 @@ navigatorFooter(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                textWithColor(title, 14, TextType.Bold, colorMilkWhite),
+                textWithColor(title, 14, TextType.Bold, Colors.white),
                 Padding(
                   padding: const EdgeInsets.only(top: 2),
                   child: textWithColor(
                     subtitle,
                     8,
                     TextType.Regular,
-                    colorMilkWhite,
+                    Colors.white,
                   ),
                 ),
               ],
@@ -180,7 +191,7 @@ navigatorFooter(
   } else {
     return Container(
       decoration: BoxDecoration(
-        color: colorPrimaryDark2,
+        color: SpiroDesignSystem.gray800,
         borderRadius: BorderRadius.circular(5),
       ),
       margin: const EdgeInsets.all(8),
@@ -205,7 +216,7 @@ navigatorListHeader(
 ) {
   return Container(
     decoration: BoxDecoration(
-      color: colorPrimaryDark,
+      color: SpiroDesignSystem.gray900,
       borderRadius: BorderRadius.circular(8),
     ),
     padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
@@ -222,7 +233,7 @@ navigatorListHeader(
             children: [
               Container(
                 decoration: BoxDecoration(
-                  color: colorPrimaryDark2,
+                  color: SpiroDesignSystem.gray800,
                   borderRadius: BorderRadius.circular(5),
                 ),
                 margin: const EdgeInsets.all(8),
@@ -238,14 +249,14 @@ navigatorListHeader(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    textWithColor(title, 14, TextType.Bold, colorMilkWhite),
+                    textWithColor(title, 14, TextType.Bold, Colors.white),
                     Padding(
                       padding: const EdgeInsets.only(top: 2),
                       child: textWithColor(
                         subtitle,
                         8,
                         TextType.Regular,
-                        colorMilkWhite,
+                        Colors.white,
                       ),
                     ),
                   ],
@@ -257,7 +268,7 @@ navigatorListHeader(
 
         Container(
           decoration: BoxDecoration(
-            color: colorPrimaryDark,
+            color: SpiroDesignSystem.gray900,
             borderRadius: BorderRadius.circular(14),
           ),
           margin: const EdgeInsets.all(8),
@@ -286,18 +297,26 @@ navigatorListTile(
       ListTile(
         onTap: clickAction,
         enableFeedback: true,
-        hoverColor: colorPrimary,
-        splashColor: colorPrimary,
+        hoverColor: SpiroDesignSystem.primaryBlue600,
+        splashColor: SpiroDesignSystem.primaryBlue600,
         leading: leadingIcon != null
-            ? Icon(leadingIcon, size: 22, color: colorPrimary)
+            ? Icon(
+                leadingIcon,
+                size: 22,
+                color: SpiroDesignSystem.primaryBlue600,
+              )
             : null,
         trailing: trailingIcon != null
-            ? Icon(trailingIcon, size: 22, color: colorPrimary)
+            ? Icon(
+                trailingIcon,
+                size: 22,
+                color: SpiroDesignSystem.primaryBlue600,
+              )
             : null,
         subtitle: Text(
           description,
           style: TextStyle(
-            color: colorPrimaryDark,
+            color: SpiroDesignSystem.gray900,
             fontFamily: getTextType(TextType.Regular),
             fontSize: 8,
           ),
@@ -305,7 +324,7 @@ navigatorListTile(
         title: Text(
           title,
           style: TextStyle(
-            color: colorPrimaryDark,
+            color: SpiroDesignSystem.gray900,
             fontFamily: getTextType(TextType.Bold),
             fontSize: 14,
           ),
@@ -314,7 +333,7 @@ navigatorListTile(
 
       Container(
         margin: const EdgeInsets.only(top: 4, bottom: 4),
-        color: colorPrimaryDark2,
+        color: SpiroDesignSystem.gray800,
         height: 4,
       ),
     ],
@@ -334,7 +353,7 @@ navigatorExpansionListTile(
     dense: true,
     child: Theme(
       data: Theme.of(context).copyWith(
-        unselectedWidgetColor: colorMilkWhite,
+        unselectedWidgetColor: Colors.white,
         dividerColor: Colors.transparent,
       ),
       child: ExpansionTile(
@@ -348,18 +367,26 @@ navigatorExpansionListTile(
               padding: const EdgeInsets.only(left: 16, right: 16),
               child: ListTile(
                 enableFeedback: true,
-                hoverColor: colorPrimary,
-                splashColor: colorPrimary,
+                hoverColor: SpiroDesignSystem.primaryBlue600,
+                splashColor: SpiroDesignSystem.primaryBlue600,
                 leading: leadingIcon != null
-                    ? Icon(leadingIcon, size: 22, color: colorPrimary)
+                    ? Icon(
+                        leadingIcon,
+                        size: 22,
+                        color: SpiroDesignSystem.primaryBlue600,
+                      )
                     : null,
                 trailing: trailingIcon != null
-                    ? Icon(trailingIcon, size: 22, color: colorPrimary)
+                    ? Icon(
+                        trailingIcon,
+                        size: 22,
+                        color: SpiroDesignSystem.primaryBlue600,
+                      )
                     : null,
                 subtitle: Text(
                   description,
                   style: TextStyle(
-                    color: colorGrey,
+                    color: SpiroDesignSystem.gray500,
                     fontFamily: getTextType(TextType.Regular),
                     fontSize: 8,
                   ),
@@ -367,7 +394,7 @@ navigatorExpansionListTile(
                 title: Text(
                   title,
                   style: TextStyle(
-                    color: colorMilkWhite,
+                    color: Colors.white,
                     fontFamily: getTextType(TextType.Bold),
                     fontSize: 14,
                   ),
@@ -376,7 +403,7 @@ navigatorExpansionListTile(
             ),
             Container(
               margin: const EdgeInsets.only(top: 4, bottom: 4),
-              color: colorPrimaryDark2,
+              color: SpiroDesignSystem.gray800,
               height: 4,
             ),
           ],
@@ -404,7 +431,7 @@ expansionPanelButton(
           crossAxisAlignment: CrossAxisAlignment.start,
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            textWithColor(label, 14, TextType.Bold, colorMilkWhite),
+            textWithColor(label, 14, TextType.Bold, Colors.white),
 
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -412,13 +439,13 @@ expansionPanelButton(
                 details,
                 10,
                 TextType.SemiBold,
-                colorMilkWhite,
+                Colors.white,
               ),
             ),
 
             Container(
               margin: const EdgeInsets.only(top: 4, bottom: 4),
-              color: colorPrimaryDark2,
+              color: SpiroDesignSystem.gray800,
               height: 4,
             ),
           ],
@@ -439,7 +466,7 @@ navigatorTitles(String title, String description) {
         textAlign: TextAlign.left,
         style: TextStyle(
           decoration: TextDecoration.none,
-          color: colorMilkWhite,
+          color: Colors.white,
           fontWeight: FontWeight.bold,
           fontSize: 14,
           fontFamily: getTextType(TextType.Regular),
@@ -452,7 +479,7 @@ navigatorTitles(String title, String description) {
         maxLines: 2,
         style: TextStyle(
           decoration: TextDecoration.none,
-          color: colorGrey,
+          color: SpiroDesignSystem.gray500,
           fontWeight: FontWeight.w200,
           fontFamily: getTextType(TextType.Regular),
           fontSize: 7,
@@ -467,8 +494,10 @@ raisedButton(String label, VoidCallback? onPressed) {
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(
       elevation: 3,
-      backgroundColor: colorPrimary,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      backgroundColor: SpiroDesignSystem.primaryBlue600,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(SpiroDesignSystem.radiusMd),
+      ),
       padding: const EdgeInsets.only(left: 16, top: 18, bottom: 18, right: 16),
     ),
 
@@ -477,7 +506,7 @@ raisedButton(String label, VoidCallback? onPressed) {
       textAlign: TextAlign.center,
       style: TextStyle(
         decoration: TextDecoration.none,
-        color: colorPrimaryDark,
+        color: Colors.white,
         fontSize: 16,
         fontFamily: getTextType(TextType.Bold),
       ),
@@ -490,7 +519,7 @@ roundedCornerButton(String label, VoidCallback? onPressed) {
     onPressed: onPressed,
     style: ElevatedButton.styleFrom(
       elevation: 3,
-      backgroundColor: colorPrimary,
+      backgroundColor: SpiroDesignSystem.primaryBlue600,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       padding: const EdgeInsets.only(left: 16, top: 24, bottom: 24, right: 16),
     ),
@@ -500,7 +529,7 @@ roundedCornerButton(String label, VoidCallback? onPressed) {
       textAlign: TextAlign.center,
       style: TextStyle(
         decoration: TextDecoration.none,
-        color: colorPrimaryDark,
+        color: Colors.white,
         fontSize: 16,
         fontFamily: getTextType(TextType.Bold),
       ),
@@ -513,7 +542,7 @@ buttonWithWidget(Widget widget, Color? color, VoidCallback? clickAction) {
     onPressed: clickAction,
     style: ElevatedButton.styleFrom(
       minimumSize: Size.zero,
-      backgroundColor: color ?? colorPrimary,
+      backgroundColor: color ?? SpiroDesignSystem.primaryBlue600,
       padding: EdgeInsets.zero,
     ),
 
@@ -534,7 +563,7 @@ textButton(String label, VoidCallback? onPressed) {
 
       style: TextStyle(
         decoration: TextDecoration.none,
-        color: colorPrimary,
+        color: SpiroDesignSystem.primaryBlue600,
         fontSize: 14,
         fontFamily: getTextType(TextType.Regular),
       ),
@@ -569,10 +598,10 @@ switchComponent(bool value, ValueChanged<bool> onChanged) {
   return Switch(
     value: value,
     onChanged: onChanged,
-    activeTrackColor: colorPrimary,
-    activeColor: colorReddish,
-    inactiveThumbColor: colorMilkWhite,
-    inactiveTrackColor: colorGrey2,
+    activeTrackColor: SpiroDesignSystem.primaryBlue600,
+    activeColor: SpiroDesignSystem.danger500,
+    inactiveThumbColor: Colors.white,
+    inactiveTrackColor: SpiroDesignSystem.gray400,
   );
 }
 
@@ -609,9 +638,13 @@ inputFieldPassword(
     decoration: InputDecoration(
       prefixIcon: Padding(
         padding: const EdgeInsets.only(left: 16, right: 16),
-        child: Icon(CupertinoIcons.lock_fill, size: 20, color: colorPrimary),
+        child: Icon(
+          CupertinoIcons.lock_fill,
+          size: 20,
+          color: SpiroDesignSystem.primaryBlue600,
+        ),
       ),
-      prefixIconColor: colorPrimaryDark,
+      prefixIconColor: SpiroDesignSystem.gray900,
       errorMaxLines: 5,
       helperMaxLines: 5,
       isDense: true,
@@ -625,12 +658,12 @@ inputFieldPassword(
                 ? Icon(
                     CupertinoIcons.eye_slash_fill,
                     size: 20,
-                    color: colorPrimary,
+                    color: SpiroDesignSystem.primaryBlue600,
                   )
                 : Icon(
                     CupertinoIcons.eye_solid,
                     size: 20,
-                    color: colorPrimaryDark,
+                    color: SpiroDesignSystem.gray900,
                   ),
           ),
         ),

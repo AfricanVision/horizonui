@@ -7,5 +7,4 @@ class Stations extends StatefulWidget {
 
   @override
   State<Stations> createState() => StationsState();
-
 }

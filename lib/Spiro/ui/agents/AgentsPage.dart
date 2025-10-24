@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:horizonui/Spiro/data/internal/application/Agents.dart';
-import 'package:horizonui/Spiro/ui/agents/agent_service.dart';
+import 'package:horizonui/Spiro/ui/agents/ConnectAgents.dart';
+import 'package:horizonui/Spiro/ui/agents/ViewAgents.dart';
 import 'package:intl/intl.dart';
 
 import '../../utils/DesignSystem.dart';
+import 'Agents.dart';
 
-class AgentsPage extends StatefulWidget {
-  const AgentsPage({super.key});
-
-  @override
-  State<AgentsPage> createState() => _AgentsPageState();
-}
-
-class _AgentsPageState extends State<AgentsPage> {
+class AgentsPageState extends State<AgentsPage> implements ConnectAgents {
   // Controllers for agent management
   final TextEditingController _firstnameController = TextEditingController();
   final TextEditingController _middlenameController = TextEditingController();
@@ -47,7 +42,7 @@ class _AgentsPageState extends State<AgentsPage> {
   List<Agent> _filteredAgents = [];
   final TextEditingController _searchController = TextEditingController();
 
-  final AgentService _agentService = AgentService();
+  final AgentViewModel _agentViewModel = AgentViewModel();
 
   @override
   void initState() {
@@ -104,7 +99,7 @@ class _AgentsPageState extends State<AgentsPage> {
     if (!mounted) return;
     setState(() => _isLoading = true);
     try {
-      final agents = await _agentService.getAgents();
+      final agents = await _agentViewModel.getAgents();
       if (!mounted) return;
       setState(() {
         _agents = agents;
@@ -328,7 +323,7 @@ class _AgentsPageState extends State<AgentsPage> {
             ],
           ),
           SizedBox(height: SpiroDesignSystem.space4),
-          // FIXED: Match incidents pattern with Row and Flexible
+          // Action buttons with responsive layout
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
@@ -1439,7 +1434,7 @@ class _AgentsPageState extends State<AgentsPage> {
         createdBy: 'admin',
       );
 
-      await _agentService.updateAgent(_currentEditingAgentId, updatedAgent);
+      await _agentViewModel.updateAgent(_currentEditingAgentId, updatedAgent);
       _showSuccessNotification("Agent details updated successfully!");
       await _loadAgents(); // Refresh the list
 
@@ -1481,7 +1476,7 @@ class _AgentsPageState extends State<AgentsPage> {
         createdBy: 'admin',
       );
 
-      await _agentService.addAgent(newAgent);
+      await _agentViewModel.addAgent(newAgent);
       _showSuccessNotification("Agent registered successfully!");
       await _loadAgents();
 

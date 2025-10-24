@@ -3,17 +3,17 @@ import 'dart:convert';
 import 'package:horizonui/Spiro/data/models/agent_model.dart';
 import 'package:horizonui/Spiro/data/models/alert_model.dart';
 import 'package:horizonui/Spiro/data/models/dashboard_data_model.dart';
-import 'package:horizonui/Spiro/ui/dashboard/ConnectDashboard.dart';
+import 'package:horizonui/Spiro/ui/dashboard/content/ConnectDashboardPageContent.dart';
 import 'package:http/http.dart' as http;
 
-import '../parent/ParentViewModel.dart';
+import '../../parent/ParentViewModel.dart';
 
-class ViewDashboard extends ParentViewModel {
+class ViewDashboardPageContent extends ParentViewModel {
   final String baseUrl = 'http://localhost:8080/api/dashboard';
 
-  ConnectDashboard connection;
+  ConnectDashboardPageContent connection;
 
-  ViewDashboard(super.context, this.connection);
+  ViewDashboardPageContent(super.context, this.connection);
 
   // API Methods
   Future<DashboardData> getDashboardData() async {

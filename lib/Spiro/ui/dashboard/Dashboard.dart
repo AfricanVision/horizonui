@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'DashboardState.dart';
+import 'DashboardPage.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
